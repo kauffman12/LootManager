@@ -1,0 +1,360 @@
+﻿using System;
+using log4net;
+using System.Linq;
+using Google.Apis.Sheets.v4;
+using Google.Apis.Sheets.v4.Data;
+using System.Collections.Generic;
+
+namespace LootManager
+{
+  static class DataManager
+  {
+    private static readonly ILog LOG = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+    // document IDs
+    private static string ROSTER_ID = "1J3Io-COBeCaAQ_jTiJS9kmdP8gqpFNr2_5-gfY_c5cg";
+    private static string LOOT_ID = "1fGMG78HVN8iLO43zoi8Ermt_nhfkqBHcQkdQLQ7BqnI";
+    private static string ITEMS_ID = "13_qG0syQGgK7-yT06r5MJ3HNrWmVh0872ou-FhXjjDM";
+
+    // ROI Loot.xlsx
+    // -- RainOfFearLoot      Date, Name, Event, Item, Slot, Rot, Alt Loot
+    // -- RainOfFearRaids     Event, Short Name, Tier, Display In List
+    // ROI Items Sheet.xlsx
+    // -- ROFItems            Slot, Item Name, Event, Special
+    // -- ROF Global Drops    Slot, Item Name, Tier, Special
+    private static string ACTIVE = "Active".ToLower();
+    private static string ALT_LOOT = "Alt Loot".ToLower();
+    private static string ARMOR_TYPES = "Armor Types".ToLower();
+    private static string CLASS = "Class".ToLower();
+    private static string DATE = "Date".ToLower();
+    private static string DISPLAY_IN_LIST = "Display In List".ToLower();
+    private static string EVENT = "Event".ToLower();
+    private static string FORUM_USERNAME = "Forum Username".ToLower();
+    private static string GLOBAL_LOOT_VIEWER = "Global Loot Viewer".ToLower();
+    private static string ITEM = "Item".ToLower();
+    private static string ITEM_NAME = "Item Name".ToLower();
+    private static string RANK = "Rank".ToLower();
+    private static string ROT = "Rot".ToLower();
+    private static string NAME = "Name".ToLower();
+    private static string SHORT_NAME = "Short Name".ToLower();
+    private static string SLOT = "Slot".ToLower();
+    private static string SPECIAL = "Special".ToLower();
+    private static string TIER = "Tier".ToLower();
+
+    // full datasets
+    private static List<Dictionary<string, string>> rosterList = new List<Dictionary<string, string>>();
+
+    // player loot counts
+    private static Dictionary<string, LootCounts> lootCountsByName = new Dictionary<string, LootCounts>();
+    // sorted play list
+    private static List<Player> activePlayerList = new List<Player>();
+    // sorted events list
+    private static List<RaidEvent> eventsList = new List<RaidEvent>();
+    // sorted item list
+    private static List<Item> itemsList = new List<Item>();
+    // sorted armor types list
+    private static List<string> armorTypesList = new List<string>();
+
+    // 90 days in seconds
+    private static int D90 = 90 * 24 * 8 * 60 * 60;
+
+    public static void load()
+    {
+      System.DateTime start = System.DateTime.Now;
+
+      // temp list
+      List<Dictionary<string, string>> temp = new List<Dictionary<string, string>>();
+
+      // read raid events and filter out ones that arent active
+      readData(temp, LOOT_ID, "RainOfFearRaids");
+      temp.Where(evt => "Yes".Equals(evt[DISPLAY_IN_LIST])).ToList().ForEach(evt =>
+      {
+        eventsList.Add(new RaidEvent { Name = evt[EVENT], ShortName = evt[SHORT_NAME], Tier = evt[TIER] });
+      });
+      eventsList.Sort((x, y) => x.ShortName.CompareTo(y.ShortName));
+
+      // read all loot data and remove everything older than 90 days
+      temp.Clear();
+      readData(temp, LOOT_ID, "RainOfFearLoot");
+      temp = temp.Where(evt =>
+      {
+        bool result = false;
+        try
+        {
+          System.DateTime eventDate = System.DateTime.Parse(evt[DATE]);
+          result = ((start - eventDate).TotalSeconds < D90);
+        }
+        catch (Exception e)
+        {
+          LOG.Error("Error parsing Date on RainOfFearLoot tab: " + evt[DATE], e);
+        }
+
+        return result;
+      }).ToList();
+
+      // player loot counts
+      populateLootCounts(temp, start);
+
+      // sorted items
+      temp.Clear();
+      readData(temp, ITEMS_ID, "ROFItems");
+      populateItemsList(temp);
+      temp.Clear();
+      readData(temp, ITEMS_ID, "ROF Global Drops");
+      populateItemsList(temp);
+
+      // full roster data and sorted players
+      readData(rosterList, ROSTER_ID, "Sheet1");
+      populatePlayerList();
+
+      // armor types
+      temp.Clear();
+      readData(temp, LOOT_ID, "Constants");
+      temp.Where(d => d.ContainsKey(ARMOR_TYPES)).ToList().ForEach(d => armorTypesList.Add(d[ARMOR_TYPES]));
+      armorTypesList.Sort();
+      armorTypesList.Insert(0, "Any Slot");
+
+      LOG.Debug("Finished Loading Data in " + (System.DateTime.Now - start).TotalSeconds + " seconds");
+    }
+
+    // -1 means no matches found at all
+    //  0 means perfect match
+    //  1 means partial match, try again
+    public static object findItem(string search)
+    {
+      object result = -1;
+
+      // search list
+      List<Item> found = itemsList.Where(item => item.Name.StartsWith(search)).ToList();
+      if (found.Count == 1 && found[0].Name.Equals(search))
+      {
+        result = found[0];
+      }
+      else
+      {
+        result = found.Count == 0 ? -1 : 1;
+      }
+
+      return result;
+    }
+
+    public static void updateLootCounts(RequestListItem requestListItem)
+    {
+      if (lootCountsByName.ContainsKey(requestListItem.Player))
+      {
+        LootCounts counts = lootCountsByName[requestListItem.Player];
+        requestListItem.Main = counts.Main;
+        requestListItem.Alt = counts.Alt;
+        requestListItem.Days = counts.LastMainDays;
+      }
+    }
+
+    public static List<Player> getActivePlayerList()
+    {
+      return activePlayerList;
+    }
+
+    public static List<Item> getItemsList()
+    {
+      return itemsList;
+    }
+
+    public static List<String> getArmorTypes()
+    {
+      return armorTypesList;
+    }
+
+    public static List<RaidEvent> getEventsList()
+    {
+      return eventsList;
+    }
+
+    public static void saveLoot(IList<Object> values)
+    {
+      appendSpreadsheet(LOOT_ID, "RainOfFearLoot", values);
+    }
+
+    public static void cleanup()
+    {
+      lootCountsByName.Clear();
+      activePlayerList.Clear();
+      armorTypesList.Clear();
+      eventsList.Clear();
+      rosterList.Clear();
+      itemsList.Clear();
+    }
+
+    private static void populatePlayerList()
+    {
+      foreach (Dictionary<string, string> row in rosterList)
+      {
+        if (row.ContainsKey(ACTIVE) && row[ACTIVE].ToLower().Equals("yes"))
+        {
+          activePlayerList.Add(new Player { Name = row[NAME], Class = row[CLASS], Rank = row[RANK] });
+        }
+      }
+
+      activePlayerList.Sort((x, y) => x.Name.CompareTo(y.Name));
+    }
+
+    private static void populateItemsList(List<Dictionary<string, string>> list)
+    {
+      foreach (Dictionary<string, string> item in list)
+      {
+        // handle global loot
+        string eventName = "Any";
+        if (item.ContainsKey(EVENT))
+        {
+          eventName = item[EVENT];
+
+          // make sure item is associated with current event
+          if (!eventsList.Any(evt => evt.ShortName.Equals(eventName)))
+          {
+            continue;
+          }
+        }
+
+        string tier = "";
+        if (item.ContainsKey(TIER))
+        {
+          tier = item[TIER];
+          if (!eventsList.Any(evt => evt.Tier.Equals(tier)))
+          {
+            continue;
+          }
+        }
+
+        // set Tier from global drops
+        Item it = new Item { Name = item[ITEM_NAME], Slot = item[SLOT], EventName = eventName, Tier = tier };
+
+
+        itemsList.Add(it);
+      }
+
+      itemsList.Sort((x, y) => x.Name.CompareTo(y.Name));
+    }
+
+    private static void populateLootCounts(List<Dictionary<string, string>> lootedList, DateTime start)
+    {
+      foreach (Dictionary<string, string> row in lootedList)
+      {
+        LootCounts counts;
+        string name;
+
+        if (row.ContainsKey(NAME) && ((name = row[NAME]) != null))
+        {
+          if (lootCountsByName.ContainsKey(name))
+          {
+            counts = lootCountsByName[name];
+          }
+          else
+          {
+            counts = new LootCounts { Main = 0, Alt = 0, LastMainDays = -1 };
+            lootCountsByName.Add(name, counts);
+          }
+
+          if (row.ContainsKey(ALT_LOOT) && "Yes".Equals(row[ALT_LOOT]))
+          {
+            counts.Alt++;
+          }
+          else if (!row.ContainsKey(ROT) || !"Yes".Equals(row[ROT]))
+          {
+            counts.Main++;
+            int days = Convert.ToInt32((start - System.DateTime.Parse(row[DATE])).TotalDays);
+            if (counts.LastMainDays == -1 || counts.LastMainDays > days)
+            {
+              counts.LastMainDays = days;
+            }
+          }
+        }
+      }
+    }
+
+    private static void readData(List<Dictionary<string, string>> results, string sheetId, string sheetName)
+    {
+      ValueRange response = readSpreadsheet(sheetId, sheetName);
+      IList<Object> headers = response.Values.Take(1).ElementAt(0);
+
+      // Iterate through each row
+      foreach (List<Object> row in response.Values.Skip(1))
+      {
+        Dictionary<string, string> record = new Dictionary<string, string>();
+        for (int i=0; i<headers.Count; i++)
+        {
+          string cellValue = readCell(row, i);
+          if (cellValue != null)
+          {
+            string header = headers[i].ToString().ToLower();
+            record.Add(header, cellValue);
+          }
+        }
+
+        results.Add(record);
+      }
+    }
+
+    private static void appendSpreadsheet(string docId, string sheetName, IList<Object> values)
+    {
+      ValueRange valueRange = new ValueRange();
+      valueRange.MajorDimension = "ROWS";
+      valueRange.Values = new List<IList<Object>> { values };
+
+      SheetsService sheetsSvc = new SheetsService();
+      SpreadsheetsResource.ValuesResource.AppendRequest request =
+        sheetsSvc.Spreadsheets.Values.Append(valueRange, docId, sheetName);
+
+      request.OauthToken = TokenManager.getAccessToken();
+      request.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.USERENTERED;
+      request.Execute();
+    }
+
+    private static ValueRange readSpreadsheet(string docId, string sheetName)
+    {
+      SheetsService sheetsSvc = new SheetsService();
+      SpreadsheetsResource.ValuesResource.GetRequest request =
+              sheetsSvc.Spreadsheets.Values.Get(docId, sheetName);
+      request.OauthToken = TokenManager.getAccessToken();
+      return request.Execute();
+    }
+
+    private static string readCell(List<Object> row, int cell)
+    {
+      string result = null;
+      if (row.Count > cell)
+      {
+        result = row[cell].ToString().Trim();
+      }
+
+      return result;
+    }
+  }
+
+  public class RaidEvent
+  {
+    public string Name { get; set; }
+    public string ShortName { get; set; }
+    public string Tier { get; set; }
+  }
+
+  public class LootCounts
+  {
+    public int Main { get; set; }
+    public int Alt { get; set; }
+    public int LastMainDays { get; set; }
+  }
+
+  public class Player
+  {
+    public string Name { get; set; }
+    public string Class { get; set; }
+    public string Rank { get; set; }
+  }
+
+  public class Item
+  {
+    public string Name { get; set; }
+    public string Slot { get; set; }
+    public string EventName { get; set; }
+    public string Tier { get; set; }
+  }
+}

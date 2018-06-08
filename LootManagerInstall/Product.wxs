@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"><?define LootManager_TargetDir=$(var.LootManager.TargetDir)?>
+	<Product Id="*" Name="LootManager" Language="1033" Version="1.0.0.0" Manufacturer="ROI" UpgradeCode="083aae5b-8389-4a57-a696-18886c6d75db">
+    <Package Platform="x64" InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <Feature Id="ProductFeature" Title="LootManager" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentRef Id="ApplicationShortcut" />
+      <ComponentRef Id="ApplicationShortcutDesktop" />
+    </Feature>
+
+    <Icon Id="roiIcon" SourceFile="$(var.LootManager.ProjectDir)\Icons\roi_icon.ico" />
+    <Property Id="APPPRODUCTICON" Value="roiIcon" />
+
+    <UI Id="WixUI_Advanced">
+      <UIRef Id="WixUI_InstallDir" />
+      <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+
+      <!-- Skip license dialog -->
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg" Order="2">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="2">1</Publish>
+    </UI>
+  </Product>
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="DesktopFolder" Name="Desktop" />
+      <Directory Id="ProgramFiles64Folder">
+        <Directory Id="INSTALLFOLDER" Name="LootManager" />
+      </Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="Loot Manager" />
+      </Directory>
+    </Directory>
+    <DirectoryRef Id="ApplicationProgramsFolder">
+      <Component Id="ApplicationShortcut" Guid="CF7778CB-0088-4C94-B3C8-15AF4BCD5EFC">
+        <Shortcut Id="ApplicationStartMenuShortcut" Name="Loot Manager" Icon="roiIcon" Description="The ROI Loot Manager" Target="[INSTALLFOLDER]\LootManager.exe" WorkingDirectory="INSTALLFOLDER" />
+        <RemoveFolder Id="CleanUpShortCut" Directory="ApplicationProgramsFolder" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\ROI\LootManager" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+    <DirectoryRef Id="DesktopFolder">
+      <Component Id="ApplicationShortcutDesktop" Guid="6948FF4A-81FB-4514-A5A8-C575A9D5AA05">
+        <Shortcut Id="ApplicationDesktopShortcut" Name="Loot Manager" Icon="roiIcon" Description="The ROI Loot Manager" Target="[INSTALLFOLDER]\LootManager.exe" WorkingDirectory="INSTALLFOLDER" />
+        <RemoveFolder Id="CleanUpDesktopShortCut" Directory="DesktopFolder" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\ROI\LootManager" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component Win64="yes" Id="lootmanager.log" Guid="0021af2f-ab48-4f75-bfc1-2a9b1dc1cd25">
+        <File Id="lootmanager.log" Name="lootmanager.log" Source="$(var.LootManager_TargetDir)lootmanager.log" />
+      </Component>
+      <Component Win64="yes" Id="properties.json" Guid="35c7ebf5-c523-46a4-bf40-7ca835908416">
+        <File Id="properties.json" Name="properties.json" Source="$(var.LootManager_TargetDir)properties.json" />
+      </Component>
+      <Component Win64="yes" Id="LootManager.exe" Guid="ff6d4f41-00fe-4741-bda3-1c53ca0a500f">
+        <File Id="LootManager.exe" Name="LootManager.exe" Source="$(var.LootManager_TargetDir)LootManager.exe" />
+      </Component>
+      <Component Win64="yes" Id="Google.Apis.dll" Guid="8815fcda-9600-41be-b1cf-1ff0414366de">
+        <File Id="Google.Apis.dll" Name="Google.Apis.dll" Source="$(var.LootManager_TargetDir)Google.Apis.dll" />
+      </Component>
+      <Component Win64="yes" Id="Google.Apis.Auth.dll" Guid="f0064700-b940-4330-b1e5-e9b944434198">
+        <File Id="Google.Apis.Auth.dll" Name="Google.Apis.Auth.dll" Source="$(var.LootManager_TargetDir)Google.Apis.Auth.dll" />
+      </Component>
+      <Component Win64="yes" Id="Google.Apis.Auth.PlatformServices.dll" Guid="62e6cf12-4184-46b2-8fa0-ee02b203d04d">
+        <File Id="Google.Apis.Auth.PlatformServices.dll" Name="Google.Apis.Auth.PlatformServices.dll" Source="$(var.LootManager_TargetDir)Google.Apis.Auth.PlatformServices.dll" />
+      </Component>
+      <Component Win64="yes" Id="Google.Apis.Core.dll" Guid="2f30e35b-99b5-4196-a29e-7c414598175c">
+        <File Id="Google.Apis.Core.dll" Name="Google.Apis.Core.dll" Source="$(var.LootManager_TargetDir)Google.Apis.Core.dll" />
+      </Component>
+      <Component Win64="yes" Id="Google.Apis.PlatformServices.dll" Guid="ddb7c468-214f-4c55-98a9-e255a9d96782">
+        <File Id="Google.Apis.PlatformServices.dll" Name="Google.Apis.PlatformServices.dll" Source="$(var.LootManager_TargetDir)Google.Apis.PlatformServices.dll" />
+      </Component>
+      <Component Win64="yes" Id="Google.Apis.Sheets.v4.dll" Guid="48ebe412-2bd9-4b90-ac8f-faf06e13d509">
+        <File Id="Google.Apis.Sheets.v4.dll" Name="Google.Apis.Sheets.v4.dll" Source="$(var.LootManager_TargetDir)Google.Apis.Sheets.v4.dll" />
+      </Component>
+      <Component Win64="yes" Id="log4net.dll" Guid="c5a0ae33-d283-4502-a038-e9da9722be6d">
+        <File Id="log4net.dll" Name="log4net.dll" Source="$(var.LootManager_TargetDir)log4net.dll" />
+      </Component>
+      <Component Win64="yes" Id="Newtonsoft.Json.dll" Guid="445d0c47-452b-4ef2-90d3-87bc54c837e7">
+        <File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="$(var.LootManager_TargetDir)Newtonsoft.Json.dll" />
+      </Component>
+      <Component Win64="yes" Id="LootManager.exe.config" Guid="e1969a57-039d-4589-a27a-dea618f0cbf2">
+        <File Id="LootManager.exe.config" Name="LootManager.exe.config" Source="$(var.LootManager_TargetDir)LootManager.exe.config" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

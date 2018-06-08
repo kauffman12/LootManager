@@ -1,0 +1,311 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LootManager"
+        xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="LootManager.MainWindow"
+        mc:Ignorable="d"
+        Title="Loot Manager (Not Connected)"
+        UseLayoutRounding="True"
+        TextOptions.TextFormattingMode="Display"
+        TextOptions.TextRenderingMode="ClearType"
+        Height="700" 
+        Width="1140" MinHeight="600" MinWidth="800"
+        Icon="/LootManager;component/Icons/roi_icon.ico" Closing="Application_Closing" Background="#FFF0F0F0" Closed="Window_Closed">
+  <Grid Margin="0,0,-8,0">
+    <Menu Margin="0,0,4,0" Height="20" VerticalAlignment="Top">
+      <MenuItem Header="File" Height="20" Width="40">
+        <MenuItem x:Name="connectMenuItem" Header="Connect" Height="20" Click="MenuItemConnect_Click">
+          <MenuItem.Icon>
+            <Image Source="/LootManager;component/Icons/ConnectToRemoteServer/ConnectToRemoteServer_16x.png"/>
+          </MenuItem.Icon>
+        </MenuItem>
+        <MenuItem x:Name="disconnectMenuItem" Header="Disconnect" Height="20" Click="MenuItemDisconnect_Click" IsEnabled="False">
+          <MenuItem.Icon>
+            <Image Source="/LootManager;component/Icons/Disconnect/Disconnect_16x.png"/>
+          </MenuItem.Icon>
+        </MenuItem>
+        <Separator Height="0"/>
+        <MenuItem Header="Select EQ Log File" Height="20" Click="MenuItemSelectEQLogFile_Click">
+          <MenuItem.Icon>
+            <Image Source="/LootManager;component/Icons/OpenFile/OpenFile_16x.png"/>
+          </MenuItem.Icon>
+        </MenuItem>
+        <Separator Height="0"/>
+        <MenuItem Header="Exit" Height="20" Click="MenuItemExit_Click">
+          <MenuItem.Icon>
+            <Image Source="/LootManager;component/Icons/Exit/Exit_16x.png"/>
+          </MenuItem.Icon>
+        </MenuItem>
+      </MenuItem>
+    </Menu>
+    <Grid Margin="-1,0,1,0" RenderTransformOrigin="0.464,0.492">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="173*" />
+        <ColumnDefinition Width="6" />
+        <ColumnDefinition Width="324*" />
+      </Grid.ColumnDefinitions>
+      <TabControl Margin="0,20,2,0" Background="#FFF0F0F0">
+        <TabControl.Resources>
+          <Style TargetType="TabItem">
+            <Setter Property="Template">
+              <Setter.Value>
+                <ControlTemplate TargetType="TabItem">
+                  <Grid Name="Panel">
+                    <ContentPresenter x:Name="ContentSite"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        ContentSource="Header"
+                                        Margin="10,2"/>
+                  </Grid>
+                  <ControlTemplate.Triggers>
+                    <Trigger Property="IsSelected" Value="True">
+                      <Setter TargetName="Panel" Property="Background" Value="#FFA7CEEE" />
+                    </Trigger>
+                    <Trigger Property="IsSelected" Value="False">
+                      <Setter TargetName="Panel" Property="Background" Value="#FFF0F0F0" />
+                    </Trigger>
+                  </ControlTemplate.Triggers>
+                </ControlTemplate>
+              </Setter.Value>
+            </Setter>
+          </Style>
+        </TabControl.Resources>
+        <TabItem Header="Award Loot">
+          <Grid Background="#FFE5E5E5">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="201*"/>
+                <RowDefinition Height="354*"/>
+                <RowDefinition Height="71*"/>
+              </Grid.RowDefinitions>
+              <DataGrid x:Name="watchListView" AutoGenerateColumns="False" CanUserAddRows="False" Margin="3,2" SelectionMode="Single" ColumnWidth="SizeToHeader" CanUserReorderColumns="False" HeadersVisibility="Column" Grid.Row="0" GridLinesVisibility="None" SelectionChanged="WatchList_SelectionChanged" TabIndex="1" IsTabStop="True">
+                <DataGrid.Resources>
+                  <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF569FD8"/>
+                  <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF569FD8" />
+                  <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="#FFFFFF" />
+                </DataGrid.Resources>
+                <DataGrid.Columns>
+                  <DataGridTextColumn Binding="{Binding Item}" ClipboardContentBinding="{x:Null}" Header="Taking Tells For" CanUserReorder="False" Width="165" />
+                  <DataGridTextColumn Binding="{Binding TellCount}" ClipboardContentBinding="{x:Null}" Header="# Tells" IsReadOnly="True" CanUserReorder="False" Width="55">
+                    <DataGridTextColumn.CellStyle>
+                      <Style TargetType="DataGridCell">
+                        <Style.Setters>
+                          <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                        </Style.Setters>
+                      </Style>
+                    </DataGridTextColumn.CellStyle>
+                  </DataGridTextColumn>
+                  <DataGridTextColumn Binding="{Binding Found}" ClipboardContentBinding="{x:Null}" Header="Found In DB" IsReadOnly="True" CanUserReorder="False" Width="165*"/>
+                </DataGrid.Columns>
+                <DataGrid.ContextMenu>
+                  <ContextMenu Opened="WatchListContextMenu_OnOpened" Focusable="False">
+                    <MenuItem x:Name="watchListDeleteMenuItem" Header="Delete" Click="WatchListDelete_Click" Focusable="False">
+                      <MenuItem.Icon>
+                        <Image Source="/LootManager;component/Icons/DeleteTableRow/DeleteTableRow_16x.png"/>
+                      </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem x:Name="watchListRenameMenuItem" Header="Rename" Click="WatchListRename_Click" Focusable="False">
+                      <MenuItem.Icon>
+                        <Image Source="/LootManager;component/Icons/Rename/Rename_16x.png"/>
+                      </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator Height="0"/>
+                    <MenuItem Header="Clear All" Click="WatchListReset_Click" Focusable="False">
+                      <MenuItem.Icon>
+                        <Image Source="/LootManager;component/Icons/ClearWindowContent/ClearWindowContent_16x.png" />
+                      </MenuItem.Icon>
+                    </MenuItem>
+                  </ContextMenu>
+                </DataGrid.ContextMenu>
+              </DataGrid>
+              <DataGrid x:Name="requestListView" AutoGenerateColumns="False" CanUserAddRows="False" Margin="3,1" ColumnWidth="SizeToHeader" CanUserReorderColumns="False" HeadersVisibility="Column" Grid.Row="1" GridLinesVisibility="None" ToolTip="Based on Last 90 Days" TabIndex="2" IsTabStop="True">
+                <DataGrid.Resources>
+                  <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF569FD8"/>
+                  <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF569FD8" />
+                  <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="#FFFFFF" />
+                </DataGrid.Resources>
+                <DataGrid.Columns>
+                  <DataGridTextColumn Binding="{Binding Player}" ClipboardContentBinding="{x:Null}" Header="Tell From" CanUserReorder="False" MinWidth="90" Width="120*" />
+                  <DataGridTextColumn Binding="{Binding Type}" ClipboardContentBinding="{x:Null}" Header="Loot Type" IsReadOnly="True" CanUserReorder="False" Width="70"/>
+                  <DataGridTextColumn Binding="{Binding Main}" ClipboardContentBinding="{x:Null}" Header="# Main" IsReadOnly="True" CanUserReorder="False" Width="50">
+                    <DataGridTextColumn.CellStyle>
+                      <Style TargetType="DataGridCell">
+                        <Style.Setters>
+                          <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                        </Style.Setters>
+                      </Style>
+                    </DataGridTextColumn.CellStyle>
+                  </DataGridTextColumn>
+                  <DataGridTextColumn Binding="{Binding Alt}" ClipboardContentBinding="{x:Null}" Header="# Alt" IsReadOnly="True" CanUserReorder="False" Width="40">
+                    <DataGridTextColumn.CellStyle>
+                      <Style TargetType="DataGridCell">
+                        <Style.Setters>
+                          <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                        </Style.Setters>
+                      </Style>
+                    </DataGridTextColumn.CellStyle>
+                  </DataGridTextColumn>
+                  <DataGridTextColumn Binding="{Binding Days}" ClipboardContentBinding="{x:Null}" Header="# Days Since Main" IsReadOnly="True" CanUserReorder="False" Width="130">
+                    <DataGridTextColumn.CellStyle>
+                      <Style TargetType="DataGridCell">
+                        <Style.Setters>
+                          <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                        </Style.Setters>
+                      </Style>
+                    </DataGridTextColumn.CellStyle>
+                  </DataGridTextColumn>
+                </DataGrid.Columns>
+                <DataGrid.ContextMenu>
+                  <ContextMenu Opened="RequestListContextMenu_OnOpened" Focusable="False">
+                    <MenuItem x:Name="requestListDeleteMenuItem" Header="Delete" Click="RequestListDelete_Click" Focusable="False">
+                      <MenuItem.Icon>
+                        <Image Source="/LootManager;component/Icons/DeleteTableRow/DeleteTableRow_16x.png"/>
+                      </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator Height="0"/>
+                    <MenuItem Header="Clear All" Click="RequestListReset_Click" Focusable="False">
+                      <MenuItem.Icon>
+                        <Image Source="/LootManager;component/Icons/ClearWindowContent/ClearWindowContent_16x.png" />
+                      </MenuItem.Icon>
+                    </MenuItem>
+                  </ContextMenu>
+                </DataGrid.ContextMenu>
+              </DataGrid>
+              <TextBox x:Name="genChatBox" Margin="3,1,110,2" MinWidth="0" TextWrapping="Wrap" FontStyle="Italic" MinHeight="40" Grid.Row="2" GotFocus="GenChatBox_GotFocus" LostFocus="GenChatBox_LostFocus" Text="Suggested Officer Chat for Selected Item" SelectionBrush="#FF01569C" Height="66" TabIndex="3" BorderBrush="#FF688CAF" />
+              <CheckBox x:Name="lootAllTypes" Content="All Loot Types" Margin="0,0,-5,4" Height="15" VerticalAlignment="Bottom"  Grid.Row="2" HorizontalAlignment="Right" Checked="CheckBoxLootAllTypes_Checked" Unchecked="CheckBoxLootAllTypes_Checked" ToolTip="Always Include Alt and Rot Requests Even With Mains Asking" Width="109" TabIndex="4"/>
+            </Grid>
+          </Grid>
+        </TabItem>
+        <TabItem Header="Add New Loot">
+          <Grid Background="#FFE5E5E5">
+            <Grid>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="166" />
+                <RowDefinition Height="303*"/>
+                <RowDefinition Height="152*"/>
+              </Grid.RowDefinitions>
+              <Grid Grid.Row="0">
+                <Grid Margin="3,-2,3,0" Width="381">
+                  <GroupBox Header="New Loot Info" Height="165" VerticalAlignment="Top" Background="#FFF0F0F0" BorderBrush="#FF688CAF" Margin="0,0,2,0" />
+                  <ComboBox x:Name="newLootPlayer" IsTextSearchEnabled="True" DisplayMemberPath="Name" SelectedValuePath="Name" Grid.Column="0" Margin="19,27,202,0" Height="21" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="False" LostFocus="NewLootPlayer_LostFocus" TextBoxBase.TextChanged="NewLoot_TextChanged"/>
+                  <ComboBox x:Name="newLootItem"  IsTextSearchEnabled="True" DisplayMemberPath="Name" SelectedValuePath="Name" Grid.Column="0" Margin="19,59,0,0" Height="21" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="False" LostFocus="NewLootItem_LostFocus" SelectionChanged="NewLootItem_SelectionChanged" HorizontalAlignment="Left" Width="160" TextBoxBase.TextChanged="NewLoot_TextChanged"/>
+                  <ComboBox x:Name="newLootSlot" IsTextSearchEnabled="True" Grid.Column="0" Margin="19,91,0,0" Height="21" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="True" LostFocus="NewLootSlot_LostFocus" SelectionChanged="NewLootSlot_SelectionChanged" HorizontalAlignment="Left" Width="160" IsReadOnly="True" SelectedIndex="0" TextBoxBase.TextChanged="NewLoot_TextChanged">
+                    <System:String>Any Slot</System:String>
+                  </ComboBox>
+                  <DatePicker x:Name="newLootDate" Grid.Column="0" Margin="199,56,0,0" Height="24" VerticalAlignment="Top" HorizontalAlignment="Left" Width="160"/>
+                  <ComboBox x:Name="newLootEvent" IsTextSearchEnabled="True" DisplayMemberPath="ShortName" SelectedValuePath="ShortName" Grid.Column="0" Margin="199,27,22,0" Height="21" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="False" LostFocus="NewLootEvent_LostFocus" SelectionChanged="NewLootEvent_SelectionChanged"/>
+                  <CheckBox x:Name="newLootAlt" Grid.Column="0" Content="Alt" Margin="199,97,0,0" VerticalAlignment="Top" Height="15" HorizontalAlignment="Left" Width="40" />
+                  <CheckBox x:Name="newLootRot" Grid.Column="0" Content="Rot" Margin="241,97,0,0" VerticalAlignment="Top" Height="15" HorizontalAlignment="Left" Width="40"/>
+                  <Button Content="Reset" Height="26" Margin="249,127,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="51" Click="NewLootReset_Click" Background="White"/>
+                  <Button x:Name="newLootSaveButton" Content="Save" Height="26" Margin="306,127,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="51" Background="White" IsEnabled="False" Click="NewLootSave_Clicked"/>
+                </Grid>
+              </Grid>
+              <DataGrid x:Name="lootedListView" AutoGenerateColumns="False" CanUserAddRows="False" Margin="3,0,3,2" ColumnWidth="SizeToHeader" HeadersVisibility="Column" Grid.Row="1" GridLinesVisibility="None" CanUserReorderColumns="False" SelectionChanged="LootedList_SelectionChanged" SelectionMode="Single" LoadingRow="LootedList_LoadingRow">
+                <DataGrid.Resources>
+                  <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF569FD8"/>
+                  <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF569FD8" />
+                  <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="#FFFFFF" />
+                </DataGrid.Resources>
+                <DataGrid.ContextMenu>
+                  <ContextMenu Opened="LootedListContextMenu_OnOpened" Focusable="False">
+                    <MenuItem x:Name="lootedListDeleteMenuItem" Header="Delete" Click="LootedListDelete_Click" Focusable="False">
+                      <MenuItem.Icon>
+                        <Image Source="/LootManager;component/Icons/DeleteTableRow/DeleteTableRow_16x.png"/>
+                      </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator Height="0"/>
+                    <MenuItem Header="Clear All" Click="LootedListReset_Click" Focusable="False">
+                      <MenuItem.Icon>
+                        <Image Source="/LootManager;component/Icons/ClearWindowContent/ClearWindowContent_16x.png" />
+                      </MenuItem.Icon>
+                    </MenuItem>
+                  </ContextMenu>
+                </DataGrid.ContextMenu>
+                <DataGrid.Columns>
+                  <DataGridTextColumn Binding="{Binding Player}" ClipboardContentBinding="{x:Null}" Header="Player" IsReadOnly="True" CanUserReorder="False" Width="120*"/>
+                  <DataGridTextColumn Binding="{Binding Item}" ClipboardContentBinding="{x:Null}" Header="Item Looted" IsReadOnly="True" CanUserReorder="False" Width="165*"/>
+                  <DataGridTextColumn Binding="{Binding Slot}" ClipboardContentBinding="{x:Null}" Header="Item Slot" IsReadOnly="True" CanUserReorder="False" Width="65"/>
+                  <DataGridTextColumn Binding="{Binding Found}" ClipboardContentBinding="{x:Null}" Header="Found In DB" IsReadOnly="True" CanUserReorder="False" Width="165*"/>
+                </DataGrid.Columns>
+              </DataGrid>
+              <TextBox x:Name="newLootAuditTextBox" Margin="3,3,3,2" Grid.Row="2" Text="Audit Log" IsReadOnly="True" TextWrapping="Wrap" FontFamily="Consolas" FontSize="10"/>
+            </Grid>
+          </Grid>
+        </TabItem>
+      </TabControl>
+      <GridSplitter Margin="0,41,2,0" HorizontalAlignment="Center" MinWidth="3" Foreground="White" Background="#994F4E4E" Grid.IsSharedSizeScope="True" Grid.Column="1" Width="4" MinHeight="1"/>
+      <TabControl Margin="0,20,2,0" Grid.Column="2" Background="#FFF0F0F0">
+        <TabControl.Resources>
+          <Style TargetType="TabItem">
+            <Setter Property="Template">
+              <Setter.Value>
+                <ControlTemplate TargetType="TabItem">
+                  <Grid Name="Panel">
+                    <ContentPresenter x:Name="ContentSite"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        ContentSource="Header"
+                                        Margin="10,2"/>
+                  </Grid>
+                  <ControlTemplate.Triggers>
+                    <Trigger Property="IsSelected" Value="True">
+                      <Setter TargetName="Panel" Property="Background" Value="#FFA7CEEE" />
+                    </Trigger>
+                    <Trigger Property="IsSelected" Value="False">
+                      <Setter TargetName="Panel" Property="Background" Value="#FFF0F0F0" />
+                    </Trigger>
+                  </ControlTemplate.Triggers>
+                </ControlTemplate>
+              </Setter.Value>
+            </Setter>
+          </Style>
+        </TabControl.Resources>
+        <TabItem Header="Chat Logs">
+          <Grid Background="#FFE5E5E5">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="27"/>
+              <RowDefinition Height="26"/>
+              <RowDefinition/>
+              <RowDefinition Height="25"/>
+              <RowDefinition/>
+              <RowDefinition Height="25"/>
+              <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Label Content="Guild Chat:" HorizontalAlignment="Left" Width="94" Grid.Row="1" Margin="0,4,0,0" Height="22" VerticalAlignment="Center"/>
+            <RichTextBox x:Name="guildChatBox" Grid.Row="2" Margin="2,3,6,3" IsReadOnly="True" VerticalScrollBarVisibility="Auto" FontSize="14" TabIndex="7">
+              <FlowDocument/>
+            </RichTextBox>
+            <Label Content="Officer Chat:" HorizontalAlignment="Left" Grid.Row="3" Width="94" Height="22" VerticalAlignment="Center" Margin="0,3,0,0"/>
+            <RichTextBox x:Name="officerChatBox" Grid.Row="4" Margin="2,3,6,3" IsReadOnly="True" VerticalScrollBarVisibility="Auto" FontSize="14" TabIndex="8">
+              <FlowDocument AllowDrop="False">
+                <Paragraph>
+                  <Run Text=""/>
+                </Paragraph>
+              </FlowDocument>
+            </RichTextBox>
+            <RichTextBox x:Name="tellsChatBox" Grid.Row="6" Margin="2,4,6,2" IsReadOnly="True" VerticalScrollBarVisibility="Auto" FontSize="14" TabIndex="9">
+              <FlowDocument AllowDrop="False">
+                <Paragraph>
+                  <Run Text=""/>
+                </Paragraph>
+              </FlowDocument>
+            </RichTextBox>
+            <Label Content="Tells Received:" HorizontalAlignment="Left" Grid.Row="5" Width="93" RenderTransformOrigin="0.223,-1.52" Height="22" Margin="0,3,0,0" VerticalAlignment="Center"/>
+            <Border x:Name="chatBorder" Background="#FFFFF7C0" Margin="0,0,4,0" Padding="0" BorderThickness="1" BorderBrush="#FF688CAF" />
+            <Label x:Name="logStatusText" Content="No Log File Selected" Margin="12,0,0,0" FontStyle="Italic" HorizontalAlignment="Left" Width="562" />
+            <CheckBox x:Name="lootChatOnly" Content="Loot Only" Margin="0,0,16,4" VerticalAlignment="Bottom" Height="16" HorizontalAlignment="Right" Width="78" Checked="CheckBoxLootOnly_Checked" Unchecked="CheckBoxLootOnly_Checked" ToolTip="Only Show Loot Related Chat Messages" TabIndex="6"/>
+            <CheckBox x:Name="autoScroll" Content="Auto-Scroll" VerticalAlignment="Bottom" Height="16" HorizontalAlignment="Right" Width="85" Checked="CheckBoxAutoscroll_Checked" Unchecked="CheckBoxAutoscroll_Checked" Margin="0,0,104,4" ToolTip="Automaticaly Scroll To Last Chat Message Received" IsChecked="True" TabIndex="5"/>
+          </Grid>
+        </TabItem>
+        <TabItem Header="Raids (TBD)">
+          <Grid Background="#FFE5E5E5"/>
+        </TabItem>
+      </TabControl>
+    </Grid>
+  </Grid>
+</Window>
