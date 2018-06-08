@@ -174,6 +174,11 @@ namespace LootManager
       appendSpreadsheet(LOOT_ID, "RainOfFearLoot", values);
     }
 
+    public static void saveItem(IList<Object> values)
+    {
+      appendSpreadsheet(ITEMS_ID, "ROFItems", values);
+    }
+
     public static void cleanup()
     {
       lootCountsByName.Clear();

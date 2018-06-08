@@ -503,9 +503,10 @@ namespace LootManager
         {
           Dispatcher.BeginInvoke((System.Action)(() =>
           {
-            bool enable = newLootSlot.SelectedIndex >= 0 && newLootEvent.Text.Length > 0 && !newLootEvent.Text.Equals("Select Event") &&
-            newLootItem.Text.Length > 0 && !newLootItem.Text.Equals("Select Item") && newLootPlayer.Text.Length > 0 && !newLootPlayer.Text.Equals("Select Player");
-            newLootSaveButton.IsEnabled = enable;
+            newLootSaveButton.IsEnabled = (newLootSlot.SelectedIndex >= 0 && newLootEvent.Text.Length > 0 && !newLootEvent.Text.Equals("Select Event") &&
+            newLootItem.Text.Length > 0 && !newLootItem.Text.Equals("Select Item") && newLootPlayer.Text.Length > 0 && !newLootPlayer.Text.Equals("Select Player"));
+
+            updateItemsDB.IsEnabled = (newLootItem.Text.Length > 0 && !newLootItem.Text.Equals("Select Item") && newLootItem.SelectedIndex == -1);
           }));
         });
       }
@@ -513,26 +514,23 @@ namespace LootManager
 
     private void NewLootItem_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-      if (newLootItem.SelectedIndex >= 0)
+      Item item;
+      if (newLootItem.SelectedIndex >= 0 && (item = newLootItem.SelectedItem as Item) != null)
       {
-        Item item = newLootItem.SelectedItem as Item;
-        if (item != null)
+        List<string> slots = newLootSlot.ItemsSource as List<string>;
+        if (slots != null)
         {
-          List<string> slots = newLootSlot.ItemsSource as List<string>;
-          if (slots != null)
+          int index = slots.IndexOf(item.Slot);
+          if (index >= 0)
           {
-            int index = slots.IndexOf(item.Slot);
-            if (index >= 0)
-            {
-              newLootSlot.SelectedIndex = index;
-            }
+            newLootSlot.SelectedIndex = index;
           }
+        }
 
-          List<RaidEvent> events = newLootEvent.ItemsSource as List<RaidEvent>;
-          if (!"Any".Equals(item.EventName))
-          {
-            newLootEvent.SelectedIndex = events.FindIndex(evt => evt.ShortName.Equals(item.EventName));
-          }
+        List<RaidEvent> events = newLootEvent.ItemsSource as List<RaidEvent>;
+        if (!"Any".Equals(item.EventName))
+        {
+          newLootEvent.SelectedIndex = events.FindIndex(evt => evt.ShortName.Equals(item.EventName));
         }
       }
       else
@@ -601,12 +599,23 @@ namespace LootManager
       string eventName = newLootEvent.Text;
       string date = newLootDate.Text;
       string rot = newLootRot.IsChecked.Value ? "Yes" : "";
-      string alt = newLootAlt.IsChecked.Value ? "Yes" : rot;
+      string alt = newLootAlt.IsChecked.Value ? "Yes" : "";
 
       if (player.Length > 0 && item.Length > 0 && slot.Length > 0 && eventName.Length > 0 && date.Length > 0 &&
         !player.Equals("Select Player") && !slot.Equals("Any Slot") && !eventName.Equals("Select Event"))
       {
+        string auditItemsDB = null;
         string auditLine = player + " | " + item + " | " + slot + " | " + eventName + " | " + date;
+
+        if ("Yes".Equals(alt))
+        {
+          auditLine += " | " + "Alt";
+        }
+
+        if ("Yes".Equals(rot))
+        {
+          auditLine += " | " + "Rot";
+        }
 
         try
         {
@@ -622,11 +631,29 @@ namespace LootManager
           }
 
           resetNewLoot(true, false);
+
+          // update ItemsDB if needed
+          if (updateItemsDB.IsEnabled && updateItemsDB.IsChecked.Value)
+          {
+            auditItemsDB = slot + " | " + item + " | " + eventName;
+
+            try
+            {
+              record = new List<object>() { slot, item, eventName };
+              DataManager.saveItem(record);
+              auditItemsDB = "S " + auditItemsDB;
+            }
+            catch(System.Exception ex)
+            {
+              LOG.Error("Could not save ItemsDB", ex);
+              auditItemsDB = "E " + auditItemsDB;
+            }
+          }
         }
         catch(System.Exception ex)
         {
           LOG.Error("Could not save Loot", ex);
-          auditLine = "E! " + auditLine;
+          auditLine = "E " + auditLine;
         }
 
         if (newLootAuditTextBox.Text.Contains("Audit Log"))
@@ -637,6 +664,11 @@ namespace LootManager
         else
         {
           newLootAuditTextBox.AppendText("\r" + auditLine);
+        }
+
+        if (auditItemsDB != null)
+        {
+          newLootAuditTextBox.AppendText("\r" + auditItemsDB);
         }
 
         newLootAuditTextBox.ScrollToEnd();
@@ -714,6 +746,14 @@ namespace LootManager
       if (newLootItem.Items.Count == 1 && newLootItem.SelectedIndex == -1)
       {
         newLootItem.SelectedIndex = 0;
+      }
+    }
+
+    private void NewLootAlt_Checked(object sender, RoutedEventArgs e)
+    {
+      if (!newLootRot.IsChecked.Value)
+      {
+        newLootRot.IsChecked = true;
       }
     }
   }

@@ -185,24 +185,26 @@
           <Grid Background="#FFE5E5E5">
             <Grid>
               <Grid.RowDefinitions>
-                <RowDefinition Height="166" />
-                <RowDefinition Height="303*"/>
-                <RowDefinition Height="152*"/>
+                <RowDefinition Height="191" />
+                <RowDefinition Height="312*"/>
+                <RowDefinition Height="119*"/>
               </Grid.RowDefinitions>
               <Grid Grid.Row="0">
-                <Grid Margin="3,-2,3,0" Width="381">
-                  <GroupBox Header="New Loot Info" Height="165" VerticalAlignment="Top" Background="#FFF0F0F0" BorderBrush="#FF688CAF" Margin="0,0,2,0" />
-                  <ComboBox x:Name="newLootPlayer" IsTextSearchEnabled="True" DisplayMemberPath="Name" SelectedValuePath="Name" Grid.Column="0" Margin="19,27,202,0" Height="21" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="False" LostFocus="NewLootPlayer_LostFocus" TextBoxBase.TextChanged="NewLoot_TextChanged"/>
-                  <ComboBox x:Name="newLootItem"  IsTextSearchEnabled="True" DisplayMemberPath="Name" SelectedValuePath="Name" Grid.Column="0" Margin="19,59,0,0" Height="21" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="False" LostFocus="NewLootItem_LostFocus" SelectionChanged="NewLootItem_SelectionChanged" HorizontalAlignment="Left" Width="160" TextBoxBase.TextChanged="NewLoot_TextChanged"/>
-                  <ComboBox x:Name="newLootSlot" IsTextSearchEnabled="True" Grid.Column="0" Margin="19,91,0,0" Height="21" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="True" LostFocus="NewLootSlot_LostFocus" SelectionChanged="NewLootSlot_SelectionChanged" HorizontalAlignment="Left" Width="160" IsReadOnly="True" SelectedIndex="0" TextBoxBase.TextChanged="NewLoot_TextChanged">
+                <Grid Margin="2,-2,0,0" HorizontalAlignment="Center" Width="383">
+                  <Border BorderBrush="#FF688CAF" BorderThickness="1" Margin="2,4,3,3" Background="#FFF0F0F0" MinWidth="378" Width="378"/>
+                  <GroupBox Header="New Loot Info" Background="White" BorderBrush="#FF688CAF" Margin="10,7,13,0" Height="133" VerticalAlignment="Top" HorizontalAlignment="Center" Width="361" MinWidth="360" />
+                  <ComboBox x:Name="newLootItem"  IsTextSearchEnabled="True" DisplayMemberPath="Name" SelectedValuePath="Name" Grid.Column="0" Margin="24,32,157,0" Height="24" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="False" LostFocus="NewLootItem_LostFocus" SelectionChanged="NewLootItem_SelectionChanged" Width="202" TextBoxBase.TextChanged="NewLoot_TextChanged" MinWidth="202" HorizontalAlignment="Center"/>
+                  <ComboBox x:Name="newLootSlot" IsTextSearchEnabled="True" Grid.Column="0" Margin="237,32,26,0" Height="24" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="True" LostFocus="NewLootSlot_LostFocus" SelectionChanged="NewLootSlot_SelectionChanged" Width="120" IsReadOnly="True" SelectedIndex="0" TextBoxBase.TextChanged="NewLoot_TextChanged" MinWidth="120" HorizontalAlignment="Center" RenderTransformOrigin="0.709,0.25">
                     <System:String>Any Slot</System:String>
                   </ComboBox>
-                  <DatePicker x:Name="newLootDate" Grid.Column="0" Margin="199,56,0,0" Height="24" VerticalAlignment="Top" HorizontalAlignment="Left" Width="160"/>
-                  <ComboBox x:Name="newLootEvent" IsTextSearchEnabled="True" DisplayMemberPath="ShortName" SelectedValuePath="ShortName" Grid.Column="0" Margin="199,27,22,0" Height="21" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="False" LostFocus="NewLootEvent_LostFocus" SelectionChanged="NewLootEvent_SelectionChanged"/>
-                  <CheckBox x:Name="newLootAlt" Grid.Column="0" Content="Alt" Margin="199,97,0,0" VerticalAlignment="Top" Height="15" HorizontalAlignment="Left" Width="40" />
-                  <CheckBox x:Name="newLootRot" Grid.Column="0" Content="Rot" Margin="241,97,0,0" VerticalAlignment="Top" Height="15" HorizontalAlignment="Left" Width="40"/>
-                  <Button Content="Reset" Height="26" Margin="249,127,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="51" Click="NewLootReset_Click" Background="White"/>
-                  <Button x:Name="newLootSaveButton" Content="Save" Height="26" Margin="306,127,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="51" Background="White" IsEnabled="False" Click="NewLootSave_Clicked"/>
+                  <DatePicker x:Name="newLootDate" Grid.Column="0" Margin="237,66,26,0" Height="24" VerticalAlignment="Top" MinWidth="120" HorizontalAlignment="Center" Width="120"/>
+                  <ComboBox x:Name="newLootEvent" IsTextSearchEnabled="True" DisplayMemberPath="ShortName" SelectedValuePath="ShortName" Grid.Column="0" Margin="24,66,157,0" Height="24" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="False" LostFocus="NewLootEvent_LostFocus" SelectionChanged="NewLootEvent_SelectionChanged" MinWidth="202" HorizontalAlignment="Center" Width="202"/>
+                  <CheckBox x:Name="newLootAlt" Grid.Column="0" Content="Alt" Margin="134,105,213,0" VerticalAlignment="Top" Height="15" HorizontalAlignment="Center" Checked="NewLootAlt_Checked" />
+                  <CheckBox x:Name="newLootRot" Grid.Column="0" Content="Rot" Margin="174,105,171,0" VerticalAlignment="Top" Height="15" HorizontalAlignment="Center"/>
+                  <CheckBox x:Name="updateItemsDB" Content="Update Items DB" Margin="237,105,26,0" VerticalAlignment="Top" RenderTransformOrigin="0.755,0.044" IsChecked="True" Height="20" HorizontalAlignment="Center" IsEnabled="False" Width="120"/>
+                  <Button Content="Reset" Height="26" Margin="250,152,82,0" VerticalAlignment="Top" Click="NewLootReset_Click" Background="White" HorizontalAlignment="Center" Width="50" MinWidth="50"/>
+                  <Button x:Name="newLootSaveButton" Content="Save" Height="26" Margin="311,152,21,0" VerticalAlignment="Top" Background="White" IsEnabled="False" Click="NewLootSave_Clicked" HorizontalAlignment="Center" Width="50" MinWidth="50"/>
+                  <ComboBox x:Name="newLootPlayer" IsTextSearchEnabled="True" DisplayMemberPath="Name" SelectedValuePath="Name" Grid.Column="0" Margin="24,100,259,0" Height="24" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="False" LostFocus="NewLootPlayer_LostFocus" TextBoxBase.TextChanged="NewLoot_TextChanged" Width="100" MinWidth="100" HorizontalAlignment="Center"/>
                 </Grid>
               </Grid>
               <DataGrid x:Name="lootedListView" AutoGenerateColumns="False" CanUserAddRows="False" Margin="3,0,3,2" ColumnWidth="SizeToHeader" HeadersVisibility="Column" Grid.Row="1" GridLinesVisibility="None" CanUserReorderColumns="False" SelectionChanged="LootedList_SelectionChanged" SelectionMode="Single" LoadingRow="LootedList_LoadingRow">
@@ -229,7 +231,7 @@
                 <DataGrid.Columns>
                   <DataGridTextColumn Binding="{Binding Player}" ClipboardContentBinding="{x:Null}" Header="Player" IsReadOnly="True" CanUserReorder="False" Width="120*"/>
                   <DataGridTextColumn Binding="{Binding Item}" ClipboardContentBinding="{x:Null}" Header="Item Looted" IsReadOnly="True" CanUserReorder="False" Width="165*"/>
-                  <DataGridTextColumn Binding="{Binding Slot}" ClipboardContentBinding="{x:Null}" Header="Item Slot" IsReadOnly="True" CanUserReorder="False" Width="65"/>
+                  <DataGridTextColumn Binding="{Binding Slot}" ClipboardContentBinding="{x:Null}" Header="Slot" IsReadOnly="True" CanUserReorder="False" Width="65"/>
                   <DataGridTextColumn Binding="{Binding Found}" ClipboardContentBinding="{x:Null}" Header="Found In DB" IsReadOnly="True" CanUserReorder="False" Width="165*"/>
                 </DataGrid.Columns>
               </DataGrid>
@@ -238,7 +240,7 @@
           </Grid>
         </TabItem>
       </TabControl>
-      <GridSplitter Margin="0,41,2,0" HorizontalAlignment="Center" MinWidth="3" Foreground="White" Background="#994F4E4E" Grid.IsSharedSizeScope="True" Grid.Column="1" Width="4" MinHeight="1"/>
+      <GridSplitter Margin="0,42,2,2" HorizontalAlignment="Center" MinWidth="3" Foreground="White" Background="#994F4E4E" Grid.IsSharedSizeScope="True" Grid.Column="1" Width="4" MinHeight="1"/>
       <TabControl Margin="0,20,2,0" Grid.Column="2" Background="#FFF0F0F0">
         <TabControl.Resources>
           <Style TargetType="TabItem">
