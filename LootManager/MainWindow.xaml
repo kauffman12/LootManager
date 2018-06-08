@@ -15,25 +15,25 @@
         Icon="/LootManager;component/Icons/roi_icon.ico" Closing="Application_Closing" Background="#FFF0F0F0" Closed="Window_Closed">
   <Grid Margin="0,0,-8,0">
     <Menu Margin="0,0,4,0" Height="20" VerticalAlignment="Top">
-      <MenuItem Header="File" Height="20" Width="40">
-        <MenuItem x:Name="connectMenuItem" Header="Connect" Height="20" Click="MenuItemConnect_Click">
+      <MenuItem Header="_File" Height="20" Width="40">
+        <MenuItem x:Name="connectMenuItem" Header="_Connect" Height="20" Click="MenuItemConnect_Click">
           <MenuItem.Icon>
             <Image Source="/LootManager;component/Icons/ConnectToRemoteServer/ConnectToRemoteServer_16x.png"/>
           </MenuItem.Icon>
         </MenuItem>
-        <MenuItem x:Name="disconnectMenuItem" Header="Disconnect" Height="20" Click="MenuItemDisconnect_Click" IsEnabled="False">
+        <MenuItem x:Name="disconnectMenuItem" Header="_Disconnect" Height="20" Click="MenuItemDisconnect_Click" IsEnabled="False">
           <MenuItem.Icon>
             <Image Source="/LootManager;component/Icons/Disconnect/Disconnect_16x.png"/>
           </MenuItem.Icon>
         </MenuItem>
         <Separator Height="0"/>
-        <MenuItem Header="Select EQ Log File" Height="20" Click="MenuItemSelectEQLogFile_Click">
+        <MenuItem Header="Select EQ _Log File" Height="20" Click="MenuItemSelectEQLogFile_Click">
           <MenuItem.Icon>
             <Image Source="/LootManager;component/Icons/OpenFile/OpenFile_16x.png"/>
           </MenuItem.Icon>
         </MenuItem>
         <Separator Height="0"/>
-        <MenuItem Header="Exit" Height="20" Click="MenuItemExit_Click">
+        <MenuItem Header="E_xit" Height="20" Click="MenuItemExit_Click" InputGestureText="Alt+F4">
           <MenuItem.Icon>
             <Image Source="/LootManager;component/Icons/Exit/Exit_16x.png"/>
           </MenuItem.Icon>
@@ -176,7 +176,7 @@
                   </ContextMenu>
                 </DataGrid.ContextMenu>
               </DataGrid>
-              <TextBox x:Name="genChatBox" Margin="3,1,110,2" MinWidth="0" TextWrapping="Wrap" FontStyle="Italic" MinHeight="40" Grid.Row="2" GotFocus="GenChatBox_GotFocus" LostFocus="GenChatBox_LostFocus" Text="Suggested Officer Chat for Selected Item" SelectionBrush="#FF01569C" Height="66" TabIndex="3" BorderBrush="#FF688CAF" />
+              <TextBox x:Name="genChatBox" Margin="3,1,110,2" MinWidth="0" TextWrapping="Wrap" FontStyle="Italic" MinHeight="40" Grid.Row="2" GotFocus="GenChatBox_GotFocus" LostFocus="GenChatBox_LostFocus" Text="Suggested Officer Chat for Selected Item" Height="66" TabIndex="3" BorderBrush="#FF688CAF" />
               <CheckBox x:Name="lootAllTypes" Content="All Loot Types" Margin="0,0,-5,4" Height="15" VerticalAlignment="Bottom"  Grid.Row="2" HorizontalAlignment="Right" Checked="CheckBoxLootAllTypes_Checked" Unchecked="CheckBoxLootAllTypes_Checked" ToolTip="Always Include Alt and Rot Requests Even With Mains Asking" Width="109" TabIndex="4"/>
             </Grid>
           </Grid>
