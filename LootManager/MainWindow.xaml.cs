@@ -105,14 +105,22 @@ namespace LootManager
       {
         // Authenticate to Google Drive
         TokenManager.authenticate();
+
+        Dispatcher.BeginInvoke((System.Action)(() =>
+        {
+          Title = Title.Replace("Connecting...", "Loading Database...");
+        }));
+
         DataManager.load();
 
         Dispatcher.BeginInvoke((System.Action)(() =>
         {
           connectMenuItem.IsEnabled = false;
           disconnectMenuItem.IsEnabled = refreshMenuItem.IsEnabled = true;
-          Title = Title.Replace("Connecting...", "Connected");
+          Title = Title.Replace("Loading Database...", "Connected");
           resetNewLoot(true, true);
+
+          checkLoadLootHistory();
         }));
       }).Start();
     }
@@ -192,6 +200,7 @@ namespace LootManager
     {
       requestListClearMenuItem.IsEnabled = requestListView.SelectedIndex > -1;
       requestListClearAllMenuItem.IsEnabled = requestListView.Items.Count > 0;
+      requestListViewLootMenuItem.IsEnabled = requestListView.Items.Count > 0;
     }
 
     private void RequestListReset_Click(object sender, RoutedEventArgs e)
@@ -202,6 +211,22 @@ namespace LootManager
         if (selected != null && requestListMap.ContainsKey(selected.Item))
         {
           requestListMap[selected.Item].Clear();
+        }
+      }
+    }
+
+    private void RequestListViewLoot_Click(object sender, RoutedEventArgs e)
+    {
+      ObservableCollection<RequestListItem> list = requestListView.ItemsSource as ObservableCollection<RequestListItem>;
+      if (list != null)
+      {
+        List<string> players = list.Select(item => item.Player).ToList();
+        string result = string.Join(" ", players);
+        if (result != null && result.Length > 3)
+        {
+          lootHistoryTab.Focus();
+          lootDetailsFilterBox.FontStyle = FontStyles.Normal;
+          lootDetailsFilterBox.Text = result;
         }
       }
     }
@@ -801,6 +826,115 @@ namespace LootManager
     {
       resetNewLoot(true, false);
     }
+
+    private void ChatLootTab_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+      if (secondTabControl.SelectedItem == lootHistoryTab)
+      {
+        // workaround to getting help text displayed
+        secondTabControl.Focus();
+      }
+
+      checkLoadLootHistory();
+    }
+
+    private void checkLoadLootHistory()
+    {
+      // load data firs time tab is used
+      if (secondTabControl.SelectedItem == lootHistoryTab && lootDetailsListView.ItemsSource == null)
+      {
+        List<LootDetailsListItem> data = DataManager.getLootDetails();
+        if (data.Count > 0)
+        {
+          loadHistoryData(data);
+        }
+      }
+    }
+
+    private void LootDetailsFilterTextBox_GotFocus(object sender, RoutedEventArgs e)
+    {
+      if (lootDetailsFilterBox.FontStyle == FontStyles.Italic)
+      {
+        lootDetailsFilterBox.Clear();
+        lootDetailsFilterBox.FontStyle = FontStyles.Normal;
+      }
+    }
+
+    private void LootDetailsFilterTextBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+      if (lootDetailsFilterBox.FontStyle == FontStyles.Normal && lootDetailsFilterBox.Text.Length == 0)
+      {
+        lootDetailsFilterBox.FontStyle = FontStyles.Italic;
+        lootDetailsFilterBox.Text = "Player1 Player2";
+
+        Dispatcher.BeginInvoke((System.Action)(() =>
+        {
+            loadHistoryData(DataManager.getLootDetails());
+        }
+        ));
+      }
+    }
+
+    private void LootDetailsFilterTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+      if (textUpdateTask == null || textUpdateTask.IsCompleted)
+      {
+        textUpdateTask = Task.Delay(System.TimeSpan.FromMilliseconds(200)).ContinueWith(task =>
+        {
+          Dispatcher.BeginInvoke((System.Action)(() =>
+          {
+            if (lootDetailsFilterBox.FontStyle != FontStyles.Italic)
+            {
+              List<LootDetailsListItem> data;
+              if (lootDetailsFilterBox.Text.Length <= 3)
+              {
+                data = DataManager.getLootDetails();
+              }
+              else
+              {
+                List<string> names;
+                if (lootDetailsFilterBox.Text.Contains(","))
+                {
+                  names = lootDetailsFilterBox.Text.Split(',').ToList();
+                }
+                else
+                {
+                  names = lootDetailsFilterBox.Text.Split(null).ToList();
+                }
+
+                data = DataManager.getLootDetails().Where(detail => names.Contains(detail.Player)).ToList();
+              }
+
+              loadHistoryData(data);
+            }
+          }
+          ));
+        });
+      }
+    }
+
+    private void LootDetailsFilterTextBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+      if (e.Key == System.Windows.Input.Key.Escape)
+      {
+        lootHistoryTab.Focus();
+      }
+    }
+
+    private void loadHistoryData(List<LootDetailsListItem> data)
+    {
+      if (lootDetailsListView.ItemsSource != data)
+      {
+        // check first load
+        if (historyStatusText.FontStyle == FontStyles.Italic)
+        {
+          historyStatusText.FontStyle = FontStyles.Normal;
+          historyBorder.Background = new SolidColorBrush(Color.FromRgb(179, 220, 217));
+          historyStatusText.Content = DataManager.getHistoryStatus();
+        }
+        lootDetailsListView.ItemsSource = data;
+      }
+    }
   }
 
   public class LootedListItem
@@ -827,5 +961,23 @@ namespace LootManager
     public string Item { get; set; }
     public int TellCount { get; set; }
     public string Found { get; set; }
+  }
+
+  public class LootDetailsListItem
+  {
+    public string Player { get; set; }
+    public int Total { get; set; }
+    public int Visibles { get; set; }
+    public int NonVisibles { get; set; }
+    public int Weapons { get; set; }
+    public int Other { get; set; }
+    public int Special { get; set; }
+    public int Main { get; set; }
+    public int Alt { get; set; }
+    public int Rot { get; set; }
+    public string LastAltDate { get; set; }
+    public string LastMainDate { get; set; }
+    public System.DateTime LastAltDateValue { get; set; }
+    public System.DateTime LastMainDateValue { get; set; }
   }
 }

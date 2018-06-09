@@ -43,6 +43,7 @@ namespace LootManager
 
     // full datasets
     private static List<Dictionary<string, string>> rosterList = new List<Dictionary<string, string>>();
+    private static List<Dictionary<string, string>> lootedList = new List<Dictionary<string, string>>();
 
     // player loot counts
     private static Dictionary<string, LootCounts> lootCountsByName = new Dictionary<string, LootCounts>();
@@ -54,6 +55,28 @@ namespace LootManager
     private static List<Item> itemsList = new List<Item>();
     // sorted armor types list
     private static List<string> armorTypesList = new List<string>();
+    // sorted list of loot details
+    private static List<LootDetailsListItem> lootDetailsList = new List<LootDetailsListItem>();
+    // map of visible armor
+    private static readonly Dictionary<string, bool> visibleArmorTypes = new Dictionary<string, bool>
+    {
+      { "Arms", true }, { "Chest", true }, { "Feet", true }, { "Hands", true }, { "Head", true },
+      { "Legs", true }, { "Wrist", true }
+    };
+    // map of non-visible armor
+    private static readonly Dictionary<string, bool> nonVisibleArmorTypes = new Dictionary<string, bool>
+    {
+      { "Back", true }, { "Charm", true }, { "Ear", true }, { "Face", true }, { "Neck", true },
+      { "Range", true }, { "Ring", true }, { "Shoulders", true }, { "Shield", true }, { "Waist", true }
+    };
+    // map of weapon types
+    private static readonly Dictionary<string, bool> weaponTypes = new Dictionary<string, bool>
+    {
+      { "1HB", true }, { "1HP", true }, { "1HS", true }, { "2HB", true }, { "2HP", true },
+      { "2HS", true }, { "H2H", true }, { "Bow", true }
+    };
+
+    private static string historyStatus = "";
 
     // 90 days in seconds
     private static int D90 = 90 * 24 * 8 * 60 * 60;
@@ -75,8 +98,8 @@ namespace LootManager
 
       // read all loot data and remove everything older than 90 days
       temp.Clear();
-      readData(temp, LOOT_ID, "RainOfFearLoot");
-      temp = temp.Where(evt =>
+      readData(lootedList, LOOT_ID, "RainOfFearLoot");
+      temp = lootedList.Where(evt =>
       {
         bool result = false;
         try
@@ -169,6 +192,21 @@ namespace LootManager
       return eventsList;
     }
 
+    public static List<LootDetailsListItem> getLootDetails()
+    {
+      if (lootDetailsList.Count == 0)
+      {
+        populateLootDetails();
+      }
+
+      return lootDetailsList;
+    }
+
+    public static string getHistoryStatus()
+    {
+      return historyStatus;
+    }
+
     public static void saveLoot(string date, string player, string eventName, string item, string slot, string rot, string alt)
     {
       appendSpreadsheet(LOOT_ID, "RainOfFearLoot", new List<object>() { date, player, eventName, item, slot, rot, alt });
@@ -240,9 +278,9 @@ namespace LootManager
       itemsList.Sort((x, y) => x.Name.CompareTo(y.Name));
     }
 
-    private static void populateLootCounts(List<Dictionary<string, string>> lootedList, DateTime start)
+    private static void populateLootCounts(List<Dictionary<string, string>> lootedSubList, DateTime start)
     {
-      foreach (Dictionary<string, string> row in lootedList)
+      foreach (Dictionary<string, string> row in lootedSubList)
       {
         LootCounts counts;
         string name;
@@ -274,6 +312,115 @@ namespace LootManager
           }
         }
       }
+    }
+
+    private static void populateLootDetails()
+    {
+      Dictionary<string, LootDetailsListItem> cache = new Dictionary<string, LootDetailsListItem>();
+      string oldestDate = null;
+      System.DateTime oldestDateValue = System.DateTime.Now;
+      int count = 0;
+
+      foreach (Dictionary<string, string> row in lootedList)
+      {
+        LootDetailsListItem lootDetails;
+        string name;
+
+        if (row.ContainsKey(NAME) && ((name = row[NAME]) != null))
+        {
+          count++;
+
+          if (cache.ContainsKey(name))
+          {
+            lootDetails = cache[name];
+          }
+          else
+          {
+            // Not handling special right now
+            lootDetails = new LootDetailsListItem { Player = name, Total = 0, Visibles = 0, NonVisibles = 0,
+              Weapons = 0, Special = 0, Main = 0, Alt = 0, Rot = 0, LastAltDate = "",  LastMainDate = "" };
+            cache.Add(name, lootDetails);
+          }
+
+          bool isAlt = false;
+          if (row.ContainsKey(ALT_LOOT) && "Yes".Equals(row[ALT_LOOT]))
+          {
+            isAlt = true;
+            lootDetails.Alt++;
+          }
+
+          bool isRot = false;
+          if (row.ContainsKey(ROT) && "Yes".Equals(row[ROT]))
+          {
+            isRot = true;
+            lootDetails.Rot++;
+          }
+
+          if (!isRot && !isAlt)
+          {
+            lootDetails.Main++;
+          }
+
+          string slot;
+          if (row.ContainsKey(SLOT) && ((slot = row[SLOT]) != null))
+          {
+            bool added = false;
+            if (visibleArmorTypes.ContainsKey(slot))
+            {
+              lootDetails.Visibles++;
+              added = true;
+            }
+            else if (nonVisibleArmorTypes.ContainsKey(slot))
+            {
+              lootDetails.NonVisibles++;
+              added = true;
+            }
+            else if (weaponTypes.ContainsKey(slot))
+            {
+              lootDetails.Weapons++;
+              added = true;
+            }
+            else
+            {
+              lootDetails.Other++;
+            }
+
+            if (added)
+            {
+              lootDetails.Total++;
+            }
+          }
+
+          System.DateTime theDate = System.DateTime.Parse(row[DATE]);
+          if (oldestDate == null || oldestDateValue.CompareTo(theDate) > 0)
+          {
+            oldestDateValue = theDate;
+            oldestDate = row[DATE];
+          }
+
+          if (isAlt)
+          {
+            if (lootDetails.LastAltDate.Length == 0 || lootDetails.LastAltDateValue.CompareTo(theDate) < 0)
+            {
+              lootDetails.LastAltDate = row[DATE];
+              lootDetails.LastAltDateValue = theDate;
+            }
+          }
+          else if (!isRot)
+          {
+            if (lootDetails.LastMainDate.Length == 0 || lootDetails.LastMainDateValue.CompareTo(theDate) < 0)
+            {
+              lootDetails.LastMainDate = row[DATE];
+              lootDetails.LastMainDateValue = theDate;
+            }
+          }
+        }
+      }
+
+      cache.Values.Cast<LootDetailsListItem>().ToList().ForEach(item => lootDetailsList.Add(item));
+      lootDetailsList.Sort((x, y) => x.Player.CompareTo(y.Player));
+
+      historyStatus = "Found " + count + " Entries In Database, First Entry Recorded: " + oldestDate;
     }
 
     private static void readData(List<Dictionary<string, string>> results, string sheetId, string sheetName)

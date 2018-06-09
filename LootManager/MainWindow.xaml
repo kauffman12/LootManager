@@ -105,7 +105,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                   </DataGridTemplateColumn>
                   <DataGridTextColumn Binding="{Binding Item}" ClipboardContentBinding="{x:Null}" Header="Taking Tells For" CanUserReorder="False" Width="165" />
-                  <DataGridTextColumn Binding="{Binding TellCount}" ClipboardContentBinding="{x:Null}" Header="# Tells" IsReadOnly="True" CanUserReorder="False" Width="55">
+                  <DataGridTextColumn Binding="{Binding TellCount}" ClipboardContentBinding="{x:Null}" Header="Tells" IsReadOnly="True" CanUserReorder="False" Width="55">
                     <DataGridTextColumn.CellStyle>
                       <Style TargetType="{x:Type DataGridCell}">
                         <Setter Property="TextBlock.TextAlignment" Value="Center" />
@@ -152,8 +152,14 @@
                     </DataGridTemplateColumn.CellTemplate>
                   </DataGridTemplateColumn>
                   <DataGridTextColumn Binding="{Binding Player}" ClipboardContentBinding="{x:Null}" Header="Tell From" CanUserReorder="False" MinWidth="90" Width="120*" />
-                  <DataGridTextColumn Binding="{Binding Type}" ClipboardContentBinding="{x:Null}" Header="Loot Type" IsReadOnly="True" CanUserReorder="False" Width="70"/>
-                  <DataGridTextColumn Binding="{Binding Main}" ClipboardContentBinding="{x:Null}" Header="# Main" IsReadOnly="True" CanUserReorder="False" Width="50">
+                  <DataGridTextColumn Binding="{Binding Type}" ClipboardContentBinding="{x:Null}" Header="Type" IsReadOnly="True" CanUserReorder="False" MinWidth="55" Width="55">
+                    <DataGridTextColumn.CellStyle>
+                      <Style TargetType="{x:Type DataGridCell}">
+                        <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                      </Style>
+                    </DataGridTextColumn.CellStyle>
+                  </DataGridTextColumn>
+                  <DataGridTextColumn Binding="{Binding Main}" ClipboardContentBinding="{x:Null}" Header="Main 90D" IsReadOnly="True" CanUserReorder="False" MinWidth="60" Width="60">
                     <DataGridTextColumn.CellStyle>
                       <Style TargetType="{x:Type DataGridCell}">
                         <Setter Property="TextBlock.TextAlignment" Value="Center" />
@@ -161,7 +167,7 @@
                       </Style>
                     </DataGridTextColumn.CellStyle>
                   </DataGridTextColumn>
-                  <DataGridTextColumn Binding="{Binding Alt}" ClipboardContentBinding="{x:Null}" Header="# Alt" IsReadOnly="True" CanUserReorder="False" Width="40">
+                  <DataGridTextColumn Binding="{Binding Alt}" ClipboardContentBinding="{x:Null}" Header="Alt 90D" IsReadOnly="True" CanUserReorder="False" MinWidth="53" Width="53">
                     <DataGridTextColumn.CellStyle>
                       <Style TargetType="{x:Type DataGridCell}">
                         <Setter Property="TextBlock.TextAlignment" Value="Center" />
@@ -169,7 +175,7 @@
                       </Style>
                     </DataGridTextColumn.CellStyle>
                   </DataGridTextColumn>
-                  <DataGridTextColumn Binding="{Binding Days}" ClipboardContentBinding="{x:Null}" Header="# Days Since Main" IsReadOnly="True" CanUserReorder="False" Width="130">
+                  <DataGridTextColumn Binding="{Binding Days}" ClipboardContentBinding="{x:Null}" Header="Days Since Main" IsReadOnly="True" CanUserReorder="False" Width="130">
                     <DataGridTextColumn.CellStyle>
                       <Style TargetType="{x:Type DataGridCell}">
                         <Setter Property="TextBlock.TextAlignment" Value="Center" />
@@ -189,6 +195,12 @@
                     <MenuItem x:Name="requestListClearAllMenuItem" Header="Clear All" Click="RequestListReset_Click" Focusable="False" IsEnabled="False">
                       <MenuItem.Icon>
                         <Image Source="/LootManager;component/Icons/ClearWindowContent/ClearWindowContent_16x.png" />
+                      </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator Height="0"/>
+                    <MenuItem x:Name="requestListViewLootMenuItem" Header="View Loot Details" Click="RequestListViewLoot_Click" Focusable="False" IsEnabled="False">
+                      <MenuItem.Icon>
+                        <Image Source="/LootManager;component/Icons/DataTable/DataTable_16x.png"/>
                       </MenuItem.Icon>
                     </MenuItem>
                   </ContextMenu>
@@ -219,24 +231,26 @@
                 <RowDefinition Height="119*"/>
               </Grid.RowDefinitions>
               <Grid Grid.Row="0">
-                <Grid Margin="2,-2,0,0" HorizontalAlignment="Center" Width="383">
-                  <Border BorderBrush="#FF688CAF" BorderThickness="1" Margin="2,4,3,3" Background="#FFF0F0F0" MinWidth="378" Width="378"/>
-                  <GroupBox Header="New Loot Info" Background="White" BorderBrush="#FF688CAF" Margin="10,7,13,0" Height="133" VerticalAlignment="Top" HorizontalAlignment="Center" Width="361" MinWidth="360" />
-                  <ComboBox x:Name="newLootItem"  IsTextSearchEnabled="True" DisplayMemberPath="Name" SelectedValuePath="Name" Grid.Column="0" Margin="24,32,157,0" Height="24" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="False" LostFocus="NewLootItem_LostFocus" SelectionChanged="NewLootItem_SelectionChanged" Width="202" TextBoxBase.TextChanged="NewLoot_TextChanged" MinWidth="202" HorizontalAlignment="Center"/>
-                  <ComboBox x:Name="newLootSlot" IsTextSearchEnabled="True" Grid.Column="0" Margin="237,32,26,0" Height="24" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="True" LostFocus="NewLootSlot_LostFocus" SelectionChanged="NewLootSlot_SelectionChanged" Width="120" IsReadOnly="True" SelectedIndex="0" TextBoxBase.TextChanged="NewLoot_TextChanged" MinWidth="120" HorizontalAlignment="Center" RenderTransformOrigin="0.709,0.25">
-                    <System:String>Any Slot</System:String>
-                  </ComboBox>
-                  <DatePicker x:Name="newLootDate" Grid.Column="0" Margin="237,66,26,0" Height="24" VerticalAlignment="Top" MinWidth="120" HorizontalAlignment="Center" Width="120"/>
-                  <ComboBox x:Name="newLootEvent" IsTextSearchEnabled="True" DisplayMemberPath="ShortName" SelectedValuePath="ShortName" Grid.Column="0" Margin="24,66,157,0" Height="24" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="False" LostFocus="NewLootEvent_LostFocus" SelectionChanged="NewLootEvent_SelectionChanged" MinWidth="202" HorizontalAlignment="Center" Width="202"/>
-                  <CheckBox x:Name="newLootAlt" Grid.Column="0" Content="Alt" Margin="134,105,213,0" VerticalAlignment="Top" Height="15" HorizontalAlignment="Center" Checked="NewLootAlt_Checked" />
-                  <CheckBox x:Name="newLootRot" Grid.Column="0" Content="Rot" Margin="174,105,171,0" VerticalAlignment="Top" Height="15" HorizontalAlignment="Center"/>
-                  <CheckBox x:Name="updateItemsDB" Content="Add to Items DB" Margin="237,105,26,0" VerticalAlignment="Top" RenderTransformOrigin="0.755,0.044" IsChecked="True" Height="20" HorizontalAlignment="Center" IsEnabled="False" Width="120" Foreground="#FFFF880F" Visibility="Hidden"/>
-                  <Button Content="Reset" Height="26" Margin="250,152,82,0" VerticalAlignment="Top" Click="NewLootReset_Click" Background="White" HorizontalAlignment="Center" Width="50" MinWidth="50"/>
-                  <Button x:Name="newLootSaveButton" Content="Save" Height="26" Margin="311,152,21,0" VerticalAlignment="Top" Background="White" IsEnabled="False" Click="NewLootSave_Clicked" HorizontalAlignment="Center" Width="50" MinWidth="50"/>
-                  <ComboBox x:Name="newLootPlayer" IsTextSearchEnabled="True" DisplayMemberPath="Name" SelectedValuePath="Name" Grid.Column="0" Margin="24,100,259,0" Height="24" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="False" LostFocus="NewLootPlayer_LostFocus" TextBoxBase.TextChanged="NewLoot_TextChanged" Width="100" MinWidth="100" HorizontalAlignment="Center"/>
+                <Grid Margin="2,-2,0,0" MinWidth="385">
+                  <Border BorderBrush="#FF688CAF" BorderThickness="1" Margin="1,4,4,3" Background="#FFF0F0F0"/>
+                  <Grid MaxWidth="440" Margin="0">
+                    <GroupBox Header="New Loot Info" Background="White" BorderBrush="#FF688CAF" Height="134" VerticalAlignment="Top" Margin="8,6,12,0" />
+                    <ComboBox x:Name="newLootItem"  IsTextSearchEnabled="True" DisplayMemberPath="Name" SelectedValuePath="Name" Grid.Column="0" Margin="24,32,159,0" Height="24" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="False" LostFocus="NewLootItem_LostFocus" SelectionChanged="NewLootItem_SelectionChanged" TextBoxBase.TextChanged="NewLoot_TextChanged" MinWidth="202"/>
+                    <ComboBox x:Name="newLootSlot" IsTextSearchEnabled="True" Grid.Column="0" Margin="0,32,27,0" Height="24" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="True" LostFocus="NewLootSlot_LostFocus" SelectionChanged="NewLootSlot_SelectionChanged" Width="120" IsReadOnly="True" SelectedIndex="0" TextBoxBase.TextChanged="NewLoot_TextChanged" MinWidth="120" HorizontalAlignment="Right" RenderTransformOrigin="0.709,0.25">
+                      <System:String>Any Slot</System:String>
+                    </ComboBox>
+                    <DatePicker x:Name="newLootDate" Grid.Column="0" Margin="0,66,27,0" Height="24" VerticalAlignment="Top" MinWidth="120" HorizontalAlignment="Right" Width="120"/>
+                    <ComboBox x:Name="newLootEvent" IsTextSearchEnabled="True" DisplayMemberPath="ShortName" SelectedValuePath="ShortName" Grid.Column="0" Margin="24,66,159,0" Height="24" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="False" LostFocus="NewLootEvent_LostFocus" SelectionChanged="NewLootEvent_SelectionChanged" MinWidth="202"/>
+                    <CheckBox x:Name="newLootAlt" Grid.Column="0" Content="Alt" Margin="145,105,205,0" VerticalAlignment="Top" Height="15" Checked="NewLootAlt_Checked" />
+                    <CheckBox x:Name="newLootRot" Grid.Column="0" Content="Rot" Margin="185,105,162,0" VerticalAlignment="Top" Height="15"/>
+                    <CheckBox x:Name="updateItemsDB" Content="Add to Items DB" Margin="237,105,26,0" VerticalAlignment="Top" RenderTransformOrigin="0.755,0.044" IsChecked="True" Height="20" HorizontalAlignment="Center" IsEnabled="False" Width="120" Foreground="#FFFF880F" Visibility="Hidden"/>
+                    <Button Content="Reset" Height="26" Margin="0,152,83,0" VerticalAlignment="Top" Click="NewLootReset_Click" Background="White" HorizontalAlignment="Right" Width="50" MinWidth="50"/>
+                    <Button x:Name="newLootSaveButton" Content="Save" Height="26" Margin="0,152,23,0" VerticalAlignment="Top" Background="White" IsEnabled="False" Click="NewLootSave_Clicked" HorizontalAlignment="Right" Width="50" MinWidth="50"/>
+                    <ComboBox x:Name="newLootPlayer" IsTextSearchEnabled="True" DisplayMemberPath="Name" SelectedValuePath="Name" Grid.Column="0" Margin="24,100,0,0" Height="24" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="False" LostFocus="NewLootPlayer_LostFocus" TextBoxBase.TextChanged="NewLoot_TextChanged" MinWidth="112" HorizontalAlignment="Left" Width="112"/>
+                  </Grid>
                 </Grid>
               </Grid>
-              <DataGrid x:Name="lootedListView" ContextMenuOpening="LootedListContextMenu_OnOpened" AutoGenerateColumns="False" CanUserAddRows="False" Margin="3,0,3,2" ColumnWidth="SizeToHeader" HeadersVisibility="Column" Grid.Row="1" GridLinesVisibility="None" CanUserReorderColumns="False" SelectionChanged="LootedList_SelectionChanged" SelectionMode="Single" LoadingRow="LootedList_LoadingRow" UnloadingRow="LootedList_UnloadingRow">
+              <DataGrid x:Name="lootedListView" ContextMenuOpening="LootedListContextMenu_OnOpened" AutoGenerateColumns="False" Margin="3,0,3,2" CanUserAddRows="False" ColumnWidth="SizeToHeader" HeadersVisibility="Column" Grid.Row="1" GridLinesVisibility="None" CanUserReorderColumns="False" SelectionChanged="LootedList_SelectionChanged" SelectionMode="Single" LoadingRow="LootedList_LoadingRow" UnloadingRow="LootedList_UnloadingRow">
                 <DataGrid.Resources>
                   <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF569FD8"/>
                   <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF646464" />
@@ -279,7 +293,7 @@
         </TabItem>
       </TabControl>
       <GridSplitter Margin="0,42,2,2" HorizontalAlignment="Center" MinWidth="3" Foreground="White" Background="#994F4E4E" Grid.IsSharedSizeScope="True" Grid.Column="1" Width="4" MinHeight="1"/>
-      <TabControl Margin="0,20,2,0" Grid.Column="2" Background="#FFF0F0F0">
+      <TabControl x:Name="secondTabControl" Margin="0,20,2,0" Grid.Column="2" Background="#FFF0F0F0" SelectionChanged="ChatLootTab_SelectionChanged">
         <TabControl.Resources>
           <Style TargetType="TabItem">
             <Setter Property="Template">
@@ -337,13 +351,98 @@
             </RichTextBox>
             <Label Content="Tells Received:" HorizontalAlignment="Left" Grid.Row="5" Width="93" RenderTransformOrigin="0.223,-1.52" Height="22" Margin="0,3,0,0" VerticalAlignment="Center"/>
             <Border x:Name="chatBorder" Background="Orange" Margin="0,0,4,0" Padding="0" BorderThickness="1" BorderBrush="#FF688CAF" />
-            <Label x:Name="logStatusText" Content="No Log File Selected" Margin="12,0,0,0" FontStyle="Italic" HorizontalAlignment="Left" Width="562" />
+            <Label x:Name="logStatusText" Content="No Log File Selected" Margin="12,1,157,25" FontStyle="Italic" Grid.RowSpan="2" />
             <CheckBox x:Name="lootChatOnly" Content="Show Only Loot Chat" Margin="0,0,19,4" VerticalAlignment="Bottom" Height="16" HorizontalAlignment="Right" Width="140" Checked="CheckBoxLootOnly_Checked" Unchecked="CheckBoxLootOnly_Checked" ToolTip="Only Show Loot Related Chat Messages" TabIndex="6"/>
             <CheckBox x:Name="autoScroll" Content="Auto-Scroll" VerticalAlignment="Bottom" Height="16" HorizontalAlignment="Right" Width="85" Checked="CheckBoxAutoscroll_Checked" Unchecked="CheckBoxAutoscroll_Checked" Margin="0,0,167,4" ToolTip="Automaticaly Scroll To Last Chat Message Received" IsChecked="True" TabIndex="5"/>
           </Grid>
         </TabItem>
-        <TabItem Header="Loot History">
-          <Grid Background="#FFE5E5E5"/>
+        <TabItem x:Name="lootHistoryTab" Header="Loot History">
+          <Grid Background="#FFE5E5E5">
+            <DataGrid x:Name="lootDetailsListView" AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="SizeToHeader" HeadersVisibility="Column" GridLinesVisibility="None" CanUserReorderColumns="False" SelectionMode="Single" Margin="2,60,6,2" >
+              <DataGrid.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF569FD8"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF646464" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="#FFFFFF" />
+              </DataGrid.Resources>
+              <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Player}" ClipboardContentBinding="{x:Null}" Header="Name" CanUserReorder="False" MinWidth="90" Width="100*" />
+                <DataGridTextColumn Binding="{Binding Total}" ClipboardContentBinding="{x:Null}" Header="Total" IsReadOnly="True" MaxWidth="90" Width="70*" CanUserReorder="False">
+                  <DataGridTextColumn.CellStyle>
+                    <Style TargetType="{x:Type DataGridCell}">
+                      <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                    </Style>
+                  </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding Visibles}" ClipboardContentBinding="{x:Null}" Header="Visibles" IsReadOnly="True" MaxWidth="70" Width="70" CanUserReorder="False">
+                  <DataGridTextColumn.CellStyle>
+                    <Style TargetType="{x:Type DataGridCell}">
+                      <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                    </Style>
+                  </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding NonVisibles}" ClipboardContentBinding="{x:Null}" Header="Non-Visibles" IsReadOnly="True" MaxWidth="80" Width="80" CanUserReorder="False">
+                  <DataGridTextColumn.CellStyle>
+                    <Style TargetType="{x:Type DataGridCell}">
+                      <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                    </Style>
+                  </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding Weapons}" ClipboardContentBinding="{x:Null}" Header="Weapons" IsReadOnly="True" MaxWidth="70" Width="70" CanUserReorder="False">
+                  <DataGridTextColumn.CellStyle>
+                    <Style TargetType="{x:Type DataGridCell}">
+                      <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                    </Style>
+                  </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding Other}" ClipboardContentBinding="{x:Null}" Header="Other" IsReadOnly="True" MaxWidth="45" Width="45" CanUserReorder="False">
+                  <DataGridTextColumn.CellStyle>
+                    <Style TargetType="{x:Type DataGridCell}">
+                      <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                    </Style>
+                  </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding Main}" ClipboardContentBinding="{x:Null}" Header="Main" IsReadOnly="True" MaxWidth="40" Width="40" CanUserReorder="False">
+                  <DataGridTextColumn.CellStyle>
+                    <Style TargetType="{x:Type DataGridCell}">
+                      <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                    </Style>
+                  </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding Alt}" ClipboardContentBinding="{x:Null}" Header="Alt" IsReadOnly="True"  MaxWidth="35" Width="35" CanUserReorder="False">
+                  <DataGridTextColumn.CellStyle>
+                    <Style TargetType="{x:Type DataGridCell}">
+                      <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                    </Style>
+                  </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding Rot}" ClipboardContentBinding="{x:Null}" Header="Rot" IsReadOnly="True" MaxWidth="35" Width="35" CanUserReorder="False">
+                  <DataGridTextColumn.CellStyle>
+                    <Style TargetType="{x:Type DataGridCell}">
+                      <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                    </Style>
+                  </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding LastAltDate}" SortMemberPath="LastAltDateValue" ClipboardContentBinding="{x:Null}" Header="Last Alt Date" CanUserReorder="False" MaxWidth="85" Width="85">
+                  <DataGridTextColumn.CellStyle>
+                    <Style TargetType="{x:Type DataGridCell}">
+                      <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                    </Style>
+                  </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding LastMainDate}" SortMemberPath="LastMainDateValue"  ClipboardContentBinding="{x:Null}" Header="Last Main Date" CanUserReorder="False" MinWidth="85" Width="85*" >
+                  <DataGridTextColumn.CellStyle>
+                    <Style TargetType="{x:Type DataGridCell}">
+                      <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                    </Style>
+                  </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
+              </DataGrid.Columns>
+            </DataGrid>
+            <Border x:Name="historyBorder" Background="Orange" Margin="0,0,4,0" Padding="0" BorderThickness="1" BorderBrush="#FF688CAF" Height="27" VerticalAlignment="Top"/>
+            <Label x:Name="historyStatusText" Content="No Loot History Available" Margin="12,1,163,-3" FontStyle="Italic" Height="624" VerticalAlignment="Top" />
+            <TextBox x:Name="lootDetailsFilterBox" Height="22" Margin="99,33,10,0" TextWrapping="Wrap" Text="Player1 Player2" VerticalAlignment="Top" VerticalContentAlignment="Center" FontStyle="Italic" TextChanged="LootDetailsFilterTextBox_TextChanged" GotFocus="LootDetailsFilterTextBox_GotFocus" LostFocus="LootDetailsFilterTextBox_LostFocus" KeyUp="LootDetailsFilterTextBox_KeyUp"/>
+            <Label Content="Filter By Players:" HorizontalAlignment="Left" Margin="0,31,0,0" VerticalAlignment="Top" Width="98"/>
+          </Grid>
         </TabItem>
       </TabControl>
     </Grid>
