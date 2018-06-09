@@ -169,14 +169,19 @@ namespace LootManager
       return eventsList;
     }
 
-    public static void saveLoot(IList<Object> values)
+    public static void saveLoot(string date, string player, string eventName, string item, string slot, string rot, string alt)
     {
-      appendSpreadsheet(LOOT_ID, "RainOfFearLoot", values);
+      appendSpreadsheet(LOOT_ID, "RainOfFearLoot", new List<object>() { date, player, eventName, item, slot, rot, alt });
     }
 
-    public static void saveItem(IList<Object> values)
+    public static void saveItem(string slot, string item, string eventName)
     {
-      appendSpreadsheet(ITEMS_ID, "ROFItems", values);
+      // Assume non-global item for now
+      appendSpreadsheet(ITEMS_ID, "ROFItems", new List<object>() { slot, item, eventName });
+      itemsList.Add(new Item { Name = item, Slot = slot, EventName = eventName, Tier = "" });
+
+      // resort
+      itemsList.Sort((x, y) => x.Name.CompareTo(y.Name));
     }
 
     public static void cleanup()
@@ -229,11 +234,7 @@ namespace LootManager
           }
         }
 
-        // set Tier from global drops
-        Item it = new Item { Name = item[ITEM_NAME], Slot = item[SLOT], EventName = eventName, Tier = tier };
-
-
-        itemsList.Add(it);
+        itemsList.Add(new Item { Name = item[ITEM_NAME], Slot = item[SLOT], EventName = eventName, Tier = tier });
       }
 
       itemsList.Sort((x, y) => x.Name.CompareTo(y.Name));

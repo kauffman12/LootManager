@@ -26,6 +26,11 @@
             <Image Source="/LootManager;component/Icons/Disconnect/Disconnect_16x.png"/>
           </MenuItem.Icon>
         </MenuItem>
+        <MenuItem x:Name="refreshMenuItem" Header="_Reload Database" Height="20" Click="MenuItemRefresh_Click" IsEnabled="False">
+          <MenuItem.Icon>
+            <Image Source="/LootManager;component/Icons/DownloadFile/DownloadFile_16x.png"/>
+          </MenuItem.Icon>
+        </MenuItem>
         <Separator Height="0"/>
         <MenuItem Header="Select EQ _Log File" Height="20" Click="MenuItemSelectEQLogFile_Click">
           <MenuItem.Icon>
@@ -100,7 +105,7 @@
                       </Style>
                     </DataGridTextColumn.CellStyle>
                   </DataGridTextColumn>
-                  <DataGridTextColumn Binding="{Binding Found}" ClipboardContentBinding="{x:Null}" Header="Found In DB" IsReadOnly="True" CanUserReorder="False" Width="165*"/>
+                  <DataGridTextColumn Binding="{Binding Found}" ClipboardContentBinding="{x:Null}" Header="Found In Database" IsReadOnly="True" CanUserReorder="False" Width="165*"/>
                 </DataGrid.Columns>
                 <DataGrid.ContextMenu>
                   <ContextMenu Opened="WatchListContextMenu_OnOpened" Focusable="False">
@@ -232,7 +237,7 @@
                   <DataGridTextColumn Binding="{Binding Player}" ClipboardContentBinding="{x:Null}" Header="Player" IsReadOnly="True" CanUserReorder="False" Width="120*"/>
                   <DataGridTextColumn Binding="{Binding Item}" ClipboardContentBinding="{x:Null}" Header="Item Looted" IsReadOnly="True" CanUserReorder="False" Width="165*"/>
                   <DataGridTextColumn Binding="{Binding Slot}" ClipboardContentBinding="{x:Null}" Header="Slot" IsReadOnly="True" CanUserReorder="False" Width="65"/>
-                  <DataGridTextColumn Binding="{Binding Found}" ClipboardContentBinding="{x:Null}" Header="Found In DB" IsReadOnly="True" CanUserReorder="False" Width="165*"/>
+                  <DataGridTextColumn Binding="{Binding Found}" ClipboardContentBinding="{x:Null}" Header="Found In Database" IsReadOnly="True" CanUserReorder="False" Width="165*"/>
                 </DataGrid.Columns>
               </DataGrid>
               <TextBox x:Name="newLootAuditTextBox" Margin="3,3,3,2" Grid.Row="2" Text="Audit Log" IsReadOnly="True" TextWrapping="Wrap" FontFamily="Consolas" FontSize="10"/>

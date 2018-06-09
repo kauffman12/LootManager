@@ -110,7 +110,7 @@ namespace LootManager
         Dispatcher.BeginInvoke((System.Action)(() =>
         {
           connectMenuItem.IsEnabled = false;
-          disconnectMenuItem.IsEnabled = true;
+          disconnectMenuItem.IsEnabled = refreshMenuItem.IsEnabled = true;
           Title = Title.Replace("Connecting...", "Connected");
           resetNewLoot(true, true);
         }));
@@ -122,9 +122,18 @@ namespace LootManager
       TokenManager.cleanup();
       DataManager.cleanup();
       connectMenuItem.IsEnabled = true;
-      disconnectMenuItem.IsEnabled = false;
+      disconnectMenuItem.IsEnabled = refreshMenuItem.IsEnabled = false;
       Title = Title.Replace("Connecting...", "Not Connected");
       Title = Title.Replace("Connected", "Not Connected");
+    }
+
+    private void MenuItemRefresh_Click(object sender, RoutedEventArgs e)
+    {
+      Title = Title.Replace("Connecting...", "Reloading Database...");
+      Title = Title.Replace("Connected", "Reloading Database...");
+      DataManager.cleanup();
+      DataManager.load();
+      Title = Title.Replace("Reloading Database...", "Connected");
     }
 
     private void MenuItemSelectEQLogFile_Click(object sender, RoutedEventArgs e)
@@ -619,8 +628,7 @@ namespace LootManager
 
         try
         {
-          IList<object> record = new List<object>() { date, player, eventName, item, slot, rot, alt };
-          DataManager.saveLoot(record);
+          DataManager.saveLoot(date, player, eventName, item, slot, rot, alt);
 
           auditLine = "S " + auditLine;
 
@@ -639,8 +647,7 @@ namespace LootManager
 
             try
             {
-              record = new List<object>() { slot, item, eventName };
-              DataManager.saveItem(record);
+              DataManager.saveItem(slot, item, eventName);
               auditItemsDB = "S " + auditItemsDB;
             }
             catch(System.Exception ex)
