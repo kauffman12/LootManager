@@ -12,7 +12,7 @@
       <ComponentRef Id="ApplicationShortcutDesktop" />
     </Feature>
 
-    <Icon Id="roiIcon" SourceFile="$(var.LootManager.ProjectDir)\Icons\roi_icon.ico" />
+    <Icon Id="roiIcon" SourceFile="$(var.LootManager.ProjectDir)\Icons\roi_icon2.ico" />
     <Property Id="APPPRODUCTICON" Value="roiIcon" />
 
     <UI Id="WixUI_Advanced">

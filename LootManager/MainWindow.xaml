@@ -12,7 +12,7 @@
         TextOptions.TextRenderingMode="ClearType"
         Height="700" 
         Width="1140" MinHeight="600" MinWidth="800"
-        Icon="/LootManager;component/Icons/roi_icon.ico" Closing="Application_Closing" Background="#FFF0F0F0" Closed="Window_Closed">
+        Icon="/LootManager;component/Icons/roi_icon2.ico" Closing="Application_Closing" Background="#FFF0F0F0" Closed="Window_Closed">
   <Grid Margin="0,0,-8,0">
     <Menu Margin="0,0,4,0" Height="20" VerticalAlignment="Top">
       <MenuItem Header="_File" Height="20" Width="40">
@@ -205,7 +205,7 @@
                     <Image Source="/LootManager;component/Icons/CopyToClipboard/CopyToClipboard_16x.png" Margin="0,0,0,2" Panel.ZIndex="1" Width="20" Height="20"/>
                   </StackPanel>
                 </Button>
-                <Label x:Name="copyNotice" Content="Copied" VerticalAlignment="Bottom" HorizontalAlignment="Right"  Margin="0,0,131,2" FontStyle="Italic" FontSize="11" Opacity="0" />
+                <Label x:Name="copyNotice" Content="Copied to Clipboard" VerticalAlignment="Bottom" HorizontalAlignment="Right"  Margin="0,0,131,2" FontStyle="Italic" FontSize="11" Opacity="0" Visibility="Hidden" Background="White" />
               </Grid>
             </Grid>
           </Grid>
@@ -230,7 +230,7 @@
                   <ComboBox x:Name="newLootEvent" IsTextSearchEnabled="True" DisplayMemberPath="ShortName" SelectedValuePath="ShortName" Grid.Column="0" Margin="24,66,157,0" Height="24" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="False" LostFocus="NewLootEvent_LostFocus" SelectionChanged="NewLootEvent_SelectionChanged" MinWidth="202" HorizontalAlignment="Center" Width="202"/>
                   <CheckBox x:Name="newLootAlt" Grid.Column="0" Content="Alt" Margin="134,105,213,0" VerticalAlignment="Top" Height="15" HorizontalAlignment="Center" Checked="NewLootAlt_Checked" />
                   <CheckBox x:Name="newLootRot" Grid.Column="0" Content="Rot" Margin="174,105,171,0" VerticalAlignment="Top" Height="15" HorizontalAlignment="Center"/>
-                  <CheckBox x:Name="updateItemsDB" Content="Update Items DB" Margin="237,105,26,0" VerticalAlignment="Top" RenderTransformOrigin="0.755,0.044" IsChecked="True" Height="20" HorizontalAlignment="Center" IsEnabled="False" Width="120"/>
+                  <CheckBox x:Name="updateItemsDB" Content="Add to Items DB" Margin="237,105,26,0" VerticalAlignment="Top" RenderTransformOrigin="0.755,0.044" IsChecked="True" Height="20" HorizontalAlignment="Center" IsEnabled="False" Width="120" Foreground="#FFFF880F" Visibility="Hidden"/>
                   <Button Content="Reset" Height="26" Margin="250,152,82,0" VerticalAlignment="Top" Click="NewLootReset_Click" Background="White" HorizontalAlignment="Center" Width="50" MinWidth="50"/>
                   <Button x:Name="newLootSaveButton" Content="Save" Height="26" Margin="311,152,21,0" VerticalAlignment="Top" Background="White" IsEnabled="False" Click="NewLootSave_Clicked" HorizontalAlignment="Center" Width="50" MinWidth="50"/>
                   <ComboBox x:Name="newLootPlayer" IsTextSearchEnabled="True" DisplayMemberPath="Name" SelectedValuePath="Name" Grid.Column="0" Margin="24,100,259,0" Height="24" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="False" LostFocus="NewLootPlayer_LostFocus" TextBoxBase.TextChanged="NewLoot_TextChanged" Width="100" MinWidth="100" HorizontalAlignment="Center"/>
@@ -336,7 +336,7 @@
               </FlowDocument>
             </RichTextBox>
             <Label Content="Tells Received:" HorizontalAlignment="Left" Grid.Row="5" Width="93" RenderTransformOrigin="0.223,-1.52" Height="22" Margin="0,3,0,0" VerticalAlignment="Center"/>
-            <Border x:Name="chatBorder" Background="#FFFFF7C0" Margin="0,0,4,0" Padding="0" BorderThickness="1" BorderBrush="#FF688CAF" />
+            <Border x:Name="chatBorder" Background="Orange" Margin="0,0,4,0" Padding="0" BorderThickness="1" BorderBrush="#FF688CAF" />
             <Label x:Name="logStatusText" Content="No Log File Selected" Margin="12,0,0,0" FontStyle="Italic" HorizontalAlignment="Left" Width="562" />
             <CheckBox x:Name="lootChatOnly" Content="Show Only Loot Chat" Margin="0,0,19,4" VerticalAlignment="Bottom" Height="16" HorizontalAlignment="Right" Width="140" Checked="CheckBoxLootOnly_Checked" Unchecked="CheckBoxLootOnly_Checked" ToolTip="Only Show Loot Related Chat Messages" TabIndex="6"/>
             <CheckBox x:Name="autoScroll" Content="Auto-Scroll" VerticalAlignment="Bottom" Height="16" HorizontalAlignment="Right" Width="85" Checked="CheckBoxAutoscroll_Checked" Unchecked="CheckBoxAutoscroll_Checked" Margin="0,0,167,4" ToolTip="Automaticaly Scroll To Last Chat Message Received" IsChecked="True" TabIndex="5"/>

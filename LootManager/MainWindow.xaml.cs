@@ -512,14 +512,16 @@ namespace LootManager
     {
       if (textUpdateTask == null || textUpdateTask.IsCompleted)
       {
-        textUpdateTask = Task.Delay(System.TimeSpan.FromMilliseconds(250)).ContinueWith(task =>
+        textUpdateTask = Task.Delay(System.TimeSpan.FromMilliseconds(100)).ContinueWith(task =>
         {
           Dispatcher.BeginInvoke((System.Action)(() =>
           {
-            newLootSaveButton.IsEnabled = (newLootSlot.SelectedIndex >= 0 && newLootEvent.Text.Length > 0 && !newLootEvent.Text.Equals("Select Event") &&
+            newLootSaveButton.IsEnabled = (newLootSlot.SelectedIndex > 0 && newLootEvent.Text.Length > 0 && !newLootEvent.Text.Equals("Select Event") &&
             newLootItem.Text.Length > 0 && !newLootItem.Text.Equals("Select Item") && newLootPlayer.Text.Length > 0 && !newLootPlayer.Text.Equals("Select Player"));
 
             updateItemsDB.IsEnabled = (newLootItem.Text.Length > 0 && !newLootItem.Text.Equals("Select Item") && newLootItem.SelectedIndex == -1);
+            updateItemsDB.Visibility = updateItemsDB.IsEnabled ? Visibility.Visible : Visibility.Hidden;
+            newLootItem.Foreground = updateItemsDB.IsEnabled ? new SolidColorBrush(Colors.DarkOrange) : new SolidColorBrush(Colors.Black);
           }));
         });
       }
@@ -688,11 +690,11 @@ namespace LootManager
 
     private void LootedList_LoadingRow(object sender, DataGridRowEventArgs e)
     {
-      LootedListItem theItem = e.Row.Item as LootedListItem;
-      if (theItem != null && theItem.Ready)
-      {
-        e.Row.Background = new SolidColorBrush(Colors.LightGreen);
-      }
+      //LootedListItem theItem = e.Row.Item as LootedListItem;
+      //if (theItem != null && theItem.Ready)
+      //{
+        //e.Row.Background = new SolidColorBrush(Colors.LightGreen);
+      //}
     }
 
     private void resetNewLoot(bool force, bool dateToo)
@@ -774,6 +776,7 @@ namespace LootManager
       {
         Clipboard.SetText(genChatBox.Text);
         copyNotice.Opacity = 1.0;
+        copyNotice.Visibility = Visibility.Visible;
         Task.Delay(System.TimeSpan.FromMilliseconds(150)).ContinueWith(task => hideCopyNotice());
       }
     }
@@ -786,6 +789,10 @@ namespace LootManager
         if (copyNotice.Opacity > 0)
         {
           Task.Delay(System.TimeSpan.FromMilliseconds(50)).ContinueWith(task => hideCopyNotice());
+        }
+        else
+        {
+          copyNotice.Visibility = Visibility.Hidden;
         }
       }));
     }

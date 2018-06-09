@@ -69,7 +69,8 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>roi_icon.ico</ApplicationIcon>
+    <ApplicationIcon>
+    </ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>LootManager.App</StartupObject>
@@ -160,13 +161,13 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Resource Include="Icons\CopyToClipboard\CopyToClipboard_16x.png" />
-    <Resource Include="roi_icon.ico" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <Resource Include="Icons\DownloadFile\DownloadFile_16x.png" />
     <Resource Include="Icons\Cancel\Cancel_16xMD.png" />
+    <Resource Include="Icons\roi_icon2.ico" />
     <Content Include="lootmanager.log">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -182,9 +183,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Icons\roi_icon.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\ConnectToRemoteServer\ConnectToRemoteServer_16x.png" />
