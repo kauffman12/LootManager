@@ -763,6 +763,28 @@ namespace LootManager
         newLootRot.IsChecked = true;
       }
     }
+
+    private void GenChatButton_Click(object sender, RoutedEventArgs e)
+    {
+      if (genChatBox.FontStyle != FontStyles.Italic)
+      {
+        Clipboard.SetText(genChatBox.Text);
+        copyNotice.Opacity = 1.0;
+        Task.Delay(System.TimeSpan.FromMilliseconds(150)).ContinueWith(task => hideCopyNotice());
+      }
+    }
+
+    private void hideCopyNotice()
+    {
+      Dispatcher.BeginInvoke((System.Action)(() =>
+      {
+        copyNotice.Opacity = copyNotice.Opacity - 0.10;
+        if (copyNotice.Opacity > 0)
+        {
+          Task.Delay(System.TimeSpan.FromMilliseconds(50)).ContinueWith(task => hideCopyNotice());
+        }
+      }));
+    }
   }
 
   public class LootedListItem

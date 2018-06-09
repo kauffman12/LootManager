@@ -98,10 +98,8 @@
                   <DataGridTextColumn Binding="{Binding Item}" ClipboardContentBinding="{x:Null}" Header="Taking Tells For" CanUserReorder="False" Width="165" />
                   <DataGridTextColumn Binding="{Binding TellCount}" ClipboardContentBinding="{x:Null}" Header="# Tells" IsReadOnly="True" CanUserReorder="False" Width="55">
                     <DataGridTextColumn.CellStyle>
-                      <Style TargetType="DataGridCell">
-                        <Style.Setters>
-                          <Setter Property="TextBlock.TextAlignment" Value="Center" />
-                        </Style.Setters>
+                      <Style TargetType="{x:Type DataGridCell}">
+                        <Setter Property="TextBlock.TextAlignment" Value="Center" />
                       </Style>
                     </DataGridTextColumn.CellStyle>
                   </DataGridTextColumn>
@@ -128,7 +126,7 @@
                   </ContextMenu>
                 </DataGrid.ContextMenu>
               </DataGrid>
-              <DataGrid x:Name="requestListView" AutoGenerateColumns="False" CanUserAddRows="False" Margin="3,1" ColumnWidth="SizeToHeader" CanUserReorderColumns="False" HeadersVisibility="Column" Grid.Row="1" GridLinesVisibility="None" ToolTip="Based on Last 90 Days" TabIndex="2" IsTabStop="True">
+              <DataGrid x:Name="requestListView" AutoGenerateColumns="False" CanUserAddRows="False" Margin="3,1" ColumnWidth="SizeToHeader" CanUserReorderColumns="False" HeadersVisibility="Column" Grid.Row="1" GridLinesVisibility="None" TabIndex="2" IsTabStop="True">
                 <DataGrid.Resources>
                   <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF569FD8"/>
                   <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF569FD8" />
@@ -139,28 +137,25 @@
                   <DataGridTextColumn Binding="{Binding Type}" ClipboardContentBinding="{x:Null}" Header="Loot Type" IsReadOnly="True" CanUserReorder="False" Width="70"/>
                   <DataGridTextColumn Binding="{Binding Main}" ClipboardContentBinding="{x:Null}" Header="# Main" IsReadOnly="True" CanUserReorder="False" Width="50">
                     <DataGridTextColumn.CellStyle>
-                      <Style TargetType="DataGridCell">
-                        <Style.Setters>
-                          <Setter Property="TextBlock.TextAlignment" Value="Center" />
-                        </Style.Setters>
+                      <Style TargetType="{x:Type DataGridCell}">
+                        <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                        <Setter Property="ToolTip" Value="Based on Last 90 Days"/>
                       </Style>
                     </DataGridTextColumn.CellStyle>
                   </DataGridTextColumn>
                   <DataGridTextColumn Binding="{Binding Alt}" ClipboardContentBinding="{x:Null}" Header="# Alt" IsReadOnly="True" CanUserReorder="False" Width="40">
                     <DataGridTextColumn.CellStyle>
-                      <Style TargetType="DataGridCell">
-                        <Style.Setters>
-                          <Setter Property="TextBlock.TextAlignment" Value="Center" />
-                        </Style.Setters>
+                      <Style TargetType="{x:Type DataGridCell}">
+                        <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                        <Setter Property="ToolTip" Value="Based on Last 90 Days"/>
                       </Style>
                     </DataGridTextColumn.CellStyle>
                   </DataGridTextColumn>
                   <DataGridTextColumn Binding="{Binding Days}" ClipboardContentBinding="{x:Null}" Header="# Days Since Main" IsReadOnly="True" CanUserReorder="False" Width="130">
                     <DataGridTextColumn.CellStyle>
-                      <Style TargetType="DataGridCell">
-                        <Style.Setters>
-                          <Setter Property="TextBlock.TextAlignment" Value="Center" />
-                        </Style.Setters>
+                      <Style TargetType="{x:Type DataGridCell}">
+                        <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                        <Setter Property="ToolTip" Value="Based on Last 90 Days"/>
                       </Style>
                     </DataGridTextColumn.CellStyle>
                   </DataGridTextColumn>
@@ -181,8 +176,19 @@
                   </ContextMenu>
                 </DataGrid.ContextMenu>
               </DataGrid>
-              <TextBox x:Name="genChatBox" Margin="3,1,110,2" MinWidth="0" TextWrapping="Wrap" FontStyle="Italic" MinHeight="40" Grid.Row="2" GotFocus="GenChatBox_GotFocus" LostFocus="GenChatBox_LostFocus" Text="Suggested Officer Chat for Selected Item" Height="66" TabIndex="3" BorderBrush="#FF688CAF" />
-              <CheckBox x:Name="lootAllTypes" Content="All Loot Types" Margin="0,0,-5,4" Height="15" VerticalAlignment="Bottom"  Grid.Row="2" HorizontalAlignment="Right" Checked="CheckBoxLootAllTypes_Checked" Unchecked="CheckBoxLootAllTypes_Checked" ToolTip="Always Include Alt and Rot Requests Even With Mains Asking" Width="109" TabIndex="4"/>
+              <Grid Grid.Row="2">
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBox x:Name="genChatBox" Margin="3,2,108,2" MinWidth="0" TextWrapping="Wrap" FontStyle="Italic" MinHeight="40" GotFocus="GenChatBox_GotFocus" LostFocus="GenChatBox_LostFocus" Text="Suggested Officer Chat for Selected Item" TabIndex="3" BorderBrush="#FF688CAF" />
+                <CheckBox x:Name="lootAllTypes" Content="All Loot Types" Margin="0,0,5,3" Height="15" VerticalAlignment="Bottom"  Checked="CheckBoxLootAllTypes_Checked" Unchecked="CheckBoxLootAllTypes_Checked" ToolTip="Always Include Alt and Rot Requests Even With Mains Asking" TabIndex="4" HorizontalAlignment="Right" Width="95"/>
+                <Button Margin="0,0,109,3" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="18" ToolTip="Copy To Clipbload" Click="GenChatButton_Click">
+                  <StackPanel Orientation="Horizontal" Height="22" Margin="0" HorizontalAlignment="Center">
+                    <Image Source="/LootManager;component/Icons/CopyToClipboard/CopyToClipboard_16x.png" Margin="0" Panel.ZIndex="1" Width="20" Height="20"/>
+                  </StackPanel>
+                </Button>
+                <Label x:Name="copyNotice" Content="Copied" VerticalAlignment="Bottom" HorizontalAlignment="Right"  Margin="0,0,131,2" FontStyle="Italic" FontSize="11" Opacity="0" />
+              </Grid>
             </Grid>
           </Grid>
         </TabItem>
