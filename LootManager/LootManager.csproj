@@ -166,6 +166,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <Resource Include="Icons\DownloadFile\DownloadFile_16x.png" />
+    <Resource Include="Icons\Cancel\Cancel_16xMD.png" />
     <Content Include="lootmanager.log">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -199,9 +200,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\ClearWindowContent\ClearWindowContent_16x.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Icons\DeleteTableRow\DeleteTableRow_16x.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\Rename\Rename_16x.png" />

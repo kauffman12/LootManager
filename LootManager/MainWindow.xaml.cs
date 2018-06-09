@@ -19,8 +19,8 @@ namespace LootManager
     private static readonly ILog LOG = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
     private ObservableCollection<LootedListItem> lootedListItems = new ObservableCollection<LootedListItem>();
-    private IDictionary<string, ObservableCollection<RequestListItem>> requestListMap = new Dictionary<string, ObservableCollection<RequestListItem>>();
     private ObservableCollection<WatchListItem> watchListItems = new ObservableCollection<WatchListItem>();
+    private IDictionary<string, ObservableCollection<RequestListItem>> requestListMap = new Dictionary<string, ObservableCollection<RequestListItem>>();
 
     private SimpleChatController officerChatController;
     private GuildChatController guildChatController;
@@ -154,17 +154,30 @@ namespace LootManager
       }
     }
 
+    private void ListClear_Click(object sender, RoutedEventArgs e)
+    {
+      if (sender == watchListClearMenuItem && watchListView.SelectedItem != null)
+      {
+        watchListItems.Remove(watchListView.SelectedItem as WatchListItem);
+      }
+      else if (sender == lootedListClearMenuItem && lootedListView.SelectedItem != null)
+      {
+        lootedListItems.Remove(lootedListView.SelectedItem as LootedListItem);
+      }
+      else if (sender == requestListClearMenuItem && requestListView.SelectedItems.Count > 0)
+      {
+        requestListView.SelectedItems.Cast<RequestListItem>().ToList().Where(selected => requestListMap.ContainsKey(selected.Item)).ToList()
+        .ForEach(selected => requestListMap[selected.Item].Remove(selected));
+      }
+    }
+
     //
     // Looted Item Table Actions
     //
     private void LootedListContextMenu_OnOpened(object sender, RoutedEventArgs e)
     {
-      lootedListDeleteMenuItem.IsEnabled = (lootedListView.SelectedIndex > -1);
-    }
-
-    private void LootedListDelete_Click(object sender, RoutedEventArgs e)
-    {
-      lootedListView.SelectedItems.Cast<LootedListItem>().ToList().ForEach(item => lootedListItems.Remove(item));
+      lootedListClearMenuItem.IsEnabled = lootedListView.SelectedIndex > -1;
+      lootedListClearAllMenuItem.IsEnabled = lootedListView.Items.Count > 0;
     }
 
     private void LootedListReset_Click(object sender, RoutedEventArgs e)
@@ -177,14 +190,8 @@ namespace LootManager
     //
     private void RequestListContextMenu_OnOpened(object sender, RoutedEventArgs e)
     {
-      requestListDeleteMenuItem.IsEnabled = (requestListView.SelectedIndex > -1);
-    }
-
-    private void RequestListDelete_Click(object sender, RoutedEventArgs e)
-    {
-      requestListView.SelectedItems.Cast<RequestListItem>().ToList()
-        .Where(selected => requestListMap.ContainsKey(selected.Item)).ToList()
-        .ForEach(selected => requestListMap[selected.Item].Remove(selected));
+      requestListClearMenuItem.IsEnabled = requestListView.SelectedIndex > -1;
+      requestListClearAllMenuItem.IsEnabled = requestListView.Items.Count > 0;
     }
 
     private void RequestListReset_Click(object sender, RoutedEventArgs e)
@@ -226,27 +233,20 @@ namespace LootManager
 
     private void WatchListContextMenu_OnOpened(object sender, RoutedEventArgs e)
     {
-      watchListDeleteMenuItem.IsEnabled = watchListRenameMenuItem.IsEnabled = (watchListView.SelectedIndex > -1);
+      watchListClearMenuItem.IsEnabled = watchListRenameMenuItem.IsEnabled = watchListView.SelectedIndex > -1;
+      watchListClearAllMenuItem.IsEnabled = watchListView.Items.Count > 0;
     }
 
-    private void WatchListDelete_Click(object sender, RoutedEventArgs e)
+    private void WatchList_UnloadingRow(object sender, DataGridRowEventArgs e)
     {
-      if (watchListView.SelectedIndex >= 0)
-      {
-        WatchListItem selected = watchListView.SelectedItem as WatchListItem;
-        if (selected != null)
-        {
-          watchListItems.Remove(selected);
-          requestListView.ItemsSource = null;
-        }
-      }
+      requestListView.ItemsSource = null;
     }
 
     private void WatchListRename_Click(object sender, RoutedEventArgs e)
     {
       if (watchListView.SelectedIndex >= 0)
       {
-        watchListView.CurrentCell = new DataGridCellInfo(watchListView.SelectedItem, watchListView.Columns[0]);
+        watchListView.CurrentCell = new DataGridCellInfo(watchListView.SelectedItem, watchListView.Columns[1]);
         watchListView.BeginEdit();
       }
     }
@@ -267,6 +267,10 @@ namespace LootManager
         {
           requestListView.ItemsSource = requestListMap[selected.Item];
         }
+      }
+      else
+      {
+        requestListView.ItemsSource = null;
       }
 
       generateOfficerChatMessage();
@@ -784,6 +788,11 @@ namespace LootManager
           Task.Delay(System.TimeSpan.FromMilliseconds(50)).ContinueWith(task => hideCopyNotice());
         }
       }));
+    }
+
+    private void LootedList_UnloadingRow(object sender, DataGridRowEventArgs e)
+    {
+      resetNewLoot(true, false);
     }
   }
 

@@ -84,17 +84,26 @@
             </Grid.RowDefinitions>
             <Grid>
               <Grid.RowDefinitions>
-                <RowDefinition Height="201*"/>
-                <RowDefinition Height="354*"/>
-                <RowDefinition Height="71*"/>
+                <RowDefinition Height="200"/>
+                <RowDefinition Height="176*"/>
+                <RowDefinition Height="35*"/>
               </Grid.RowDefinitions>
-              <DataGrid x:Name="watchListView" AutoGenerateColumns="False" CanUserAddRows="False" Margin="3,2" SelectionMode="Single" ColumnWidth="SizeToHeader" CanUserReorderColumns="False" HeadersVisibility="Column" Grid.Row="0" GridLinesVisibility="None" SelectionChanged="WatchList_SelectionChanged" TabIndex="1" IsTabStop="True">
+              <DataGrid x:Name="watchListView" ContextMenuOpening="WatchListContextMenu_OnOpened" AutoGenerateColumns="False" CanUserAddRows="False" Margin="3,2" SelectionMode="Single" ColumnWidth="SizeToHeader" CanUserReorderColumns="False" HeadersVisibility="Column" Grid.Row="0" GridLinesVisibility="None" SelectionChanged="WatchList_SelectionChanged" TabIndex="1" IsTabStop="True" UnloadingRow="WatchList_UnloadingRow">
                 <DataGrid.Resources>
                   <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF569FD8"/>
-                  <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF569FD8" />
+                  <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF646464" />
                   <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="#FFFFFF" />
                 </DataGrid.Resources>
                 <DataGrid.Columns>
+                  <DataGridTemplateColumn ClipboardContentBinding="{x:Null}" Header="" MaxWidth="20" MinWidth="20" IsReadOnly="True" CanUserReorder="False" Width="16">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate>
+                        <Button Command="Delete">
+                          <Image Source="/LootManager;component/Icons/Cancel/Cancel_16xMD.png"/>
+                        </Button>
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
                   <DataGridTextColumn Binding="{Binding Item}" ClipboardContentBinding="{x:Null}" Header="Taking Tells For" CanUserReorder="False" Width="165" />
                   <DataGridTextColumn Binding="{Binding TellCount}" ClipboardContentBinding="{x:Null}" Header="# Tells" IsReadOnly="True" CanUserReorder="False" Width="55">
                     <DataGridTextColumn.CellStyle>
@@ -106,19 +115,19 @@
                   <DataGridTextColumn Binding="{Binding Found}" ClipboardContentBinding="{x:Null}" Header="Found In Database" IsReadOnly="True" CanUserReorder="False" Width="165*"/>
                 </DataGrid.Columns>
                 <DataGrid.ContextMenu>
-                  <ContextMenu Opened="WatchListContextMenu_OnOpened" Focusable="False">
-                    <MenuItem x:Name="watchListDeleteMenuItem" Header="Delete" Click="WatchListDelete_Click" Focusable="False">
+                  <ContextMenu Focusable="False">
+                    <MenuItem x:Name="watchListClearMenuItem" InputGestureText="Del" Header="Clear Selected" Click="ListClear_Click" Focusable="False">
                       <MenuItem.Icon>
-                        <Image Source="/LootManager;component/Icons/DeleteTableRow/DeleteTableRow_16x.png"/>
+                        <Image Source="/LootManager;component/Icons/Cancel/Cancel_16xMD.png"/>
                       </MenuItem.Icon>
                     </MenuItem>
-                    <MenuItem x:Name="watchListRenameMenuItem" Header="Rename" Click="WatchListRename_Click" Focusable="False">
+                    <MenuItem x:Name="watchListRenameMenuItem" Header="Rename" Click="WatchListRename_Click" Focusable="False" IsEnabled="False">
                       <MenuItem.Icon>
                         <Image Source="/LootManager;component/Icons/Rename/Rename_16x.png"/>
                       </MenuItem.Icon>
                     </MenuItem>
                     <Separator Height="0"/>
-                    <MenuItem Header="Clear All" Click="WatchListReset_Click" Focusable="False">
+                    <MenuItem x:Name="watchListClearAllMenuItem" Header="Clear All" Click="WatchListReset_Click" Focusable="False">
                       <MenuItem.Icon>
                         <Image Source="/LootManager;component/Icons/ClearWindowContent/ClearWindowContent_16x.png" />
                       </MenuItem.Icon>
@@ -126,13 +135,22 @@
                   </ContextMenu>
                 </DataGrid.ContextMenu>
               </DataGrid>
-              <DataGrid x:Name="requestListView" AutoGenerateColumns="False" CanUserAddRows="False" Margin="3,1" ColumnWidth="SizeToHeader" CanUserReorderColumns="False" HeadersVisibility="Column" Grid.Row="1" GridLinesVisibility="None" TabIndex="2" IsTabStop="True">
+              <DataGrid x:Name="requestListView" ContextMenuOpening="RequestListContextMenu_OnOpened" AutoGenerateColumns="False" CanUserAddRows="False" Margin="3,1" ColumnWidth="SizeToHeader" CanUserReorderColumns="False" HeadersVisibility="Column" Grid.Row="1" GridLinesVisibility="None" TabIndex="2" IsTabStop="True">
                 <DataGrid.Resources>
                   <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF569FD8"/>
-                  <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF569FD8" />
+                  <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF646464" />
                   <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="#FFFFFF" />
                 </DataGrid.Resources>
                 <DataGrid.Columns>
+                  <DataGridTemplateColumn ClipboardContentBinding="{x:Null}" Header="" IsReadOnly="True" MaxWidth="20" MinWidth="20" CanUserReorder="False" Width="16">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate>
+                        <Button Command="Delete">
+                          <Image Source="/LootManager;component/Icons/Cancel/Cancel_16xMD.png"/>
+                        </Button>
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
                   <DataGridTextColumn Binding="{Binding Player}" ClipboardContentBinding="{x:Null}" Header="Tell From" CanUserReorder="False" MinWidth="90" Width="120*" />
                   <DataGridTextColumn Binding="{Binding Type}" ClipboardContentBinding="{x:Null}" Header="Loot Type" IsReadOnly="True" CanUserReorder="False" Width="70"/>
                   <DataGridTextColumn Binding="{Binding Main}" ClipboardContentBinding="{x:Null}" Header="# Main" IsReadOnly="True" CanUserReorder="False" Width="50">
@@ -161,14 +179,14 @@
                   </DataGridTextColumn>
                 </DataGrid.Columns>
                 <DataGrid.ContextMenu>
-                  <ContextMenu Opened="RequestListContextMenu_OnOpened" Focusable="False">
-                    <MenuItem x:Name="requestListDeleteMenuItem" Header="Delete" Click="RequestListDelete_Click" Focusable="False">
+                  <ContextMenu Focusable="False">
+                    <MenuItem x:Name="requestListClearMenuItem" InputGestureText="Del" Header="Clear Selected" Click="ListClear_Click" Focusable="False">
                       <MenuItem.Icon>
-                        <Image Source="/LootManager;component/Icons/DeleteTableRow/DeleteTableRow_16x.png"/>
+                        <Image Source="/LootManager;component/Icons/Cancel/Cancel_16xMD.png"/>
                       </MenuItem.Icon>
                     </MenuItem>
                     <Separator Height="0"/>
-                    <MenuItem Header="Clear All" Click="RequestListReset_Click" Focusable="False">
+                    <MenuItem x:Name="requestListClearAllMenuItem" Header="Clear All" Click="RequestListReset_Click" Focusable="False" IsEnabled="False">
                       <MenuItem.Icon>
                         <Image Source="/LootManager;component/Icons/ClearWindowContent/ClearWindowContent_16x.png" />
                       </MenuItem.Icon>
@@ -182,9 +200,9 @@
                 </Grid.RowDefinitions>
                 <TextBox x:Name="genChatBox" Margin="3,2,108,2" MinWidth="0" TextWrapping="Wrap" FontStyle="Italic" MinHeight="40" GotFocus="GenChatBox_GotFocus" LostFocus="GenChatBox_LostFocus" Text="Suggested Officer Chat for Selected Item" TabIndex="3" BorderBrush="#FF688CAF" />
                 <CheckBox x:Name="lootAllTypes" Content="All Loot Types" Margin="0,0,5,3" Height="15" VerticalAlignment="Bottom"  Checked="CheckBoxLootAllTypes_Checked" Unchecked="CheckBoxLootAllTypes_Checked" ToolTip="Always Include Alt and Rot Requests Even With Mains Asking" TabIndex="4" HorizontalAlignment="Right" Width="95"/>
-                <Button Margin="0,0,109,3" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="18" ToolTip="Copy To Clipbload" Click="GenChatButton_Click">
+                <Button Margin="0,0,109,3" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="18" ToolTip="Copy To Clipbload" Click="GenChatButton_Click">
                   <StackPanel Orientation="Horizontal" Height="22" Margin="0" HorizontalAlignment="Center">
-                    <Image Source="/LootManager;component/Icons/CopyToClipboard/CopyToClipboard_16x.png" Margin="0" Panel.ZIndex="1" Width="20" Height="20"/>
+                    <Image Source="/LootManager;component/Icons/CopyToClipboard/CopyToClipboard_16x.png" Margin="0,0,0,2" Panel.ZIndex="1" Width="20" Height="20"/>
                   </StackPanel>
                 </Button>
                 <Label x:Name="copyNotice" Content="Copied" VerticalAlignment="Bottom" HorizontalAlignment="Right"  Margin="0,0,131,2" FontStyle="Italic" FontSize="11" Opacity="0" />
@@ -218,21 +236,21 @@
                   <ComboBox x:Name="newLootPlayer" IsTextSearchEnabled="True" DisplayMemberPath="Name" SelectedValuePath="Name" Grid.Column="0" Margin="24,100,259,0" Height="24" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="False" LostFocus="NewLootPlayer_LostFocus" TextBoxBase.TextChanged="NewLoot_TextChanged" Width="100" MinWidth="100" HorizontalAlignment="Center"/>
                 </Grid>
               </Grid>
-              <DataGrid x:Name="lootedListView" AutoGenerateColumns="False" CanUserAddRows="False" Margin="3,0,3,2" ColumnWidth="SizeToHeader" HeadersVisibility="Column" Grid.Row="1" GridLinesVisibility="None" CanUserReorderColumns="False" SelectionChanged="LootedList_SelectionChanged" SelectionMode="Single" LoadingRow="LootedList_LoadingRow">
+              <DataGrid x:Name="lootedListView" ContextMenuOpening="LootedListContextMenu_OnOpened" AutoGenerateColumns="False" CanUserAddRows="False" Margin="3,0,3,2" ColumnWidth="SizeToHeader" HeadersVisibility="Column" Grid.Row="1" GridLinesVisibility="None" CanUserReorderColumns="False" SelectionChanged="LootedList_SelectionChanged" SelectionMode="Single" LoadingRow="LootedList_LoadingRow" UnloadingRow="LootedList_UnloadingRow">
                 <DataGrid.Resources>
                   <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF569FD8"/>
-                  <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF569FD8" />
+                  <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF646464" />
                   <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="#FFFFFF" />
                 </DataGrid.Resources>
                 <DataGrid.ContextMenu>
-                  <ContextMenu Opened="LootedListContextMenu_OnOpened" Focusable="False">
-                    <MenuItem x:Name="lootedListDeleteMenuItem" Header="Delete" Click="LootedListDelete_Click" Focusable="False">
+                  <ContextMenu Focusable="False">
+                    <MenuItem x:Name="lootedListClearMenuItem" InputGestureText="Del" Header="Clear Selected" Click="ListClear_Click" Focusable="False">
                       <MenuItem.Icon>
-                        <Image Source="/LootManager;component/Icons/DeleteTableRow/DeleteTableRow_16x.png"/>
+                        <Image Source="/LootManager;component/Icons/Cancel/Cancel_16xMD.png"/>
                       </MenuItem.Icon>
                     </MenuItem>
                     <Separator Height="0"/>
-                    <MenuItem Header="Clear All" Click="LootedListReset_Click" Focusable="False">
+                    <MenuItem x:Name="lootedListClearAllMenuItem" Header="Clear All" Click="LootedListReset_Click" Focusable="False">
                       <MenuItem.Icon>
                         <Image Source="/LootManager;component/Icons/ClearWindowContent/ClearWindowContent_16x.png" />
                       </MenuItem.Icon>
@@ -240,9 +258,18 @@
                   </ContextMenu>
                 </DataGrid.ContextMenu>
                 <DataGrid.Columns>
+                  <DataGridTemplateColumn ClipboardContentBinding="{x:Null}" Header="" IsReadOnly="True" MaxWidth="20" MinWidth="20" CanUserReorder="False" Width="16">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate>
+                        <Button Command="Delete">
+                          <Image Source="/LootManager;component/Icons/Cancel/Cancel_16xMD.png"/>
+                        </Button>
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
                   <DataGridTextColumn Binding="{Binding Player}" ClipboardContentBinding="{x:Null}" Header="Player" IsReadOnly="True" CanUserReorder="False" Width="120*"/>
                   <DataGridTextColumn Binding="{Binding Item}" ClipboardContentBinding="{x:Null}" Header="Item Looted" IsReadOnly="True" CanUserReorder="False" Width="165*"/>
-                  <DataGridTextColumn Binding="{Binding Slot}" ClipboardContentBinding="{x:Null}" Header="Slot" IsReadOnly="True" CanUserReorder="False" Width="65"/>
+                  <DataGridTextColumn Binding="{Binding Slot}" ClipboardContentBinding="{x:Null}" Header="Slot" IsReadOnly="True" CanUserReorder="False" Width="50"/>
                   <DataGridTextColumn Binding="{Binding Found}" ClipboardContentBinding="{x:Null}" Header="Found In Database" IsReadOnly="True" CanUserReorder="False" Width="165*"/>
                 </DataGrid.Columns>
               </DataGrid>
@@ -311,8 +338,8 @@
             <Label Content="Tells Received:" HorizontalAlignment="Left" Grid.Row="5" Width="93" RenderTransformOrigin="0.223,-1.52" Height="22" Margin="0,3,0,0" VerticalAlignment="Center"/>
             <Border x:Name="chatBorder" Background="#FFFFF7C0" Margin="0,0,4,0" Padding="0" BorderThickness="1" BorderBrush="#FF688CAF" />
             <Label x:Name="logStatusText" Content="No Log File Selected" Margin="12,0,0,0" FontStyle="Italic" HorizontalAlignment="Left" Width="562" />
-            <CheckBox x:Name="lootChatOnly" Content="Loot Chat Only" Margin="0,0,19,4" VerticalAlignment="Bottom" Height="16" HorizontalAlignment="Right" Width="104" Checked="CheckBoxLootOnly_Checked" Unchecked="CheckBoxLootOnly_Checked" ToolTip="Only Show Loot Related Chat Messages" TabIndex="6"/>
-            <CheckBox x:Name="autoScroll" Content="Auto-Scroll" VerticalAlignment="Bottom" Height="16" HorizontalAlignment="Right" Width="85" Checked="CheckBoxAutoscroll_Checked" Unchecked="CheckBoxAutoscroll_Checked" Margin="0,0,133,4" ToolTip="Automaticaly Scroll To Last Chat Message Received" IsChecked="True" TabIndex="5"/>
+            <CheckBox x:Name="lootChatOnly" Content="Show Only Loot Chat" Margin="0,0,19,4" VerticalAlignment="Bottom" Height="16" HorizontalAlignment="Right" Width="140" Checked="CheckBoxLootOnly_Checked" Unchecked="CheckBoxLootOnly_Checked" ToolTip="Only Show Loot Related Chat Messages" TabIndex="6"/>
+            <CheckBox x:Name="autoScroll" Content="Auto-Scroll" VerticalAlignment="Bottom" Height="16" HorizontalAlignment="Right" Width="85" Checked="CheckBoxAutoscroll_Checked" Unchecked="CheckBoxAutoscroll_Checked" Margin="0,0,167,4" ToolTip="Automaticaly Scroll To Last Chat Message Received" IsChecked="True" TabIndex="5"/>
           </Grid>
         </TabItem>
         <TabItem Header="Loot History">
