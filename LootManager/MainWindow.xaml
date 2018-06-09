@@ -192,7 +192,7 @@
             </Grid>
           </Grid>
         </TabItem>
-        <TabItem Header="Add New Loot">
+        <TabItem Header="Save Loot">
           <Grid Background="#FFE5E5E5">
             <Grid>
               <Grid.RowDefinitions>
@@ -311,11 +311,11 @@
             <Label Content="Tells Received:" HorizontalAlignment="Left" Grid.Row="5" Width="93" RenderTransformOrigin="0.223,-1.52" Height="22" Margin="0,3,0,0" VerticalAlignment="Center"/>
             <Border x:Name="chatBorder" Background="#FFFFF7C0" Margin="0,0,4,0" Padding="0" BorderThickness="1" BorderBrush="#FF688CAF" />
             <Label x:Name="logStatusText" Content="No Log File Selected" Margin="12,0,0,0" FontStyle="Italic" HorizontalAlignment="Left" Width="562" />
-            <CheckBox x:Name="lootChatOnly" Content="Loot Only" Margin="0,0,16,4" VerticalAlignment="Bottom" Height="16" HorizontalAlignment="Right" Width="78" Checked="CheckBoxLootOnly_Checked" Unchecked="CheckBoxLootOnly_Checked" ToolTip="Only Show Loot Related Chat Messages" TabIndex="6"/>
-            <CheckBox x:Name="autoScroll" Content="Auto-Scroll" VerticalAlignment="Bottom" Height="16" HorizontalAlignment="Right" Width="85" Checked="CheckBoxAutoscroll_Checked" Unchecked="CheckBoxAutoscroll_Checked" Margin="0,0,104,4" ToolTip="Automaticaly Scroll To Last Chat Message Received" IsChecked="True" TabIndex="5"/>
+            <CheckBox x:Name="lootChatOnly" Content="Loot Chat Only" Margin="0,0,19,4" VerticalAlignment="Bottom" Height="16" HorizontalAlignment="Right" Width="104" Checked="CheckBoxLootOnly_Checked" Unchecked="CheckBoxLootOnly_Checked" ToolTip="Only Show Loot Related Chat Messages" TabIndex="6"/>
+            <CheckBox x:Name="autoScroll" Content="Auto-Scroll" VerticalAlignment="Bottom" Height="16" HorizontalAlignment="Right" Width="85" Checked="CheckBoxAutoscroll_Checked" Unchecked="CheckBoxAutoscroll_Checked" Margin="0,0,133,4" ToolTip="Automaticaly Scroll To Last Chat Message Received" IsChecked="True" TabIndex="5"/>
           </Grid>
         </TabItem>
-        <TabItem Header="Raids (TBD)">
+        <TabItem Header="Loot History">
           <Grid Background="#FFE5E5E5"/>
         </TabItem>
       </TabControl>
