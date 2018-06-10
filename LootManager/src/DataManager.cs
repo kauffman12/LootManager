@@ -52,6 +52,8 @@ namespace LootManager
     private static Dictionary<string, LootCounts> lootCountsByName = new Dictionary<string, LootCounts>();
     // sorted play list
     private static List<Player> activePlayerList = new List<Player>();
+    // active player Map
+    private static Dictionary<string, Player> activePlayerByName = new Dictionary<string, Player>();
     // sorted events list
     private static List<RaidEvent> eventsList = new List<RaidEvent>();
     // sorted item list
@@ -256,7 +258,13 @@ namespace LootManager
       {
         if (row.ContainsKey(ACTIVE) && row[ACTIVE].ToLower().Equals("yes"))
         {
-          activePlayerList.Add(new Player { Name = row[NAME], Class = row[CLASS], Rank = row[RANK] });
+          Player player = new Player { Name = row[NAME], Class = row[CLASS], Rank = row[RANK] };
+          activePlayerList.Add(player);
+
+          if (!activePlayerByName.ContainsKey(row[NAME]))
+          {
+            activePlayerByName.Add(row[NAME], player);
+          }
         }
       }
 
@@ -349,7 +357,8 @@ namespace LootManager
 
         if (row.ContainsKey(NAME) && ((name = row[NAME]) != null) && row.ContainsKey(DATE) && (theDate = System.DateTime.Parse(row[DATE])) != null)
         {
-          if (names != null && !names.Contains(name))
+          // check active player map in addition to name filter
+          if (!activePlayerByName.ContainsKey(name) || (names != null && !names.Any(n => n.Equals(name, StringComparison.OrdinalIgnoreCase))))
           {
             continue;
           }
