@@ -462,17 +462,12 @@
             </DataGrid>
             <Border x:Name="historyBorder" Background="Orange" Margin="0,0,4,0" Padding="0" BorderThickness="1" BorderBrush="#FF688CAF" Height="27" VerticalAlignment="Top"/>
             <Label x:Name="historyStatusText" Margin="12,1,28,0" FontStyle="Italic" Height="27" VerticalAlignment="Top" Content="No Loot Data Available"/>
-            <TextBox x:Name="lootDetailsFilterBox" Height="22" Margin="81,63,35,0" TextWrapping="Wrap" Text="Showing All Players &lt;Enter List Player Names to Filter&gt;" VerticalAlignment="Top" VerticalContentAlignment="Center" FontStyle="Italic" TextChanged="LootDetailsFilterTextBox_TextChanged" GotFocus="LootDetailsFilterTextBox_GotFocus" LostFocus="LootDetailsFilterTextBox_LostFocus" KeyUp="LootDetailsFilterTextBox_KeyUp" BorderBrush="#FF688CAF"/>
+            <TextBox x:Name="lootDetailsFilterBox" Height="22" Margin="81,63,35,0" TextWrapping="Wrap" Text="Enter Player Names To Limit Results" VerticalAlignment="Top" VerticalContentAlignment="Center" FontStyle="Italic" TextChanged="LootDetailsFilterTextBox_TextChanged" GotFocus="LootDetailsFilterTextBox_GotFocus" LostFocus="LootDetailsFilterTextBox_LostFocus" KeyUp="LootDetailsFilterTextBox_KeyUp" BorderBrush="#FF688CAF"/>
             <Label Content="Players:" HorizontalAlignment="Left" Margin="29,61,0,0" VerticalAlignment="Top" Width="98"/>
             <xctk:CheckComboBox x:Name="tierComboBox" HorizontalAlignment="Left" VerticalContentAlignment="Center" VerticalAlignment="Top" IsEditable="true" Width="150" Height="22" Margin="207,35,0,0" BorderThickness="1" ClipToBounds="True" BorderBrush="#FF688CAF" Panel.ZIndex="1" ItemSelectionChanged="TierComboBox_ItemSelectionChanged"/>
             <Label Content="Tier:" HorizontalAlignment="Left" Margin="170,33,0,0" VerticalAlignment="Top" Width="43"/>
-            <Label Content="Time Span:" HorizontalAlignment="Left" Margin="8,33,0,0" VerticalAlignment="Top" Width="70"/>
-            <ComboBox x:Name="timeComboBox" HorizontalAlignment="Left" VerticalContentAlignment="Center" Margin="81,35,0,0" VerticalAlignment="Top" Width="84" Height="22" IsTextSearchEnabled="False" SelectedIndex="3" SelectionChanged="TimeComboBox_SelectionChanged">
-              <System:String>Any Time</System:String>
-              <System:String>30 Days</System:String>
-              <System:String>60 Days</System:String>
-              <System:String>90 Days</System:String>
-            </ComboBox>
+            <Label Content="Days Back:" HorizontalAlignment="Left" Margin="10,33,0,0" VerticalAlignment="Top" Width="70"/>
+            <xctk:LongUpDown x:Name="timeSpinner" Width="70" AllowTextInput="False" ValueChanged="TimeSpinner_ValueChanged" Increment="30" FormatString="0 Days" Value="90" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Height="22" Margin="81,35,0,0" VerticalAlignment="Top" Minimum="30" Maximum="9999" AutoMoveFocus="False"/>
           </Grid>
         </TabItem>
       </TabControl>

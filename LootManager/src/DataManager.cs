@@ -86,10 +86,6 @@ namespace LootManager
     // 1 day in seconds
     private static readonly long D1 = 24 * 60 * 60;
 
-    // timeframes  Any, 30 days, 60 days, 90 days
-    // should match UI control order
-    private static readonly long[] timeFrames = { D1*9999, D1*30, D1*60, D1*90 };
-
     private static string historyStatus = "";
 
     public static void load()
@@ -125,7 +121,7 @@ namespace LootManager
         try
         {
           System.DateTime eventDate = System.DateTime.Parse(evt[DATE]);
-          result = ((start - eventDate).TotalSeconds < timeFrames[3]);
+          result = ((start - eventDate).TotalSeconds < 90 * D1);
         }
         catch (Exception e)
         {
@@ -212,10 +208,10 @@ namespace LootManager
       return eventsList;
     }
 
-    public static List<LootDetailsListItem> getLootDetails(List<string> names, List<string> tiers, int timeFrame)
+    public static List<LootDetailsListItem> getLootDetails(List<string> names, List<string> tiers, long? days)
     {
       lootDetailsList.Clear();
-      populateLootDetails(names, tiers, timeFrame);
+      populateLootDetails(names, tiers, D1 * (days == null ? 90 : Convert.ToInt64(days)));
       return lootDetailsList.ToList();  // avoids some odd refresh problems
     }
 
@@ -336,7 +332,7 @@ namespace LootManager
       }
     }
 
-    private static void populateLootDetails(List<string> names, List<string> tiers, int timeFrame)
+    private static void populateLootDetails(List<string> names, List<string> tiers, long time)
     {
       int count = 0;
       string oldestDate = null;
@@ -359,7 +355,7 @@ namespace LootManager
           }
 
           // outside timerange
-          if (timeFrames.Length > timeFrame && timeFrame > -1 && (start - theDate).TotalSeconds > timeFrames[timeFrame])
+          if ((start - theDate).TotalSeconds > time)
           {
             continue;
           }

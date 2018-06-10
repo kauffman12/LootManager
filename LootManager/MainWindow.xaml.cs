@@ -860,7 +860,7 @@ namespace LootManager
       if (lootDetailsFilterBox.FontStyle == FontStyles.Normal && lootDetailsFilterBox.Text.Length == 0)
       {
         lootDetailsFilterBox.FontStyle = FontStyles.Italic;
-        lootDetailsFilterBox.Text = "Showing All Players <Enter List Player Names to Filter>";
+        lootDetailsFilterBox.Text = "Enter Player Names To Limit Results";
 
         Dispatcher.BeginInvoke((System.Action)(() =>
         {
@@ -889,7 +889,7 @@ namespace LootManager
       }
     }
 
-    private void TimeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void TimeSpinner_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
       loadHistoryData();
     }
@@ -936,7 +936,7 @@ namespace LootManager
 
         // get tiers filter
         List<string> tiers = tierComboBox.SelectedItemsOverride as List<string>;
-        lootDetailsListView.ItemsSource = DataManager.getLootDetails(names, tiers, timeComboBox.SelectedIndex);
+        lootDetailsListView.ItemsSource = DataManager.getLootDetails(names, tiers, timeSpinner.Value);
         historyStatusText.Content = DataManager.getHistoryStatus();
       }
     }
