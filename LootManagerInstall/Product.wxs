@@ -88,6 +88,9 @@
       <Component Win64="yes" Id="LootManager.exe.config" Guid="e1969a57-039d-4589-a27a-dea618f0cbf2">
         <File Id="LootManager.exe.config" Name="LootManager.exe.config" Source="$(var.LootManager_TargetDir)LootManager.exe.config" />
       </Component>
+      <Component Win64="yes" Id="Xceed.Wpf.Toolkit.dll" Guid="e1325508-4b95-4a25-8faa-da286b8b3c17">
+        <File Id="Xceed.Wpf.Toolkit.dll" Name="Xceed.Wpf.Toolkit.dll" Source="$(var.LootManager_TargetDir)Xceed.Wpf.Toolkit.dll" />
+      </Component>
     </ComponentGroup>
   </Fragment>
 </Wix>

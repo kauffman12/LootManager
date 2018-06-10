@@ -119,7 +119,6 @@ namespace LootManager
           disconnectMenuItem.IsEnabled = refreshMenuItem.IsEnabled = true;
           Title = Title.Replace("Loading Database...", "Connected");
           resetNewLoot(true, true);
-
           checkLoadLootHistory();
         }));
       }).Start();
@@ -843,11 +842,7 @@ namespace LootManager
       // load data firs time tab is used
       if (secondTabControl.SelectedItem == lootHistoryTab && lootDetailsListView.ItemsSource == null)
       {
-        List<LootDetailsListItem> data = DataManager.getLootDetails();
-        if (data.Count > 0)
-        {
-          loadHistoryData(data);
-        }
+        loadHistoryData();
       }
     }
 
@@ -865,11 +860,11 @@ namespace LootManager
       if (lootDetailsFilterBox.FontStyle == FontStyles.Normal && lootDetailsFilterBox.Text.Length == 0)
       {
         lootDetailsFilterBox.FontStyle = FontStyles.Italic;
-        lootDetailsFilterBox.Text = "Player1 Player2";
+        lootDetailsFilterBox.Text = "Showing All Players <Enter List Player Names to Filter>";
 
         Dispatcher.BeginInvoke((System.Action)(() =>
         {
-            loadHistoryData(DataManager.getLootDetails());
+            loadHistoryData();
         }
         ));
       }
@@ -881,34 +876,7 @@ namespace LootManager
       {
         textUpdateTask = Task.Delay(System.TimeSpan.FromMilliseconds(200)).ContinueWith(task =>
         {
-          Dispatcher.BeginInvoke((System.Action)(() =>
-          {
-            if (lootDetailsFilterBox.FontStyle != FontStyles.Italic)
-            {
-              List<LootDetailsListItem> data;
-              if (lootDetailsFilterBox.Text.Length <= 3)
-              {
-                data = DataManager.getLootDetails();
-              }
-              else
-              {
-                List<string> names;
-                if (lootDetailsFilterBox.Text.Contains(","))
-                {
-                  names = lootDetailsFilterBox.Text.Split(',').ToList();
-                }
-                else
-                {
-                  names = lootDetailsFilterBox.Text.Split(null).ToList();
-                }
-
-                data = DataManager.getLootDetails().Where(detail => names.Contains(detail.Player)).ToList();
-              }
-
-              loadHistoryData(data);
-            }
-          }
-          ));
+          Dispatcher.BeginInvoke((System.Action)(() => loadHistoryData() ));
         });
       }
     }
@@ -921,18 +889,55 @@ namespace LootManager
       }
     }
 
-    private void loadHistoryData(List<LootDetailsListItem> data)
+    private void TimeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-      if (lootDetailsListView.ItemsSource != data)
+      loadHistoryData();
+    }
+
+    private void TierComboBox_ItemSelectionChanged(object sender, Xceed.Wpf.Toolkit.Primitives.ItemSelectionChangedEventArgs e)
+    {
+      // silly workaround
+      List<string> selected = tierComboBox.SelectedItemsOverride as List<string>;
+      if (selected != null)
       {
-        // check first load
+        tierComboBox.SelectedValue = string.Join(",", selected);
+      }
+
+      loadHistoryData();
+    }
+
+    private void loadHistoryData()
+    {
+      // if data loaded
+      if (DataManager.getTiers().Count > 0)
+      {
+        // if first time
         if (historyStatusText.FontStyle == FontStyles.Italic)
         {
           historyStatusText.FontStyle = FontStyles.Normal;
           historyBorder.Background = new SolidColorBrush(Color.FromRgb(179, 220, 217));
-          historyStatusText.Content = DataManager.getHistoryStatus();
+          tierComboBox.ItemsSource = DataManager.getTiers();
+          tierComboBox.SelectedItemsOverride = DataManager.getTiers();
         }
-        lootDetailsListView.ItemsSource = data;
+
+        // get names filter
+        List<string> names = null;
+        if (lootDetailsFilterBox.FontStyle != FontStyles.Italic && lootDetailsFilterBox.Text.Length > 3)
+        {
+          if (lootDetailsFilterBox.Text.Contains(","))
+          {
+            names = lootDetailsFilterBox.Text.Split(',').ToList();
+          }
+          else
+          {
+            names = lootDetailsFilterBox.Text.Split(null).ToList();
+          }
+        }
+
+        // get tiers filter
+        List<string> tiers = tierComboBox.SelectedItemsOverride as List<string>;
+        lootDetailsListView.ItemsSource = DataManager.getLootDetails(names, tiers, timeComboBox.SelectedIndex);
+        historyStatusText.Content = DataManager.getHistoryStatus();
       }
     }
   }
