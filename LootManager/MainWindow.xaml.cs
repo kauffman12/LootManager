@@ -21,7 +21,8 @@ namespace LootManager
     private ObservableCollection<LootedListItem> lootedListItems = new ObservableCollection<LootedListItem>();
     private ObservableCollection<WatchListItem> watchListItems = new ObservableCollection<WatchListItem>();
     private IDictionary<string, ObservableCollection<RequestListItem>> requestListMap = new Dictionary<string, ObservableCollection<RequestListItem>>();
-
+    private GridLength AUTO_GRID = (GridLength) new GridLengthConverter().ConvertFromString("Auto");
+    private GridLength STAR_GRID = (GridLength)new GridLengthConverter().ConvertFromString("*");
     private SimpleChatController officerChatController;
     private GuildChatController guildChatController;
     private TellsChatController tellsChatController;
@@ -939,6 +940,36 @@ namespace LootManager
         lootDetailsListView.ItemsSource = DataManager.getLootDetails(names, tiers, timeSpinner.Value);
         historyStatusText.Content = DataManager.getHistoryStatus();
       }
+    }
+
+    private void GuildChatExpander_Expanded(object sender, RoutedEventArgs e)
+    {
+      chatGrid.RowDefinitions[1].Height = STAR_GRID;
+    }
+
+    private void OfficerChatExpander_Expanded(object sender, RoutedEventArgs e)
+    {
+      chatGrid.RowDefinitions[2].Height = STAR_GRID;
+    }
+
+    private void TellsChatExpander_Expanded(object sender, RoutedEventArgs e)
+    {
+      chatGrid.RowDefinitions[3].Height = STAR_GRID;
+    }
+
+    private void GuildChatExpander_Collapsed(object sender, RoutedEventArgs e)
+    {
+      chatGrid.RowDefinitions[1].Height = AUTO_GRID;
+    }
+
+    private void OfficerChatExpander_Collapsed(object sender, RoutedEventArgs e)
+    {
+      chatGrid.RowDefinitions[2].Height = AUTO_GRID;
+    }
+
+    private void TellsChatExpander_Collapsed(object sender, RoutedEventArgs e)
+    {
+      chatGrid.RowDefinitions[3].Height = AUTO_GRID;
     }
   }
 

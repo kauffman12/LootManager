@@ -7,14 +7,14 @@
         xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock" x:Class="LootManager.MainWindow"
         mc:Ignorable="d"
-        Title="Loot Manager v1.0.0.4 (Not Connected)"
+        Title="Loot Manager v1.0.0.5 (Not Connected)"
         UseLayoutRounding="True"
         TextOptions.TextFormattingMode="Display"
         TextOptions.TextRenderingMode="ClearType"
         Height="700" 
         Width="1140" MinHeight="600" MinWidth="800"
         Icon="/LootManager;component/Icons/roi_icon2.ico" Closing="Application_Closing" Background="#FFF0F0F0" Closed="Window_Closed">
-  <Grid Margin="0,0,-8,0">
+  <Grid Margin="0">
     <Menu Margin="0,0,4,0" Height="20" VerticalAlignment="Top">
       <MenuItem Header="_File" Height="20" Width="40">
         <MenuItem x:Name="connectMenuItem" Header="_Connect" Height="20" Click="MenuItemConnect_Click">
@@ -46,7 +46,7 @@
         </MenuItem>
       </MenuItem>
     </Menu>
-    <Grid RenderTransformOrigin="0.464,0.492" Margin="-1,0,1,0">
+    <Grid Margin="4,0,4,4">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="193*" />
         <ColumnDefinition Width="6" />
@@ -309,7 +309,7 @@
         </TabItem>
       </TabControl>
       <GridSplitter Margin="1,41,1,0" MinWidth="3" Foreground="White" Background="#FFF0F0F0" Grid.IsSharedSizeScope="True" MinHeight="1" Grid.Column="1" HorizontalAlignment="Center" Width="4"/>
-      <TabControl x:Name="secondTabControl" Margin="0,20,2,-1" Grid.Column="2" Background="#FFF0F0F0" SelectionChanged="ChatLootTab_SelectionChanged" BorderBrush="#FF688CAF">
+      <TabControl x:Name="secondTabControl" Margin="0,20,0,0" Grid.Column="2" Background="#FFF0F0F0" SelectionChanged="ChatLootTab_SelectionChanged" BorderBrush="#FF688CAF">
         <TabControl.Resources>
           <Style TargetType="{x:Type TabItem}">
             <Setter Property="Template">
@@ -335,38 +335,42 @@
             </Setter>
           </Style>
         </TabControl.Resources>
-        <TabItem Header="Chat Logs" BorderBrush="{x:Null}" Background="{x:Null}">
-          <Grid Background="#FFE8E8E8">
+        <TabItem Header="Chat Logs" BorderBrush="{x:Null}" Background="{x:Null}" Margin="0">
+          <Grid x:Name="chatGrid" Background="#FFE8E8E8" Margin="0,0,0,-4">
             <Grid.RowDefinitions>
               <RowDefinition Height="25"/>
-              <RowDefinition Height="25"/>
-              <RowDefinition Height="175*"/>
-              <RowDefinition Height="25"/>
-              <RowDefinition Height="175*"/>
-              <RowDefinition Height="25"/>
-              <RowDefinition Height="173*"/>
+              <RowDefinition Height="*"/>
+              <RowDefinition Height="*"/>
+              <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Label Content="Guild Chat:" HorizontalAlignment="Left" Width="94" Grid.Row="1" Margin="-1,1,0,2" Height="22" VerticalAlignment="Center"/>
-            <RichTextBox x:Name="guildChatBox" Grid.Row="2" Margin="-3,0,-2,0" IsReadOnly="True" VerticalScrollBarVisibility="Auto" FontSize="14" TabIndex="7" BorderBrush="#FF688CAF">
-              <FlowDocument/>
-            </RichTextBox>
-            <Label Content="Officer Chat:" HorizontalAlignment="Left" Grid.Row="3" Width="94" Height="22" VerticalAlignment="Center" Margin="-1,2,0,1"/>
-            <RichTextBox x:Name="officerChatBox" Grid.Row="4" Margin="-3,1,-2,24" IsReadOnly="True" VerticalScrollBarVisibility="Auto" FontSize="14" TabIndex="8" BorderBrush="#FF688CAF" Grid.RowSpan="2">
-              <FlowDocument AllowDrop="False">
-                <Paragraph>
-                  <Run Text=""/>
-                </Paragraph>
-              </FlowDocument>
-            </RichTextBox>
-            <RichTextBox x:Name="tellsChatBox" Grid.Row="6" Margin="-3,1,-2,-3" IsReadOnly="True" VerticalScrollBarVisibility="Auto" FontSize="14" TabIndex="9" BorderBrush="#FF688CAF">
-              <FlowDocument AllowDrop="False">
-                <Paragraph>
-                  <Run Text=""/>
-                </Paragraph>
-              </FlowDocument>
-            </RichTextBox>
-            <Label Content="Tells Received:" HorizontalAlignment="Left" Grid.Row="5" Width="93" RenderTransformOrigin="0.223,-1.52" Height="22" VerticalAlignment="Center" Margin="0,3,0,0"/>
-            <Border x:Name="chatBorder" Background="Orange" Margin="-3,-3,0,0" Padding="0" BorderThickness="1" BorderBrush="#FF688CAF" />
+            <Expander Grid.Row="1" Header="Guild Chat" IsExpanded="True" Expanded="GuildChatExpander_Expanded" Collapsed="GuildChatExpander_Collapsed" Margin="0">
+              <RichTextBox x:Name="guildChatBox" Grid.Row="0" IsReadOnly="True" VerticalScrollBarVisibility="Auto" FontSize="14" TabIndex="7" BorderBrush="#FF688CAF" Margin="-4,0">
+                <FlowDocument AllowDrop="False">
+                  <Paragraph>
+                    <Run Text=""/>
+                  </Paragraph>
+                </FlowDocument>
+              </RichTextBox>
+            </Expander>
+            <Expander Grid.Row="2" Header="Officer Chat" Collapsed="OfficerChatExpander_Collapsed" Expanded="OfficerChatExpander_Expanded" IsExpanded="True">
+              <RichTextBox x:Name="officerChatBox" IsReadOnly="True" VerticalScrollBarVisibility="Auto" FontSize="14" TabIndex="8" BorderBrush="#FF688CAF" Margin="-4,0">
+                <FlowDocument AllowDrop="False">
+                  <Paragraph>
+                    <Run Text=""/>
+                  </Paragraph>
+                </FlowDocument>
+              </RichTextBox>
+            </Expander>
+            <Expander Grid.Row="3" Header="Received Tells" IsExpanded="True" Collapsed="TellsChatExpander_Collapsed" Expanded="TellsChatExpander_Expanded">
+              <RichTextBox x:Name="tellsChatBox" IsReadOnly="True" VerticalScrollBarVisibility="Auto" FontSize="14" TabIndex="9" BorderBrush="#FF688CAF" Margin="-4,0">
+                <FlowDocument AllowDrop="False">
+                  <Paragraph>
+                    <Run Text=""/>
+                  </Paragraph>
+                </FlowDocument>
+              </RichTextBox>
+            </Expander>
+            <Border x:Name="chatBorder" Background="Orange" Margin="-3,-3,-3,0" Padding="0" BorderThickness="1" BorderBrush="#FF688CAF" />
             <Label x:Name="logStatusText" Content="No Log File Selected" Margin="10,0,275,2" FontStyle="Italic" />
             <CheckBox x:Name="lootChatOnly" Content="Show Only Loot Chat" Margin="0,0,19,4" VerticalAlignment="Bottom" Height="16" HorizontalAlignment="Right" Width="140" Checked="CheckBoxLootOnly_Checked" Unchecked="CheckBoxLootOnly_Checked" ToolTip="Only Show Loot Related Chat Messages" TabIndex="6"/>
             <CheckBox x:Name="autoScroll" Content="Auto-Scroll" VerticalAlignment="Bottom" Height="16" HorizontalAlignment="Right" Width="85" Checked="CheckBoxAutoscroll_Checked" Unchecked="CheckBoxAutoscroll_Checked" Margin="0,0,167,4" ToolTip="Automaticaly Scroll To Last Chat Message Received" IsChecked="True" TabIndex="5"/>
@@ -381,11 +385,6 @@
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="White" />
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="Black" />
               </DataGrid.Resources>
-              <DataGrid.ContextMenu>
-                <ContextMenu Focusable="False">
-                  <MenuItem x:Name="lootHistoryShowMenuItem" IsCheckable="True" IsChecked="True" Header="Show Details" Focusable="False"/>
-                </ContextMenu>
-              </DataGrid.ContextMenu>
               <DataGrid.ColumnHeaderStyle>
                 <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                   <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -465,7 +464,7 @@
                 </DataGridTextColumn>
               </DataGrid.Columns>
             </DataGrid>
-            <Border x:Name="historyBorder" Background="Orange" Margin="-3,-3,0,0" Padding="0" BorderThickness="1" BorderBrush="#FF688CAF" Height="28" VerticalAlignment="Top"/>
+            <Border x:Name="historyBorder" Background="Orange" Margin="-3,-3,-3,0" Padding="0" BorderThickness="1" BorderBrush="#FF688CAF" Height="28" VerticalAlignment="Top"/>
             <Label x:Name="historyStatusText" Margin="10,0,234,0" FontStyle="Italic" Height="28" VerticalAlignment="Top" Content="No Loot Data Available"/>
             <TextBox x:Name="lootDetailsFilterBox" Height="22" Margin="73,65,43,0" TextWrapping="Wrap" Text="Enter Player Names To Limit Results" VerticalAlignment="Top" VerticalContentAlignment="Center" FontStyle="Italic" TextChanged="LootDetailsFilterTextBox_TextChanged" GotFocus="LootDetailsFilterTextBox_GotFocus" LostFocus="LootDetailsFilterTextBox_LostFocus" KeyUp="LootDetailsFilterTextBox_KeyUp" BorderBrush="#FF688CAF"/>
             <Label Content="Players:" HorizontalAlignment="Left" Margin="21,63,0,0" VerticalAlignment="Top" Width="98"/>
