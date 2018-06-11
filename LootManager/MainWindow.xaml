@@ -7,7 +7,7 @@
         xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock" x:Class="LootManager.MainWindow"
         mc:Ignorable="d"
-        Title="Loot Manager v1.0.0.3 (Not Connected)"
+        Title="Loot Manager v1.0.0.4 (Not Connected)"
         UseLayoutRounding="True"
         TextOptions.TextFormattingMode="Display"
         TextOptions.TextRenderingMode="ClearType"
@@ -46,13 +46,13 @@
         </MenuItem>
       </MenuItem>
     </Menu>
-    <Grid Margin="-1,0,1,0" RenderTransformOrigin="0.464,0.492">
+    <Grid RenderTransformOrigin="0.464,0.492" Margin="-1,0,1,0">
       <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="173*" />
+        <ColumnDefinition Width="193*" />
         <ColumnDefinition Width="6" />
-        <ColumnDefinition Width="324*" />
+        <ColumnDefinition Width="374*" />
       </Grid.ColumnDefinitions>
-      <TabControl Margin="0,20,2,0" Background="#FFF0F0F0">
+      <TabControl Margin="0,20,2,-1" Background="#FFE8E8E8" BorderBrush="#FF688CAF">
         <TabControl.Resources>
           <Style TargetType="{x:Type TabItem}">
             <Setter Property="Template">
@@ -79,17 +79,17 @@
           </Style>
         </TabControl.Resources>
         <TabItem Header="Award Loot">
-          <Grid Background="#FFE5E5E5">
+          <Grid Margin="0,0,0,-1">
             <Grid.RowDefinitions>
               <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Grid>
+            <Grid Margin="-3,-3,-3,-1">
               <Grid.RowDefinitions>
                 <RowDefinition Height="200"/>
-                <RowDefinition Height="176*"/>
-                <RowDefinition Height="35*"/>
+                <RowDefinition Height="59*"/>
+                <RowDefinition Height="12*"/>
               </Grid.RowDefinitions>
-              <DataGrid x:Name="watchListView" ContextMenuOpening="WatchListContextMenu_OnOpened" AutoGenerateColumns="False" CanUserAddRows="False" Margin="3,2" SelectionMode="Single" ColumnWidth="SizeToHeader" CanUserReorderColumns="False" HeadersVisibility="Column" Grid.Row="0" GridLinesVisibility="None" SelectionChanged="WatchList_SelectionChanged" TabIndex="1" IsTabStop="True" UnloadingRow="WatchList_UnloadingRow">
+              <DataGrid x:Name="watchListView" ContextMenuOpening="WatchListContextMenu_OnOpened" AutoGenerateColumns="False" CanUserAddRows="False" SelectionMode="Single" ColumnWidth="SizeToHeader" CanUserReorderColumns="False" HeadersVisibility="Column" Grid.Row="0" GridLinesVisibility="None" SelectionChanged="WatchList_SelectionChanged" TabIndex="1" IsTabStop="True" UnloadingRow="WatchList_UnloadingRow" BorderBrush="#FF688CAF" Background="#FFE8E8E8">
                 <DataGrid.Resources>
                   <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF569FD8"/>
                   <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF646464" />
@@ -141,7 +141,7 @@
                   </ContextMenu>
                 </DataGrid.ContextMenu>
               </DataGrid>
-              <DataGrid x:Name="requestListView" ContextMenuOpening="RequestListContextMenu_OnOpened" AutoGenerateColumns="False" CanUserAddRows="False" Margin="3,1" ColumnWidth="SizeToHeader" CanUserReorderColumns="False" HeadersVisibility="Column" Grid.Row="1" GridLinesVisibility="None" TabIndex="2" IsTabStop="True">
+              <DataGrid x:Name="requestListView" ContextMenuOpening="RequestListContextMenu_OnOpened" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,199,0,1" ColumnWidth="SizeToHeader" CanUserReorderColumns="False" HeadersVisibility="Column" GridLinesVisibility="None" TabIndex="2" IsTabStop="True" Grid.RowSpan="2" BorderBrush="#FF688CAF" Background="#FFE8E8E8">
                 <DataGrid.Resources>
                   <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF569FD8"/>
                   <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF646464" />
@@ -217,13 +217,13 @@
                   </ContextMenu>
                 </DataGrid.ContextMenu>
               </DataGrid>
-              <Grid Grid.Row="2">
+              <Grid Grid.Row="2" Margin="0,0,0,4">
                 <Grid.RowDefinitions>
                   <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <TextBox x:Name="genChatBox" Margin="3,2,108,2" MinWidth="0" TextWrapping="Wrap" FontStyle="Italic" MinHeight="40" GotFocus="GenChatBox_GotFocus" LostFocus="GenChatBox_LostFocus" Text="Suggested Officer Chat for Selected Item" TabIndex="3" BorderBrush="#FF688CAF" />
-                <CheckBox x:Name="lootAllTypes" Content="All Loot Types" Margin="0,0,5,3" Height="15" VerticalAlignment="Bottom"  Checked="CheckBoxLootAllTypes_Checked" Unchecked="CheckBoxLootAllTypes_Checked" ToolTip="Always Include Alt and Rot Requests Even With Mains Asking" TabIndex="4" HorizontalAlignment="Right" Width="95"/>
-                <Button Margin="0,0,109,3" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="18" ToolTip="Copy To Clipbload" Click="GenChatButton_Click">
+                <TextBox x:Name="genChatBox" Margin="0,-1,109,-3" MinWidth="0" TextWrapping="Wrap" FontStyle="Italic" MinHeight="40" GotFocus="GenChatBox_GotFocus" LostFocus="GenChatBox_LostFocus" Text="Suggested Officer Chat for Selected Item" TabIndex="3" BorderBrush="#FF688CAF" BorderThickness="1,0" />
+                <CheckBox x:Name="lootAllTypes" Content="All Loot Types" Margin="0,0,10,-2" Height="15" VerticalAlignment="Bottom"  Checked="CheckBoxLootAllTypes_Checked" Unchecked="CheckBoxLootAllTypes_Checked" ToolTip="Always Include Alt and Rot Requests Even With Mains Asking" TabIndex="4" HorizontalAlignment="Right" Width="95" BorderBrush="#FF688CAF"/>
+                <Button Margin="0,0,109,-5" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="18" ToolTip="Copy To Clipbload" Click="GenChatButton_Click" BorderBrush="#FF688CAF" BorderThickness="1">
                   <StackPanel Orientation="Horizontal" Height="22" Margin="0" HorizontalAlignment="Center">
                     <Image Source="/LootManager;component/Icons/CopyToClipboard/CopyToClipboard_16x.png" Margin="0,0,0,2" Panel.ZIndex="1" Width="20" Height="20"/>
                   </StackPanel>
@@ -238,30 +238,30 @@
             <Grid>
               <Grid.RowDefinitions>
                 <RowDefinition Height="191" />
-                <RowDefinition Height="312*"/>
-                <RowDefinition Height="119*"/>
+                <RowDefinition Height="311*"/>
+                <RowDefinition Height="121*"/>
               </Grid.RowDefinitions>
               <Grid Grid.Row="0">
-                <Grid Margin="2,-2,0,0" MinWidth="385">
-                  <Border BorderBrush="#FF688CAF" BorderThickness="1" Margin="1,4,4,3" Background="#FFF0F0F0"/>
+                <Grid Margin="0" MinWidth="385">
+                  <Border BorderBrush="#FF688CAF" BorderThickness="1" Margin="192,94,191,95" Background="#FFF0F0F0"/>
                   <Grid MaxWidth="440" Margin="0">
-                    <GroupBox Header="New Loot Info" Background="White" BorderBrush="#FF688CAF" Height="134" VerticalAlignment="Top" Margin="8,6,12,0" />
-                    <ComboBox x:Name="newLootItem" VerticalContentAlignment="Center" IsTextSearchEnabled="True" DisplayMemberPath="Name" SelectedValuePath="Name" Grid.Column="0" Margin="24,32,159,0" Height="24" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="False" LostFocus="NewLootItem_LostFocus" SelectionChanged="NewLootItem_SelectionChanged" TextBoxBase.TextChanged="NewLoot_TextChanged" MinWidth="202"/>
-                    <ComboBox x:Name="newLootSlot" VerticalContentAlignment="Center" IsTextSearchEnabled="True" Grid.Column="0" Margin="0,32,27,0" Height="24" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="True" LostFocus="NewLootSlot_LostFocus" SelectionChanged="NewLootSlot_SelectionChanged" Width="120" IsReadOnly="True" SelectedIndex="0" TextBoxBase.TextChanged="NewLoot_TextChanged" MinWidth="120" HorizontalAlignment="Right" RenderTransformOrigin="0.709,0.25">
+                    <GroupBox Header="New Loot Info" Background="#FFFAFAFA" BorderBrush="#FF688CAF" Height="134" VerticalAlignment="Top" Margin="10,4,10,0" />
+                    <ComboBox x:Name="newLootItem" VerticalContentAlignment="Center" IsTextSearchEnabled="True" DisplayMemberPath="Name" SelectedValuePath="Name" Grid.Column="0" Margin="26,30,157,0" Height="24" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="False" LostFocus="NewLootItem_LostFocus" SelectionChanged="NewLootItem_SelectionChanged" TextBoxBase.TextChanged="NewLoot_TextChanged" MinWidth="202"/>
+                    <ComboBox x:Name="newLootSlot" VerticalContentAlignment="Center" IsTextSearchEnabled="True" Grid.Column="0" Margin="0,30,25,0" Height="24" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="True" LostFocus="NewLootSlot_LostFocus" SelectionChanged="NewLootSlot_SelectionChanged" Width="120" IsReadOnly="True" SelectedIndex="0" TextBoxBase.TextChanged="NewLoot_TextChanged" MinWidth="120" HorizontalAlignment="Right" RenderTransformOrigin="0.709,0.25">
                       <System:String>Any Slot</System:String>
                     </ComboBox>
-                    <DatePicker x:Name="newLootDate" Grid.Column="0" Margin="0,66,27,0" Height="24" VerticalAlignment="Top" MinWidth="120" HorizontalAlignment="Right" Width="120"/>
-                    <ComboBox x:Name="newLootEvent" VerticalContentAlignment="Center" IsTextSearchEnabled="True" DisplayMemberPath="ShortName" SelectedValuePath="ShortName" Grid.Column="0" Margin="24,66,159,0" Height="24" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="False" LostFocus="NewLootEvent_LostFocus" SelectionChanged="NewLootEvent_SelectionChanged" MinWidth="202"/>
-                    <CheckBox x:Name="newLootAlt" Grid.Column="0" Content="Alt" Margin="145,105,205,0" VerticalAlignment="Top" Height="15" Checked="NewLootAlt_Checked" />
-                    <CheckBox x:Name="newLootRot" Grid.Column="0" Content="Rot" Margin="185,105,162,0" VerticalAlignment="Top" Height="15"/>
+                    <DatePicker x:Name="newLootDate" Grid.Column="0" Margin="0,64,25,0" Height="24" VerticalAlignment="Top" MinWidth="120" HorizontalAlignment="Right" Width="120"/>
+                    <ComboBox x:Name="newLootEvent" VerticalContentAlignment="Center" IsTextSearchEnabled="True" DisplayMemberPath="ShortName" SelectedValuePath="ShortName" Grid.Column="0" Margin="26,64,157,0" Height="24" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="False" LostFocus="NewLootEvent_LostFocus" SelectionChanged="NewLootEvent_SelectionChanged" MinWidth="202"/>
+                    <CheckBox x:Name="newLootAlt" Grid.Column="0" Content="Alt" Margin="147,103,203,0" VerticalAlignment="Top" Height="15" Checked="NewLootAlt_Checked" />
+                    <CheckBox x:Name="newLootRot" Grid.Column="0" Content="Rot" Margin="187,103,160,0" VerticalAlignment="Top" Height="15"/>
                     <CheckBox x:Name="updateItemsDB" Content="Add to Items DB" Margin="237,105,26,0" VerticalAlignment="Top" RenderTransformOrigin="0.755,0.044" IsChecked="True" Height="20" HorizontalAlignment="Center" IsEnabled="False" Width="120" Foreground="#FFFF880F" Visibility="Hidden"/>
-                    <Button Content="Reset" Height="26" Margin="0,152,83,0" VerticalAlignment="Top" Click="NewLootReset_Click" Background="White" HorizontalAlignment="Right" Width="50" MinWidth="50"/>
-                    <Button x:Name="newLootSaveButton" Content="Save" Height="26" Margin="0,152,23,0" VerticalAlignment="Top" Background="White" IsEnabled="False" Click="NewLootSave_Clicked" HorizontalAlignment="Right" Width="50" MinWidth="50"/>
-                    <ComboBox x:Name="newLootPlayer" VerticalContentAlignment="Center" IsTextSearchEnabled="True" DisplayMemberPath="Name" SelectedValuePath="Name" Grid.Column="0" Margin="24,100,0,0" Height="24" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="False" LostFocus="NewLootPlayer_LostFocus" TextBoxBase.TextChanged="NewLoot_TextChanged" MinWidth="112" HorizontalAlignment="Left" Width="112"/>
+                    <Button Content="Reset" Height="26" Margin="0,150,83,0" VerticalAlignment="Top" Click="NewLootReset_Click" Background="White" HorizontalAlignment="Right" Width="50" MinWidth="50"/>
+                    <Button x:Name="newLootSaveButton" Content="Save" Height="26" Margin="0,150,23,0" VerticalAlignment="Top" Background="White" IsEnabled="False" Click="NewLootSave_Clicked" HorizontalAlignment="Right" Width="50" MinWidth="50"/>
+                    <ComboBox x:Name="newLootPlayer" VerticalContentAlignment="Center" IsTextSearchEnabled="True" DisplayMemberPath="Name" SelectedValuePath="Name" Grid.Column="0" Margin="26,98,0,0" Height="24" VerticalAlignment="Top" IsEditable="True" IsSynchronizedWithCurrentItem="False" LostFocus="NewLootPlayer_LostFocus" TextBoxBase.TextChanged="NewLoot_TextChanged" MinWidth="112" HorizontalAlignment="Left" Width="112"/>
                   </Grid>
                 </Grid>
               </Grid>
-              <DataGrid x:Name="lootedListView" ContextMenuOpening="LootedListContextMenu_OnOpened" AutoGenerateColumns="False" Margin="3,0,3,2" CanUserAddRows="False" ColumnWidth="SizeToHeader" HeadersVisibility="Column" Grid.Row="1" GridLinesVisibility="None" CanUserReorderColumns="False" SelectionChanged="LootedList_SelectionChanged" SelectionMode="Single" LoadingRow="LootedList_LoadingRow" UnloadingRow="LootedList_UnloadingRow">
+              <DataGrid x:Name="lootedListView" ContextMenuOpening="LootedListContextMenu_OnOpened" AutoGenerateColumns="False" Margin="-3,0" CanUserAddRows="False" ColumnWidth="SizeToHeader" HeadersVisibility="Column" Grid.Row="1" GridLinesVisibility="None" CanUserReorderColumns="False" SelectionChanged="LootedList_SelectionChanged" SelectionMode="Single" LoadingRow="LootedList_LoadingRow" UnloadingRow="LootedList_UnloadingRow" Background="#FFE8E8E8">
                 <DataGrid.Resources>
                   <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF569FD8"/>
                   <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF646464" />
@@ -303,13 +303,13 @@
                   <DataGridTextColumn Binding="{Binding Found}" ClipboardContentBinding="{x:Null}" Header="Found In Database" IsReadOnly="True" CanUserReorder="False" Width="165*"/>
                 </DataGrid.Columns>
               </DataGrid>
-              <TextBox x:Name="newLootAuditTextBox" Margin="3,3,3,2" Grid.Row="2" Text="Audit Log" IsReadOnly="True" TextWrapping="Wrap" FontFamily="Consolas" FontSize="10"/>
+              <TextBox x:Name="newLootAuditTextBox" Margin="-3,1,-3,-3" Grid.Row="2" Text="Audit Log" IsReadOnly="True" TextWrapping="Wrap" FontFamily="Consolas" FontSize="10" BorderBrush="#FF688EAF" BorderThickness="1,0,1,1"/>
             </Grid>
           </Grid>
         </TabItem>
       </TabControl>
-      <GridSplitter Margin="0,42,2,2" HorizontalAlignment="Center" MinWidth="3" Foreground="White" Background="#994F4E4E" Grid.IsSharedSizeScope="True" Grid.Column="1" Width="4" MinHeight="1"/>
-      <TabControl x:Name="secondTabControl" Margin="0,20,2,0" Grid.Column="2" Background="#FFF0F0F0" SelectionChanged="ChatLootTab_SelectionChanged">
+      <GridSplitter Margin="1,41,1,0" MinWidth="3" Foreground="White" Background="#FFF0F0F0" Grid.IsSharedSizeScope="True" MinHeight="1" Grid.Column="1" HorizontalAlignment="Center" Width="4"/>
+      <TabControl x:Name="secondTabControl" Margin="0,20,2,-1" Grid.Column="2" Background="#FFF0F0F0" SelectionChanged="ChatLootTab_SelectionChanged" BorderBrush="#FF688CAF">
         <TabControl.Resources>
           <Style TargetType="{x:Type TabItem}">
             <Setter Property="Template">
@@ -335,46 +335,46 @@
             </Setter>
           </Style>
         </TabControl.Resources>
-        <TabItem Header="Chat Logs">
-          <Grid Background="#FFE5E5E5">
+        <TabItem Header="Chat Logs" BorderBrush="{x:Null}" Background="{x:Null}">
+          <Grid Background="#FFE8E8E8">
             <Grid.RowDefinitions>
-              <RowDefinition Height="27"/>
-              <RowDefinition Height="26"/>
-              <RowDefinition/>
               <RowDefinition Height="25"/>
-              <RowDefinition/>
               <RowDefinition Height="25"/>
-              <RowDefinition/>
+              <RowDefinition Height="175*"/>
+              <RowDefinition Height="25"/>
+              <RowDefinition Height="175*"/>
+              <RowDefinition Height="25"/>
+              <RowDefinition Height="173*"/>
             </Grid.RowDefinitions>
-            <Label Content="Guild Chat:" HorizontalAlignment="Left" Width="94" Grid.Row="1" Margin="0,4,0,0" Height="22" VerticalAlignment="Center"/>
-            <RichTextBox x:Name="guildChatBox" Grid.Row="2" Margin="2,3,6,3" IsReadOnly="True" VerticalScrollBarVisibility="Auto" FontSize="14" TabIndex="7">
+            <Label Content="Guild Chat:" HorizontalAlignment="Left" Width="94" Grid.Row="1" Margin="-1,1,0,2" Height="22" VerticalAlignment="Center"/>
+            <RichTextBox x:Name="guildChatBox" Grid.Row="2" Margin="-3,0,-2,0" IsReadOnly="True" VerticalScrollBarVisibility="Auto" FontSize="14" TabIndex="7" BorderBrush="#FF688CAF">
               <FlowDocument/>
             </RichTextBox>
-            <Label Content="Officer Chat:" HorizontalAlignment="Left" Grid.Row="3" Width="94" Height="22" VerticalAlignment="Center" Margin="0,3,0,0"/>
-            <RichTextBox x:Name="officerChatBox" Grid.Row="4" Margin="2,3,6,3" IsReadOnly="True" VerticalScrollBarVisibility="Auto" FontSize="14" TabIndex="8">
+            <Label Content="Officer Chat:" HorizontalAlignment="Left" Grid.Row="3" Width="94" Height="22" VerticalAlignment="Center" Margin="-1,2,0,1"/>
+            <RichTextBox x:Name="officerChatBox" Grid.Row="4" Margin="-3,1,-2,24" IsReadOnly="True" VerticalScrollBarVisibility="Auto" FontSize="14" TabIndex="8" BorderBrush="#FF688CAF" Grid.RowSpan="2">
               <FlowDocument AllowDrop="False">
                 <Paragraph>
                   <Run Text=""/>
                 </Paragraph>
               </FlowDocument>
             </RichTextBox>
-            <RichTextBox x:Name="tellsChatBox" Grid.Row="6" Margin="2,4,6,2" IsReadOnly="True" VerticalScrollBarVisibility="Auto" FontSize="14" TabIndex="9">
+            <RichTextBox x:Name="tellsChatBox" Grid.Row="6" Margin="-3,1,-2,-3" IsReadOnly="True" VerticalScrollBarVisibility="Auto" FontSize="14" TabIndex="9" BorderBrush="#FF688CAF">
               <FlowDocument AllowDrop="False">
                 <Paragraph>
                   <Run Text=""/>
                 </Paragraph>
               </FlowDocument>
             </RichTextBox>
-            <Label Content="Tells Received:" HorizontalAlignment="Left" Grid.Row="5" Width="93" RenderTransformOrigin="0.223,-1.52" Height="22" Margin="0,3,0,0" VerticalAlignment="Center"/>
-            <Border x:Name="chatBorder" Background="Orange" Margin="0,0,4,0" Padding="0" BorderThickness="1" BorderBrush="#FF688CAF" />
-            <Label x:Name="logStatusText" Content="No Log File Selected" Margin="12,1,157,25" FontStyle="Italic" Grid.RowSpan="2" />
+            <Label Content="Tells Received:" HorizontalAlignment="Left" Grid.Row="5" Width="93" RenderTransformOrigin="0.223,-1.52" Height="22" VerticalAlignment="Center" Margin="0,3,0,0"/>
+            <Border x:Name="chatBorder" Background="Orange" Margin="-3,-3,0,0" Padding="0" BorderThickness="1" BorderBrush="#FF688CAF" />
+            <Label x:Name="logStatusText" Content="No Log File Selected" Margin="10,0,275,2" FontStyle="Italic" />
             <CheckBox x:Name="lootChatOnly" Content="Show Only Loot Chat" Margin="0,0,19,4" VerticalAlignment="Bottom" Height="16" HorizontalAlignment="Right" Width="140" Checked="CheckBoxLootOnly_Checked" Unchecked="CheckBoxLootOnly_Checked" ToolTip="Only Show Loot Related Chat Messages" TabIndex="6"/>
             <CheckBox x:Name="autoScroll" Content="Auto-Scroll" VerticalAlignment="Bottom" Height="16" HorizontalAlignment="Right" Width="85" Checked="CheckBoxAutoscroll_Checked" Unchecked="CheckBoxAutoscroll_Checked" Margin="0,0,167,4" ToolTip="Automaticaly Scroll To Last Chat Message Received" IsChecked="True" TabIndex="5"/>
           </Grid>
         </TabItem>
         <TabItem x:Name="lootHistoryTab" Header="Loot History">
-          <Grid Background="#FFE5E5E5">
-            <DataGrid x:Name="lootDetailsListView" AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="SizeToHeader" HeadersVisibility="Column" CanUserReorderColumns="False" SelectionMode="Single" Margin="2,91,6,0" HorizontalGridLinesBrush="#FF688CAF" VerticalGridLinesBrush="#FF688CAF" >
+          <Grid Background="#FFFAFAFA">
+            <DataGrid x:Name="lootDetailsListView" AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="SizeToHeader" HeadersVisibility="Column" CanUserReorderColumns="False" SelectionMode="Single" Margin="-3,94,-3,-3" HorizontalGridLinesBrush="#FF688CAF" VerticalGridLinesBrush="#FF688CAF" Background="#FFE8E8E8" >
               <DataGrid.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="White"/>
@@ -465,14 +465,14 @@
                 </DataGridTextColumn>
               </DataGrid.Columns>
             </DataGrid>
-            <Border x:Name="historyBorder" Background="Orange" Margin="0,0,4,0" Padding="0" BorderThickness="1" BorderBrush="#FF688CAF" Height="27" VerticalAlignment="Top"/>
-            <Label x:Name="historyStatusText" Margin="12,1,28,0" FontStyle="Italic" Height="27" VerticalAlignment="Top" Content="No Loot Data Available"/>
-            <TextBox x:Name="lootDetailsFilterBox" Height="22" Margin="81,63,35,0" TextWrapping="Wrap" Text="Enter Player Names To Limit Results" VerticalAlignment="Top" VerticalContentAlignment="Center" FontStyle="Italic" TextChanged="LootDetailsFilterTextBox_TextChanged" GotFocus="LootDetailsFilterTextBox_GotFocus" LostFocus="LootDetailsFilterTextBox_LostFocus" KeyUp="LootDetailsFilterTextBox_KeyUp" BorderBrush="#FF688CAF"/>
-            <Label Content="Players:" HorizontalAlignment="Left" Margin="29,61,0,0" VerticalAlignment="Top" Width="98"/>
-            <xctk:CheckComboBox x:Name="tierComboBox" HorizontalAlignment="Left" VerticalContentAlignment="Center" VerticalAlignment="Top" IsEditable="true" Width="150" Height="22" Margin="207,35,0,0" BorderThickness="1" ClipToBounds="True" BorderBrush="#FF688CAF" Panel.ZIndex="1" ItemSelectionChanged="TierComboBox_ItemSelectionChanged"/>
-            <Label Content="Tier:" HorizontalAlignment="Left" Margin="170,33,0,0" VerticalAlignment="Top" Width="43"/>
-            <Label Content="Days Back:" HorizontalAlignment="Left" Margin="10,33,0,0" VerticalAlignment="Top" Width="70"/>
-            <xctk:LongUpDown x:Name="timeSpinner" Width="70" AllowTextInput="False" ValueChanged="TimeSpinner_ValueChanged" Increment="30" FormatString="0 Days" Value="90" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Height="22" Margin="81,35,0,0" VerticalAlignment="Top" Minimum="30" Maximum="9999" AutoMoveFocus="False"/>
+            <Border x:Name="historyBorder" Background="Orange" Margin="-3,-3,0,0" Padding="0" BorderThickness="1" BorderBrush="#FF688CAF" Height="28" VerticalAlignment="Top"/>
+            <Label x:Name="historyStatusText" Margin="10,0,234,0" FontStyle="Italic" Height="28" VerticalAlignment="Top" Content="No Loot Data Available"/>
+            <TextBox x:Name="lootDetailsFilterBox" Height="22" Margin="73,65,43,0" TextWrapping="Wrap" Text="Enter Player Names To Limit Results" VerticalAlignment="Top" VerticalContentAlignment="Center" FontStyle="Italic" TextChanged="LootDetailsFilterTextBox_TextChanged" GotFocus="LootDetailsFilterTextBox_GotFocus" LostFocus="LootDetailsFilterTextBox_LostFocus" KeyUp="LootDetailsFilterTextBox_KeyUp" BorderBrush="#FF688CAF"/>
+            <Label Content="Players:" HorizontalAlignment="Left" Margin="21,63,0,0" VerticalAlignment="Top" Width="98"/>
+            <xctk:CheckComboBox x:Name="tierComboBox" HorizontalAlignment="Left" VerticalContentAlignment="Center" VerticalAlignment="Top" IsEditable="true" Width="150" Height="22" Margin="199,34,0,0" BorderThickness="1" ClipToBounds="True" BorderBrush="#FF688CAF" Panel.ZIndex="1" ItemSelectionChanged="TierComboBox_ItemSelectionChanged"/>
+            <Label Content="Tier:" HorizontalAlignment="Left" Margin="163,32,0,0" VerticalAlignment="Top" Width="43"/>
+            <Label Content="Days Back:" HorizontalAlignment="Left" Margin="2,32,0,0" VerticalAlignment="Top" Width="70"/>
+            <xctk:LongUpDown x:Name="timeSpinner" Width="70" AllowTextInput="False" ValueChanged="TimeSpinner_ValueChanged" Increment="30" FormatString="0 Days" Value="90" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Height="22" Margin="73,35,0,0" VerticalAlignment="Top" Minimum="30" Maximum="9999" AutoMoveFocus="False" BorderBrush="#FF688CAF"/>
           </Grid>
         </TabItem>
       </TabControl>
