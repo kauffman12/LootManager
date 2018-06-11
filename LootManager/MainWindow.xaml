@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LootManager"
         xmlns:System="clr-namespace:System;assembly=mscorlib"
-  xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" x:Class="LootManager.MainWindow"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock" x:Class="LootManager.MainWindow"
         mc:Ignorable="d"
-        Title="Loot Manager (Not Connected)"
+        Title="Loot Manager v1.0.0.3 (Not Connected)"
         UseLayoutRounding="True"
         TextOptions.TextFormattingMode="Display"
         TextOptions.TextRenderingMode="ClearType"
@@ -54,11 +54,11 @@
       </Grid.ColumnDefinitions>
       <TabControl Margin="0,20,2,0" Background="#FFF0F0F0">
         <TabControl.Resources>
-          <Style TargetType="TabItem">
+          <Style TargetType="{x:Type TabItem}">
             <Setter Property="Template">
               <Setter.Value>
-                <ControlTemplate TargetType="TabItem">
-                  <Grid Name="Panel">
+                <ControlTemplate TargetType="{x:Type TabItem}">
+                  <Grid x:Name="Panel">
                     <ContentPresenter x:Name="ContentSite"
                                         VerticalAlignment="Center"
                                         HorizontalAlignment="Center"
@@ -96,7 +96,7 @@
                   <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="#FFFFFF" />
                 </DataGrid.Resources>
                 <DataGrid.ColumnHeaderStyle>
-                  <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                  <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                     <Setter Property="HorizontalContentAlignment" Value="Center"/>
                   </Style>
                 </DataGrid.ColumnHeaderStyle>
@@ -104,7 +104,7 @@
                   <DataGridTemplateColumn ClipboardContentBinding="{x:Null}" Header="" MaxWidth="20" MinWidth="20" IsReadOnly="True" CanUserReorder="False" Width="16">
                     <DataGridTemplateColumn.CellTemplate>
                       <DataTemplate>
-                        <Button Command="Delete">
+                        <Button Command="Delete" BorderBrush="{x:Null}" Foreground="{x:Null}" BorderThickness="0" Background="#FFF4F4F4">
                           <Image Source="/LootManager;component/Icons/Cancel/Cancel_16xMD.png"/>
                         </Button>
                       </DataTemplate>
@@ -148,7 +148,7 @@
                   <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="#FFFFFF" />
                 </DataGrid.Resources>
                 <DataGrid.ColumnHeaderStyle>
-                  <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                  <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                     <Setter Property="HorizontalContentAlignment" Value="Center"/>
                   </Style>
                 </DataGrid.ColumnHeaderStyle>
@@ -156,7 +156,7 @@
                   <DataGridTemplateColumn ClipboardContentBinding="{x:Null}" Header="" IsReadOnly="True" MaxWidth="20" MinWidth="20" CanUserReorder="False" Width="16">
                     <DataGridTemplateColumn.CellTemplate>
                       <DataTemplate>
-                        <Button Command="Delete">
+                        <Button Command="Delete" BorderBrush="{x:Null}" Foreground="{x:Null}" BorderThickness="0" Background="#FFF4F4F4">
                           <Image Source="/LootManager;component/Icons/Cancel/Cancel_16xMD.png"/>
                         </Button>
                       </DataTemplate>
@@ -268,7 +268,7 @@
                   <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="#FFFFFF" />
                 </DataGrid.Resources>
                 <DataGrid.ColumnHeaderStyle>
-                  <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                  <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                     <Setter Property="HorizontalContentAlignment" Value="Center"/>
                   </Style>
                 </DataGrid.ColumnHeaderStyle>
@@ -291,7 +291,7 @@
                   <DataGridTemplateColumn ClipboardContentBinding="{x:Null}" Header="" IsReadOnly="True" MaxWidth="20" MinWidth="20" CanUserReorder="False" Width="16">
                     <DataGridTemplateColumn.CellTemplate>
                       <DataTemplate>
-                        <Button Command="Delete">
+                        <Button Command="Delete" BorderBrush="{x:Null}" Foreground="{x:Null}" BorderThickness="0" Background="#FFF4F4F4">
                           <Image Source="/LootManager;component/Icons/Cancel/Cancel_16xMD.png"/>
                         </Button>
                       </DataTemplate>
@@ -311,11 +311,11 @@
       <GridSplitter Margin="0,42,2,2" HorizontalAlignment="Center" MinWidth="3" Foreground="White" Background="#994F4E4E" Grid.IsSharedSizeScope="True" Grid.Column="1" Width="4" MinHeight="1"/>
       <TabControl x:Name="secondTabControl" Margin="0,20,2,0" Grid.Column="2" Background="#FFF0F0F0" SelectionChanged="ChatLootTab_SelectionChanged">
         <TabControl.Resources>
-          <Style TargetType="TabItem">
+          <Style TargetType="{x:Type TabItem}">
             <Setter Property="Template">
               <Setter.Value>
-                <ControlTemplate TargetType="TabItem">
-                  <Grid Name="Panel">
+                <ControlTemplate TargetType="{x:Type TabItem}">
+                  <Grid x:Name="Panel">
                     <ContentPresenter x:Name="ContentSite"
                                         VerticalAlignment="Center"
                                         HorizontalAlignment="Center"
@@ -374,15 +374,20 @@
         </TabItem>
         <TabItem x:Name="lootHistoryTab" Header="Loot History">
           <Grid Background="#FFE5E5E5">
-            <DataGrid x:Name="lootDetailsListView" AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="SizeToHeader" HeadersVisibility="Column" CanUserReorderColumns="False" SelectionMode="Single" Margin="2,91,6,2" HorizontalGridLinesBrush="#FF688CAF" VerticalGridLinesBrush="#FF688CAF" >
+            <DataGrid x:Name="lootDetailsListView" AutoGenerateColumns="False" CanUserAddRows="False" ColumnWidth="SizeToHeader" HeadersVisibility="Column" CanUserReorderColumns="False" SelectionMode="Single" Margin="2,91,6,0" HorizontalGridLinesBrush="#FF688CAF" VerticalGridLinesBrush="#FF688CAF" >
               <DataGrid.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="White"/>
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="White" />
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="Black" />
               </DataGrid.Resources>
+              <DataGrid.ContextMenu>
+                <ContextMenu Focusable="False">
+                  <MenuItem x:Name="lootHistoryShowMenuItem" IsCheckable="True" IsChecked="True" Header="Show Details" Focusable="False"/>
+                </ContextMenu>
+              </DataGrid.ContextMenu>
               <DataGrid.ColumnHeaderStyle>
-                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                   <Setter Property="HorizontalContentAlignment" Value="Center"/>
                 </Style>
               </DataGrid.ColumnHeaderStyle>

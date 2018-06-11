@@ -10,7 +10,8 @@ namespace LootManager
   public class GuildChatController : SimpleChatController
   {
     private Regex aNumber = new Regex(@"\d");
-    private Regex guildLootChat = new Regex(@"^You say to your guild, '/t (.+)'");
+    private Regex otherLootChat = new Regex(@"^\w+ tells the guild, '/t (.+)'");
+    private Regex yourLootChat = new Regex(@"^You say to your guild, '/t (.+)'");
     private DataGrid watchListView;
     private CheckBox lootChatOnly;
     private List<string> guildChatBuffer = new List<string>();
@@ -24,7 +25,7 @@ namespace LootManager
     public new void handleEvent(LogEventArgs e)
     {
       string line = parseLine(e.line);
-      MatchCollection matches = guildLootChat.Matches(line);
+      MatchCollection matches = yourLootChat.Matches(line);
 
       if (matches.Count > 0 && matches[0].Groups.Count == 2)
       {
@@ -75,7 +76,8 @@ namespace LootManager
         }
       }
 
-      bool isLootChat = matches.Count > 0 || (e.line.Split(new string[] { " // " }, System.StringSplitOptions.None).Length > 1);
+      bool isLootChat = matches.Count > 0 || otherLootChat.IsMatch(line) || (e.line.Split(new string[] { " // " }, System.StringSplitOptions.None).Length > 1) ||
+        (e.line.Split(new string[] { " || " }, System.StringSplitOptions.None).Length > 1);
 
       if (!isLootChat)
       {
@@ -97,10 +99,28 @@ namespace LootManager
 
     public void toggleDisplayLootOnly()
     {
+      string[] temp = { };
       TextRange range = new TextRange(richTextBox.Document.ContentStart, richTextBox.Document.ContentEnd);
-      string[] temp = range.Text.TrimEnd().Split('\r');
-      range.Text = System.String.Join("\r", guildChatBuffer.ToArray()) + "\r";
-      guildChatBuffer = new List<string>(temp);
+      if (range.Text.Length > 0)
+      {
+        temp = range.Text.TrimEnd().Split('\r');
+      }
+
+      range.Text = (guildChatBuffer.Count > 0) ? System.String.Join("\r", guildChatBuffer.ToArray()) : "";
+
+      if (temp.Length > 0)
+      {
+        guildChatBuffer = new List<string>(temp);
+      }
+      else
+      {
+        guildChatBuffer = new List<string>();
+      }
+
+      if (autoScroll.IsChecked.Value)
+      {
+        richTextBox.ScrollToEnd();
+      }
     }
   }
 }

@@ -125,10 +125,28 @@ namespace LootManager
 
     public void toggleDisplayLootOnly()
     {
+      string[] temp = { };
       TextRange range = new TextRange(richTextBox.Document.ContentStart, richTextBox.Document.ContentEnd);
-      string[] temp = range.Text.TrimEnd().Split('\r');
-      range.Text = System.String.Join("\r", tellsChatBuffer.ToArray()) + "\r";
-      tellsChatBuffer = new List<string>(temp);
+      if (range.Text.Length > 0)
+      {
+        temp = range.Text.TrimEnd().Split('\r');
+      }
+
+      range.Text = (tellsChatBuffer.Count > 0) ? System.String.Join("\r", tellsChatBuffer.ToArray()) : "";
+
+      if (temp.Length > 0)
+      {
+        tellsChatBuffer = new List<string>(temp);
+      }
+      else
+      {
+        tellsChatBuffer = new List<string>();
+      }
+
+      if (autoScroll.IsChecked.Value)
+      {
+        richTextBox.ScrollToEnd();
+      }
     }
   }
 }

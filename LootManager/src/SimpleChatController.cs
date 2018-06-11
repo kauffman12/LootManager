@@ -4,7 +4,7 @@ namespace LootManager
 {
   public class SimpleChatController
   {
-    private CheckBox autoScroll;
+    protected CheckBox autoScroll;
     protected RichTextBox richTextBox;
 
     public SimpleChatController(RichTextBox richTextBox, CheckBox autoScroll)
