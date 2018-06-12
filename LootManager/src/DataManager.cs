@@ -242,6 +242,52 @@ namespace LootManager
       itemsList.Sort((x, y) => x.Name.CompareTo(y.Name));
     }
 
+    public static List<LootAuditRecord> getLootAudit(string player, List<string> tiers, long? days)
+    {
+      long time = D1 * (days == null ? 90 : Convert.ToInt64(days));
+      List<LootAuditRecord> audits = new List<LootAuditRecord>();
+      System.DateTime start = System.DateTime.Now;
+
+      foreach (Dictionary<string, string> row in lootedList)
+      {
+        try
+        {
+          string name;
+          if (row.ContainsKey(NAME) && ((name = row[NAME]) != null) && name.Equals(player, StringComparison.OrdinalIgnoreCase))
+          {
+            string item = row[ITEM];
+            string slot = row[SLOT];
+            string eventName = row[EVENT];
+            string date = row[DATE];
+            System.DateTime dateValue = System.DateTime.Parse(row[DATE]);
+            bool alt = row.ContainsKey(ALT_LOOT) && "Yes".Equals(row[ALT_LOOT], StringComparison.OrdinalIgnoreCase);
+            bool rot = row.ContainsKey(ROT) && "Yes".Equals(row[ROT], StringComparison.OrdinalIgnoreCase);
+
+            // outside timerange
+            if ((start - dateValue).TotalSeconds > time)
+            {
+              continue;
+            }
+
+            if (tiers != null && eventToTier.ContainsKey(eventName) && !tiers.Contains(eventToTier[eventName]))
+            {
+              continue;
+            }
+
+            audits.Add(new LootAuditRecord { Item = item, Slot = slot, Event = eventName, Date = date, DateValue = dateValue, Alt = alt, Rot = rot });
+          }
+        }
+#pragma warning disable CS0168 // Variable is declared but never used
+        catch (Exception e)
+#pragma warning restore CS0168 // Variable is declared but never used
+        {
+          LOG.Error("Found bad data in Loot spreadsheet for " + player);
+        }
+      }
+    
+      return audits;
+    }
+
     public static void cleanup()
     {
       lootCountsByName.Clear();
@@ -541,34 +587,5 @@ namespace LootManager
 
       return result;
     }
-  }
-
-  public class RaidEvent
-  {
-    public string Name { get; set; }
-    public string ShortName { get; set; }
-    public string Tier { get; set; }
-  }
-
-  public class LootCounts
-  {
-    public int Main { get; set; }
-    public int Alt { get; set; }
-    public int LastMainDays { get; set; }
-  }
-
-  public class Player
-  {
-    public string Name { get; set; }
-    public string Class { get; set; }
-    public string Rank { get; set; }
-  }
-
-  public class Item
-  {
-    public string Name { get; set; }
-    public string Slot { get; set; }
-    public string EventName { get; set; }
-    public string Tier { get; set; }
   }
 }

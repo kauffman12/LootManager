@@ -27,6 +27,7 @@ namespace LootManager
     private GuildChatController guildChatController;
     private TellsChatController tellsChatController;
     private Task textUpdateTask = null;
+    private LootAuditWindow lootAuditWindow = null;
 
     public MainWindow()
     {
@@ -942,6 +943,48 @@ namespace LootManager
       }
     }
 
+    private void LootDetailsListRow_DoubleClick(object sender, RoutedEventArgs e)
+    {
+      DataGridRow row = e.Source as DataGridRow;
+      viewLootLog(row.DataContext as LootDetailsListItem);
+    }
+
+    private void LootDetailsListViewLog_Click(object sender, RoutedEventArgs e)
+    {
+      List<LootDetailsListItem> list = lootDetailsListView.SelectedItems.Cast<LootDetailsListItem>().ToList();
+      if (list != null)
+      {
+        list.ForEach(l => viewLootLog(l));
+      }
+    }
+
+    private void viewLootLog(LootDetailsListItem details)
+    {
+      if (details != null)
+      {
+        if (lootAuditWindow == null)
+        {
+          lootAuditWindow = new LootAuditWindow(tierComboBox.SelectedItemsOverride as List<string>, timeSpinner.Value);
+          lootAuditWindow.Closed += (object s, System.EventArgs e2) => lootAuditWindow = null;
+        }
+
+        lootAuditWindow.Show();
+
+        if (lootAuditWindow.WindowState == WindowState.Minimized)
+        {
+          lootAuditWindow.WindowState = WindowState.Normal;
+        }
+
+        lootAuditWindow.Activate();
+        lootAuditWindow.load(details.Player);
+      }
+    }
+
+    private void LootDetailsListContextMenu_OnOpened(object sender, RoutedEventArgs e)
+    {
+      lootHistoryViewLogMenuItem.IsEnabled = (lootDetailsListView.SelectedItems.Count > -1 && lootDetailsListView.SelectedItems.Count < 10);
+    }
+
     private void GuildChatExpander_Expanded(object sender, RoutedEventArgs e)
     {
       chatGrid.RowDefinitions[1].Height = STAR_GRID;
@@ -971,49 +1014,5 @@ namespace LootManager
     {
       chatGrid.RowDefinitions[3].Height = AUTO_GRID;
     }
-  }
-
-  public class LootedListItem
-  {
-    public string Item { get; set; }
-    public string Player { get; set; }
-    public string Slot { get; set; }
-    public string Found { get; set; }
-    public bool Ready { get; set; }
-  }
-
-  public class RequestListItem
-  {
-    public string Item { get; set; }
-    public string Player { get; set; }
-    public string Type { get; set; }
-    public int Main{ get; set; }
-    public int Alt { get; set; }
-    public int Days { get; set; }
-  }
-
-  public class WatchListItem
-  {
-    public string Item { get; set; }
-    public int TellCount { get; set; }
-    public string Found { get; set; }
-  }
-
-  public class LootDetailsListItem
-  {
-    public string Player { get; set; }
-    public int Total { get; set; }
-    public int Visibles { get; set; }
-    public int NonVisibles { get; set; }
-    public int Weapons { get; set; }
-    public int Other { get; set; }
-    public int Special { get; set; }
-    public int Main { get; set; }
-    public int Alt { get; set; }
-    public int Rot { get; set; }
-    public string LastAltDate { get; set; }
-    public string LastMainDate { get; set; }
-    public System.DateTime LastAltDateValue { get; set; }
-    public System.DateTime LastMainDateValue { get; set; }
   }
 }
