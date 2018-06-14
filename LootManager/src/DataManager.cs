@@ -84,6 +84,17 @@ namespace LootManager
       { "1HB", true }, { "1HP", true }, { "1HS", true }, { "2HB", true }, { "2HP", true },
       { "2HS", true }, { "H2H", true }, { "Bow", true }
     };
+    // class type map
+    private static readonly Dictionary<string, List<string>> classTypeMap = new Dictionary<string, List<string>>
+    {
+      { "Tanks", new List<string> { "Paladin", "Shadow Knight", "Warrior" } },
+      { "Priests", new List<string> { "Cleric", "Druid", "Shaman" } },
+      { "Melee", new List<string> { "Monk", "Rogue", "Zerker" } },
+      { "Hybrid", new List<string> { "Bard", "Beastlord", "Ranger" } },
+      { "Casters", new List<string> { "Enchanter", "Magician", "Necromancer", "Wizard" } }
+    };
+    // list of classes
+    private static readonly List<string> classTypes = classTypeMap.Keys.ToList();
 
     // 1 day in seconds
     private static readonly long D1 = 24 * 60 * 60;
@@ -93,6 +104,9 @@ namespace LootManager
     public static void load()
     {
       System.DateTime start = System.DateTime.Now;
+
+      // sort class types
+      classTypes.Sort();
 
       // temp list
       List<Dictionary<string, string>> temp = new List<Dictionary<string, string>>();
@@ -210,16 +224,21 @@ namespace LootManager
       return eventsList;
     }
 
-    public static List<LootDetailsListItem> getLootDetails(List<string> names, List<string> tiers, long? days)
+    public static List<LootDetailsListItem> getLootDetails(List<string> names, List<string> tiers, List<string> classTypes, long? days)
     {
       lootDetailsList.Clear();
-      populateLootDetails(names, tiers, D1 * (days == null ? 90 : Convert.ToInt64(days)));
+      populateLootDetails(names, tiers, classTypes, D1 * (days == null ? 90 : Convert.ToInt64(days)));
       return lootDetailsList.ToList();  // avoids some odd refresh problems
     }
 
     public static string getHistoryStatus()
     {
       return historyStatus;
+    }
+
+    public static List<string> getClassTypes()
+    {
+      return classTypes.ToList();
     }
 
     public static List<string> getTiers()
@@ -386,12 +405,18 @@ namespace LootManager
       }
     }
 
-    private static void populateLootDetails(List<string> names, List<string> tiers, long time)
+    private static void populateLootDetails(List<string> names, List<string> tiers, List<string> classTypes, long time)
     {
       int count = 0;
       string oldestDate = null;
       System.DateTime oldestDateValue = System.DateTime.Now;
       System.DateTime start = System.DateTime.Now;
+
+      Dictionary<string, bool> classMap = new Dictionary<string, bool>();
+      if (classTypes != null)
+      {
+        classTypes.ForEach(type => classTypeMap[type].ForEach(c => classMap.Add(c, true)));
+      }
 
       Dictionary<string, LootDetailsListItem> cache = new Dictionary<string, LootDetailsListItem>();
 
@@ -424,6 +449,12 @@ namespace LootManager
             }
           }
 
+          string className = activePlayerByName[name].Class;
+          if (!classMap.ContainsKey(className))
+          {
+            continue;
+          }
+
           count++;
 
           if (oldestDate == null || oldestDateValue.CompareTo(theDate) > 0)
@@ -442,6 +473,7 @@ namespace LootManager
             lootDetails = new LootDetailsListItem
             {
               Player = name,
+              Class = className,
               Total = 0,
               Visibles = 0,
               NonVisibles = 0,

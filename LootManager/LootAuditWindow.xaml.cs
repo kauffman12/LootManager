@@ -31,6 +31,7 @@ namespace LootManager
         if (tabItem != null)
         {
           dataGrid = ((tabItem.Content as Grid).Children[0] as DataGrid);
+          tabControl.SelectedItem = tabItem;
         }
         else
         {

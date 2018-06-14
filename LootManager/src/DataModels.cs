@@ -31,6 +31,7 @@ namespace LootManager
   public class LootDetailsListItem
   {
     public string Player { get; set; }
+    public string Class { get; set; }
     public int Total { get; set; }
     public int Visibles { get; set; }
     public int NonVisibles { get; set; }

@@ -543,9 +543,9 @@ namespace LootManager
           Dispatcher.BeginInvoke((System.Action)(() =>
           {
             newLootSaveButton.IsEnabled = (newLootSlot.SelectedIndex > 0 && newLootEvent.Text.Length > 0 && !newLootEvent.Text.Equals("Select Event") &&
-            newLootItem.Text.Length > 0 && !newLootItem.Text.Equals("Select Item") && newLootPlayer.Text.Length > 0 && !newLootPlayer.Text.Equals("Select Player"));
+            newLootItem.Text.Length > 0 && !newLootItem.Text.Equals("Select Item") && !newLootItem.Text.Equals("No Matching Loot Found") && newLootPlayer.Text.Length > 0 && !newLootPlayer.Text.Equals("Select Player"));
 
-            updateItemsDB.IsEnabled = (newLootItem.Text.Length > 0 && !newLootItem.Text.Equals("Select Item") && newLootItem.SelectedIndex == -1);
+            updateItemsDB.IsEnabled = (newLootItem.Text.Length > 0 && !newLootItem.Text.Equals("Select Item") && !newLootItem.Text.Equals("No Matching Loot Found") &&  newLootItem.SelectedIndex == -1);
             updateItemsDB.Visibility = updateItemsDB.IsEnabled ? Visibility.Visible : Visibility.Hidden;
             newLootItem.Foreground = updateItemsDB.IsEnabled ? new SolidColorBrush(Colors.DarkOrange) : new SolidColorBrush(Colors.Black);
           }));
@@ -786,6 +786,10 @@ namespace LootManager
       {
         newLootItem.SelectedIndex = 0;
       }
+      else if (newLootItem.Items.Count == 0)
+      {
+        newLootItem.Text = "No Matching Loot Found";
+      }
     }
 
     private void NewLootAlt_Checked(object sender, RoutedEventArgs e)
@@ -908,6 +912,18 @@ namespace LootManager
       loadHistoryData();
     }
 
+    private void ClassComboBox_ItemSelectionChanged(object sender, Xceed.Wpf.Toolkit.Primitives.ItemSelectionChangedEventArgs e)
+    {
+      // silly workaround
+      List<string> selected = classComboBox.SelectedItemsOverride as List<string>;
+      if (selected != null)
+      {
+        classComboBox.SelectedValue = string.Join(",", selected);
+      }
+
+      loadHistoryData();
+    }
+
     private void loadHistoryData()
     {
       // if data loaded
@@ -920,6 +936,8 @@ namespace LootManager
           historyBorder.Background = new SolidColorBrush(Color.FromRgb(179, 220, 217));
           tierComboBox.ItemsSource = DataManager.getTiers();
           tierComboBox.SelectedItemsOverride = DataManager.getTiers();
+          classComboBox.ItemsSource = DataManager.getClassTypes();
+          classComboBox.SelectedItemsOverride = DataManager.getClassTypes();
         }
 
         // get names filter
@@ -938,7 +956,8 @@ namespace LootManager
 
         // get tiers filter
         List<string> tiers = tierComboBox.SelectedItemsOverride as List<string>;
-        lootDetailsListView.ItemsSource = DataManager.getLootDetails(names, tiers, timeSpinner.Value);
+        List<string> classTypes = classComboBox.SelectedItemsOverride as List<string>;
+        lootDetailsListView.ItemsSource = DataManager.getLootDetails(names, tiers, classTypes, timeSpinner.Value);
         historyStatusText.Content = DataManager.getHistoryStatus();
       }
     }
