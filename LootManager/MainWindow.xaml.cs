@@ -45,6 +45,13 @@ namespace LootManager
           Height = height;
           Width = width;
         }
+
+        // first grid length position
+        string firstGridLength = RuntimeProperties.getProperty("first_grid_length");
+        if (firstGridLength != null)
+        {
+          mainGrid.ColumnDefinitions[0].Width = (GridLength) new GridLengthConverter().ConvertFromString(firstGridLength);
+        }       
       }
 #pragma warning disable CS0168 // Variable is declared but never used
       catch (System.Exception e)
@@ -82,6 +89,7 @@ namespace LootManager
       LogReader.getInstance().stop();
       RuntimeProperties.setProperty("height", Height.ToString());
       RuntimeProperties.setProperty("width", Width.ToString());
+      RuntimeProperties.setProperty("first_grid_length", mainGrid.ColumnDefinitions[0].Width.ToString());
       RuntimeProperties.serialize();
     }
 

@@ -49,7 +49,7 @@
         </MenuItem>
       </MenuItem>
     </Menu>
-    <Grid Margin="4,0,4,4">
+    <Grid x:Name="mainGrid" Margin="4,0,4,4">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="400*" />
         <ColumnDefinition Width="6" />
