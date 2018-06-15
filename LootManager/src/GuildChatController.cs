@@ -14,27 +14,31 @@ namespace LootManager
     private Regex yourLootChat = new Regex(@"^You say to your guild, '/t (.+)'");
     private DataGrid watchListView;
     private CheckBox lootChatOnly;
-    private List<string> guildChatBuffer = new List<string>();
+    private FlowDocument guildChatBuffer;
 
     public GuildChatController(RichTextBox richTextBox, DataGrid watchListView, CheckBox lootChatOnly, CheckBox autoScroll) : base(richTextBox, autoScroll)
     {
       this.watchListView = watchListView;
       this.lootChatOnly = lootChatOnly;
+
+      guildChatBuffer = new FlowDocument();
+      guildChatBuffer.Blocks.Add(new Paragraph());
     }
 
     public new void handleEvent(LogEventArgs e)
     {
       string line = parseLine(e.line);
       MatchCollection matches = yourLootChat.Matches(line);
+      string highlight = null;
 
       if (matches.Count > 0 && matches[0].Groups.Count == 2)
       {
         string lootString = matches[0].Groups[1].Value;
         if (lootString.Length > 0 && char.IsUpper(lootString[0]))
         {
+          WatchListItem listItem = null;
           // find loot in database
           string item = "";
-          WatchListItem listItem = null;
 
           // try to cut out end with possibly digit like x2
           string output = System.String.Join(" ", lootString.Split(null).Where(x => !aNumber.IsMatch(x)));
@@ -68,6 +72,8 @@ namespace LootManager
             listItem = new WatchListItem { Item = output, TellCount = 0, Found = "No, Edit if needed" };
           }
 
+          highlight = listItem.Item;
+
           ObservableCollection<WatchListItem> collection = watchListView.ItemsSource as ObservableCollection<WatchListItem>;
           if (collection == null || collection.Count <= 0 || collection.FirstOrDefault(x => listItem.Item.Equals(x.Item)) == null)
           {
@@ -83,39 +89,25 @@ namespace LootManager
       {
         if (lootChatOnly.IsChecked.Value)
         {
-          guildChatBuffer.Add(line);
+          appendLine(guildChatBuffer, line, highlight);
         }
         else
         {
-          appendLine(line);
+          appendLine(richTextBox.Document, line, highlight);
         }
       }
       else
       {
-        guildChatBuffer.Add(line);
-        appendLine(line);
+        appendLine(guildChatBuffer, line, highlight);
+        appendLine(richTextBox.Document, line, highlight);
       }
     }
 
     public void toggleDisplayLootOnly()
     {
-      string[] temp = { };
-      TextRange range = new TextRange(richTextBox.Document.ContentStart, richTextBox.Document.ContentEnd);
-      if (range.Text.Length > 0)
-      {
-        temp = range.Text.TrimEnd().Split('\r');
-      }
-
-      range.Text = (guildChatBuffer.Count > 0) ? System.String.Join("\r", guildChatBuffer.ToArray()) : "";
-
-      if (temp.Length > 0)
-      {
-        guildChatBuffer = new List<string>(temp);
-      }
-      else
-      {
-        guildChatBuffer = new List<string>();
-      }
+      FlowDocument temp = richTextBox.Document;
+      richTextBox.Document = guildChatBuffer;
+      guildChatBuffer = temp;
 
       if (autoScroll.IsChecked.Value)
       {

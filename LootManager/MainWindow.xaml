@@ -7,7 +7,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" 
         x:Class="LootManager.MainWindow"
         mc:Ignorable="d"
-        Title="Loot Manager v1.0.0.7 (Not Connected)"
+        Title="Loot Manager v1.0.0.8 (Not Connected)"
         UseLayoutRounding="True"
         TextOptions.TextFormattingMode="Display"
         TextOptions.TextRenderingMode="ClearType"
@@ -109,8 +109,8 @@
                       </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                   </DataGridTemplateColumn>
-                  <DataGridTextColumn Binding="{Binding Item}" ClipboardContentBinding="{x:Null}" Header="Taking Tells For" CanUserReorder="False" Width="165" />
-                  <DataGridTextColumn Binding="{Binding TellCount}" ClipboardContentBinding="{x:Null}" Header="Tells" IsReadOnly="True" CanUserReorder="False" Width="55">
+                  <DataGridTextColumn Binding="{Binding Item}" ClipboardContentBinding="{x:Null}" Header="Taking Tells For" CanUserReorder="False" Width="175" />
+                  <DataGridTextColumn Binding="{Binding TellCount}" ClipboardContentBinding="{x:Null}" Header="Tells" IsReadOnly="True" CanUserReorder="False" Width="45">
                     <DataGridTextColumn.CellStyle>
                       <Style TargetType="{x:Type DataGridCell}">
                         <Setter Property="TextBlock.TextAlignment" Value="Center" />
@@ -341,27 +341,21 @@
             <Expander Grid.Row="1" Header="Guild Chat" IsExpanded="True" Expanded="GuildChatExpander_Expanded" Collapsed="GuildChatExpander_Collapsed" Margin="0">
               <RichTextBox x:Name="guildChatBox" Grid.Row="0" IsReadOnly="True" VerticalScrollBarVisibility="Auto" FontSize="14" TabIndex="7" BorderBrush="#FF688CAF" Margin="-4,0">
                 <FlowDocument AllowDrop="False">
-                  <Paragraph>
-                    <Run Text=""/>
-                  </Paragraph>
+                  <Paragraph />
                 </FlowDocument>
               </RichTextBox>
             </Expander>
             <Expander Grid.Row="2" Header="Officer Chat" Collapsed="OfficerChatExpander_Collapsed" Expanded="OfficerChatExpander_Expanded" IsExpanded="True">
               <RichTextBox x:Name="officerChatBox" IsReadOnly="True" VerticalScrollBarVisibility="Auto" FontSize="14" TabIndex="8" BorderBrush="#FF688CAF" Margin="-4,0">
                 <FlowDocument AllowDrop="False">
-                  <Paragraph>
-                    <Run Text=""/>
-                  </Paragraph>
+                  <Paragraph />
                 </FlowDocument>
               </RichTextBox>
             </Expander>
             <Expander Grid.Row="3" Header="Received Tells" IsExpanded="True" Collapsed="TellsChatExpander_Collapsed" Expanded="TellsChatExpander_Expanded">
               <RichTextBox x:Name="tellsChatBox" IsReadOnly="True" VerticalScrollBarVisibility="Auto" FontSize="14" TabIndex="9" BorderBrush="#FF688CAF" Margin="-4,0">
                 <FlowDocument AllowDrop="False">
-                  <Paragraph>
-                    <Run Text=""/>
-                  </Paragraph>
+                  <Paragraph />
                 </FlowDocument>
               </RichTextBox>
             </Expander>
@@ -398,9 +392,9 @@
                 </Style>
               </DataGrid.ColumnHeaderStyle>
               <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding Player}" ClipboardContentBinding="{x:Null}" Header="Name" IsReadOnly="True" CanUserReorder="False" MinWidth="85" Width="90*" />
-                <DataGridTextColumn Binding="{Binding Class}" ClipboardContentBinding="{x:Null}" Header="Class" IsReadOnly="True" CanUserReorder="False" MinWidth="85" Width="88" />
-                <DataGridTextColumn Binding="{Binding Total}" ClipboardContentBinding="{x:Null}" Header="Total" IsReadOnly="True" MaxWidth="42" Width="42" CanUserReorder="False">
+                <DataGridTextColumn Binding="{Binding Player}" ClipboardContentBinding="{x:Null}" Header="Name" IsReadOnly="True" CanUserReorder="False" MinWidth="85" Width="88*" />
+                <DataGridTextColumn Binding="{Binding Class}" ClipboardContentBinding="{x:Null}" Header="Class" IsReadOnly="True" CanUserReorder="False" MinWidth="88" Width="88" />
+                <DataGridTextColumn Binding="{Binding Total}" ClipboardContentBinding="{x:Null}" Header="Total" IsReadOnly="True" MaxWidth="40" Width="40" CanUserReorder="False">
                   <DataGridTextColumn.CellStyle>
                     <Style TargetType="{x:Type DataGridCell}">
                       <Setter Property="TextBlock.TextAlignment" Value="Center" />

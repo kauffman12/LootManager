@@ -15,7 +15,7 @@ namespace LootManager
     private DataGrid watchListView;
     private IDictionary<string, ObservableCollection<RequestListItem>> requestListMap;
     private CheckBox lootChatOnly;
-    private List<string> tellsChatBuffer = new List<string>();
+    private FlowDocument tellsChatBuffer;
 
     public TellsChatController(RichTextBox richTextBox, DataGrid watchListView, IDictionary<string, ObservableCollection<RequestListItem>> requestListMap, 
       CheckBox lootChatOnly, CheckBox autoScroll) : base(richTextBox, autoScroll)
@@ -23,12 +23,16 @@ namespace LootManager
       this.watchListView = watchListView;
       this.requestListMap = requestListMap;
       this.lootChatOnly = lootChatOnly;
+
+      tellsChatBuffer = new FlowDocument();
+      tellsChatBuffer.Blocks.Add(new Paragraph());
     }
 
     public new void handleEvent(LogEventArgs e)
     {
       string line = parseLine(e.line);
       bool wasLoot = false;
+      string highlight = null;
 
       MatchCollection matches = lootTell.Matches(line);
       if (matches.Count > 0)
@@ -42,6 +46,7 @@ namespace LootManager
           WatchListItem found = watchList.FirstOrDefault(x => text.Contains(x.Item));
           if (found != null)
           {
+            highlight = found.Item;
             string cleaned = text.Replace(found.Item, "").ToLower();
             string type = "Main";
 
@@ -109,39 +114,25 @@ namespace LootManager
       {
         if (lootChatOnly.IsChecked.Value)
         {
-          tellsChatBuffer.Add(line);
+          appendLine(tellsChatBuffer, line, highlight);
         }
         else
         {
-          appendLine(line);
+          appendLine(richTextBox.Document, line, highlight);
         }
       }
       else
       {
-        tellsChatBuffer.Add(line);
-        appendLine(line);
+        appendLine(tellsChatBuffer, line, highlight);
+        appendLine(richTextBox.Document, line, highlight);
       }
     }
 
     public void toggleDisplayLootOnly()
     {
-      string[] temp = { };
-      TextRange range = new TextRange(richTextBox.Document.ContentStart, richTextBox.Document.ContentEnd);
-      if (range.Text.Length > 0)
-      {
-        temp = range.Text.TrimEnd().Split('\r');
-      }
-
-      range.Text = (tellsChatBuffer.Count > 0) ? System.String.Join("\r", tellsChatBuffer.ToArray()) : "";
-
-      if (temp.Length > 0)
-      {
-        tellsChatBuffer = new List<string>(temp);
-      }
-      else
-      {
-        tellsChatBuffer = new List<string>();
-      }
+      FlowDocument temp = richTextBox.Document;
+      richTextBox.Document = tellsChatBuffer;
+      tellsChatBuffer = temp;
 
       if (autoScroll.IsChecked.Value)
       {
