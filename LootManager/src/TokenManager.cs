@@ -22,7 +22,7 @@ namespace LootManager
     private static string CLIENT_ID = "454647371816-r8gv4nnmfqbe8ujk3t0mc9g04uk5voh6.apps.googleusercontent.com";
     private static string AUTH_ENDPOINT = "https://accounts.google.com/o/oauth2/v2/auth";
     private static string TOKEN_REQUEST_URI = "https://www.googleapis.com/oauth2/v4/token";
-    private static string SCOPE = "openid profile https://www.googleapis.com/auth/spreadsheets";
+    private static string SCOPE = "openid profile https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive";
 
     private static Dictionary<string, string> tokens = null;
     private static System.DateTime expireTime;

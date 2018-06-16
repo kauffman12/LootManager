@@ -4,6 +4,8 @@ using System.Linq;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
 using System.Collections.Generic;
+using Google.Apis.Drive.v3;
+using Google.Apis.Drive.v3.Data;
 
 namespace LootManager
 {
@@ -44,14 +46,20 @@ namespace LootManager
     private static string SPECIAL = "Special".ToLower();
     private static string TIER = "Tier".ToLower();
 
+    // keep track of original row in spreadsheet
+    private static string SHEET_ROW = "SheetRow";
+
     // full datasets
     private static List<Dictionary<string, string>> rosterList = new List<Dictionary<string, string>>();
     private static List<Dictionary<string, string>> lootedList = new List<Dictionary<string, string>>();
 
+    private static Dictionary<string, DateTime?> fileModTimes = new Dictionary<string, DateTime?>();
+    private static Dictionary<string, IList<object>> headerMap = new Dictionary<string, IList<object>>();
+
     // player loot counts
     private static Dictionary<string, LootCounts> lootCountsByName = new Dictionary<string, LootCounts>();
-    // sorted play list
-    private static List<Player> activePlayerList = new List<Player>();
+    // sorted player list
+    private static List<Player> fullPlayerList = new List<Player>();
     // active player Map
     private static Dictionary<string, Player> activePlayerByName = new Dictionary<string, Player>();
     // sorted events list
@@ -96,6 +104,9 @@ namespace LootManager
     // list of classes
     private static readonly List<string> classTypes = classTypeMap.Keys.ToList();
 
+    // for spreadsheet ranges
+    private static readonly char[] rangeCountToLetter = { 'Z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M' };
+
     // 1 day in seconds
     private static readonly long D1 = 24 * 60 * 60;
 
@@ -120,7 +131,7 @@ namespace LootManager
           eventToTier.Add(evt[SHORT_NAME], evt[TIER]);
         }
 
-        if ("Yes".Equals(evt[DISPLAY_IN_LIST]))
+        if ("Yes".Equals(evt[DISPLAY_IN_LIST], StringComparison.OrdinalIgnoreCase))
         {
           eventsList.Add(new RaidEvent { Name = evt[EVENT], ShortName = evt[SHORT_NAME], Tier = evt[TIER] });
         }
@@ -158,8 +169,7 @@ namespace LootManager
       readData(temp, ITEMS_ID, "ROF Global Drops");
       populateItemsList(temp);
 
-      // full roster data and sorted players
-      readData(rosterList, ROSTER_ID, "Sheet1");
+      // get players
       populatePlayerList();
 
       // armor types
@@ -204,9 +214,14 @@ namespace LootManager
       }
     }
 
+    public static List<Player> getFullPlayerList()
+    {
+      return fullPlayerList.ToList();
+    }
+
     public static List<Player> getActivePlayerList()
     {
-      return activePlayerList;
+      return fullPlayerList.Where(player => player.Active).ToList();
     }
 
     public static List<Item> getItemsList()
@@ -303,14 +318,19 @@ namespace LootManager
           LOG.Error("Found bad data in Loot spreadsheet for " + player);
         }
       }
-    
+
       return audits;
+    }
+
+    public static int updateMember(Player player)
+    {
+      return updateRosterSpreadsheet(player);
     }
 
     public static void cleanup()
     {
       lootCountsByName.Clear();
-      activePlayerList.Clear();
+      fullPlayerList.Clear();
       armorTypesList.Clear();
       eventsList.Clear();
       rosterList.Clear();
@@ -319,21 +339,29 @@ namespace LootManager
 
     private static void populatePlayerList()
     {
+      fullPlayerList.Clear();
+      rosterList.Clear();
+
+      getModifiedTime(ROSTER_ID);
+
+      // full roster data and sorted players
+      readData(rosterList, ROSTER_ID, "Sheet1");
+
       foreach (Dictionary<string, string> row in rosterList)
       {
-        if (row.ContainsKey(ACTIVE) && row[ACTIVE].ToLower().Equals("yes"))
-        {
-          Player player = new Player { Name = row[NAME], Class = row[CLASS], Rank = row[RANK] };
-          activePlayerList.Add(player);
+        bool active = row.ContainsKey(ACTIVE) && "Yes".Equals(row[ACTIVE], StringComparison.OrdinalIgnoreCase);
+        string forumName = row.ContainsKey(FORUM_USERNAME) ? row[FORUM_USERNAME] : "";
+        Player player = new Player { Name = row[NAME], Class = row[CLASS], Rank = row[RANK], ForumName = forumName, Active = active };
 
-          if (!activePlayerByName.ContainsKey(row[NAME]))
-          {
-            activePlayerByName.Add(row[NAME], player);
-          }
+        if (active && !activePlayerByName.ContainsKey(row[NAME]))
+        {
+          activePlayerByName.Add(row[NAME], player);
         }
+
+        fullPlayerList.Add(player);
       }
 
-      activePlayerList.Sort((x, y) => x.Name.CompareTo(y.Name));
+      fullPlayerList.Sort((x, y) => x.Name.CompareTo(y.Name));
     }
 
     private static void populateItemsList(List<Dictionary<string, string>> list)
@@ -388,11 +416,11 @@ namespace LootManager
             lootCountsByName.Add(name, counts);
           }
 
-          if (row.ContainsKey(ALT_LOOT) && "Yes".Equals(row[ALT_LOOT]))
+          if (row.ContainsKey(ALT_LOOT) && "Yes".Equals(row[ALT_LOOT], StringComparison.OrdinalIgnoreCase))
           {
             counts.Alt++;
           }
-          else if (!row.ContainsKey(ROT) || !"Yes".Equals(row[ROT]))
+          else if (!row.ContainsKey(ROT) || !"Yes".Equals(row[ROT], StringComparison.OrdinalIgnoreCase))
           {
             counts.Main++;
             int days = Convert.ToInt32((start - System.DateTime.Parse(row[DATE])).TotalDays);
@@ -440,7 +468,7 @@ namespace LootManager
             continue;
           }
 
-         string eventName;
+          string eventName;
           if (tiers != null && row.ContainsKey(EVENT) && ((eventName = row[EVENT]) != null))
           {
             if (eventToTier.ContainsKey(eventName) && !tiers.Contains(eventToTier[eventName]))
@@ -489,14 +517,14 @@ namespace LootManager
           }
 
           bool isAlt = false;
-          if (row.ContainsKey(ALT_LOOT) && "Yes".Equals(row[ALT_LOOT]))
+          if (row.ContainsKey(ALT_LOOT) && "Yes".Equals(row[ALT_LOOT], StringComparison.OrdinalIgnoreCase))
           {
             isAlt = true;
             lootDetails.Alt++;
           }
 
           bool isRot = false;
-          if (row.ContainsKey(ROT) && "Yes".Equals(row[ROT]))
+          if (row.ContainsKey(ROT) && "Yes".Equals(row[ROT], StringComparison.OrdinalIgnoreCase))
           {
             isRot = true;
             lootDetails.Rot++;
@@ -562,16 +590,43 @@ namespace LootManager
       historyStatus = "Found " + count + " Entries Matching Filters, First Entry Recorded On " + oldestDate;
     }
 
+    private static DateTime? getModifiedTime(string docId)
+    {
+      DriveService driveSvc = new DriveService();
+      FilesResource.GetRequest request = driveSvc.Files.Get(docId);
+      request.Fields = "modifiedTime";
+      request.OauthToken = TokenManager.getAccessToken();
+      File file = request.Execute();
+
+      if (fileModTimes.ContainsKey(docId))
+      {
+        fileModTimes.Remove(docId);
+      }
+
+      fileModTimes.Add(docId, file.ModifiedTime);
+      return file.ModifiedTime;
+    }
+
     private static void readData(List<Dictionary<string, string>> results, string sheetId, string sheetName)
     {
       ValueRange response = readSpreadsheet(sheetId, sheetName);
-      IList<Object> headers = response.Values.Take(1).ElementAt(0);
+      IList<object> headers = response.Values.Take(1).ElementAt(0);
 
+      string headerKey = sheetId + sheetName;
+      if (headerMap.ContainsKey(headerKey))
+      {
+        headerMap.Remove(headerKey);
+      }
+
+      // save for future updates
+      headerMap.Add(headerKey, headers);
+
+      int sheetRow = 2;
       // Iterate through each row
-      foreach (List<Object> row in response.Values.Skip(1))
+      foreach (List<object> row in response.Values.Skip(1))
       {
         Dictionary<string, string> record = new Dictionary<string, string>();
-        for (int i=0; i<headers.Count; i++)
+        for (int i = 0; i < headers.Count; i++)
         {
           string cellValue = readCell(row, i);
           if (cellValue != null)
@@ -581,15 +636,88 @@ namespace LootManager
           }
         }
 
+        record.Add(SHEET_ROW, sheetRow.ToString());
         results.Add(record);
+        sheetRow++;
       }
     }
 
-    private static void appendSpreadsheet(string docId, string sheetName, IList<Object> values)
+    private static int updateRosterSpreadsheet(Player player)
+    {
+      // default to error
+      int ret = 1;
+
+      if (fileModTimes.ContainsKey(ROSTER_ID))
+      {
+        DateTime? previous = fileModTimes[ROSTER_ID];
+        DateTime? update = getModifiedTime(ROSTER_ID);
+        if (previous != null && update != null && (update - previous).Value.TotalSeconds > 0)
+        {
+          // file has been updated so re-populate
+          populatePlayerList();
+        }
+      }
+
+      Dictionary<string, string> found = rosterList.FirstOrDefault(row => row.ContainsKey(NAME) && row[NAME].Equals(player.Name));
+      if (found != null)
+      {
+        int index = fullPlayerList.FindIndex(p => p.Name.Equals(player.Name));
+        if (index >= 0)
+        {
+          fullPlayerList[index] = player;
+          bool active = found.ContainsKey(ACTIVE) && "yes".Equals(found[ACTIVE], StringComparison.OrdinalIgnoreCase);
+          updateValue(found, ACTIVE, player.Active ? "Yes" : "No");
+          updateValue(found, NAME, player.Name);
+          updateValue(found, CLASS, player.Class);
+          updateValue(found, RANK, player.Rank);
+          updateValue(found, FORUM_USERNAME, player.ForumName);
+
+          string headerKey = ROSTER_ID + "Sheet1";
+          if (headerMap.ContainsKey(headerKey) && found.ContainsKey(SHEET_ROW))
+          {
+            IList<string> updatedValues = headerMap[headerKey].Select(header =>
+            {
+              string value = "";
+              string key = header.ToString().ToLower();
+              if (found.ContainsKey(key))
+              {
+                value = found[key];
+              }
+
+              return value;
+            }).ToList();
+
+            string range = "A" + found[SHEET_ROW] + ":" + rangeCountToLetter[updatedValues.Count] + found[SHEET_ROW];
+            updateSpreadsheet(ROSTER_ID, "Sheet1", range, updatedValues.Cast<object>().ToList());
+            ret = 0;
+          }
+        }
+      }
+
+      return ret;
+    }
+
+    private static void updateSpreadsheet(string docId, string sheetName, string range, IList<object> values)
     {
       ValueRange valueRange = new ValueRange();
       valueRange.MajorDimension = "ROWS";
-      valueRange.Values = new List<IList<Object>> { values };
+      valueRange.Values = new List<IList<object>> { values };
+      valueRange.Range = sheetName + "!" + range;
+
+      SheetsService sheetsSvc = new SheetsService();
+      SpreadsheetsResource.ValuesResource.UpdateRequest request =
+        sheetsSvc.Spreadsheets.Values.Update(valueRange, docId, sheetName + "!" + range);
+
+      request.OauthToken = TokenManager.getAccessToken();
+      request.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+      request.Execute();
+    }
+
+    private static void appendSpreadsheet(string docId, string sheetName, IList<object> values)
+    {
+      ValueRange valueRange = new ValueRange();
+      valueRange.MajorDimension = "ROWS";
+      valueRange.Values = new List<IList<object>> { values };
 
       SheetsService sheetsSvc = new SheetsService();
       SpreadsheetsResource.ValuesResource.AppendRequest request =
@@ -609,7 +737,7 @@ namespace LootManager
       return request.Execute();
     }
 
-    private static string readCell(List<Object> row, int cell)
+    private static string readCell(List<object> row, int cell)
     {
       string result = null;
       if (row.Count > cell)
@@ -618,6 +746,14 @@ namespace LootManager
       }
 
       return result;
+    }
+
+    private static void updateValue(Dictionary<string, string> data, string key, string value)
+    {
+      if (data.ContainsKey(key))
+      {
+        data[key] = value;
+      }
     }
   }
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"><?define LootManager_TargetDir=$(var.LootManager.TargetDir)?>
-	<Product Id="*" Name="LootManager" Language="1033" Version="1.0.0.8" Manufacturer="ROI" UpgradeCode="083aae5b-8389-4a57-a696-18886c6d75db">
+	<Product Id="*" Name="LootManager" Language="1033" Version="1.0.0.9" Manufacturer="ROI" UpgradeCode="083aae5b-8389-4a57-a696-18886c6d75db">
     <Package Platform="x64" InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
 		<MajorUpgrade AllowSameVersionUpgrades="yes" DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
@@ -91,6 +91,9 @@
       <Component Win64="yes" Id="Xceed.Wpf.Toolkit.dll" Guid="e1325508-4b95-4a25-8faa-da286b8b3c17">
         <File Id="Xceed.Wpf.Toolkit.dll" Name="Xceed.Wpf.Toolkit.dll" Source="$(var.LootManager_TargetDir)Xceed.Wpf.Toolkit.dll" />
       </Component>
+      <Component Win64="yes" Id="Google.Apis.Drive.v3.dll" Guid="f158e21d-b80e-4271-9448-09d64f77837d">
+        <File Id="Google.Apis.Drive.v3.dll" Name="Google.Apis.Drive.v3.dll" Source="$(var.LootManager_TargetDir)Google.Apis.Drive.v3.dll" />
+      </Component>      
     </ComponentGroup>
   </Fragment>
 </Wix>

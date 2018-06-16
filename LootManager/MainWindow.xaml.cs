@@ -130,6 +130,7 @@ namespace LootManager
           Title = Title.Replace("Loading Database...", "Connected");
           resetNewLoot(true, true);
           checkLoadLootHistory();
+          loadMembers();
         }));
       }).Start();
     }
@@ -150,6 +151,9 @@ namespace LootManager
       Title = Title.Replace("Connected", "Reloading Database...");
       DataManager.cleanup();
       DataManager.load();
+      resetNewLoot(true, true);
+      checkLoadLootHistory();
+      loadMembers();
       Title = Title.Replace("Reloading Database...", "Connected");
     }
 
@@ -1005,6 +1009,84 @@ namespace LootManager
         lootAuditWindow.Activate();
         lootAuditWindow.load(details.Player);
       }
+    }
+
+    private void loadMembers()
+    {
+      // may not be ready during init
+      if (membersListView != null)
+      {
+        List<Player> list = onlyActiveMembers.IsChecked.Value ? DataManager.getActivePlayerList() : DataManager.getFullPlayerList();
+        membersListView.ItemsSource = list;
+
+        if (membersText.FontStyle == FontStyles.Italic)
+        {
+          membersDataBorder.Background = new SolidColorBrush(Color.FromRgb(179, 220, 217));
+          membersText.FontStyle = FontStyles.Normal;
+        }
+
+        membersText.Content = "Found " + list.Count + " Members";
+      }
+    }
+
+    private void CheckBoxMemberActiveData_Checked(object sender, RoutedEventArgs e)
+    {
+      if (membersListView.SelectedItem != null)
+      {
+        DataGridCell theCell = sender as DataGridCell;
+        if (theCell != null)
+        {
+          Player player = theCell.DataContext as Player;
+          if (player != null && player == membersListView.SelectedItem)
+          {
+            if (player.Active != e.RoutedEvent.Name.Equals("Checked"))
+            {
+              player.Active = e.RoutedEvent.Name.Equals("Checked");
+              updateMember(player);
+            }
+          }
+        }
+      }
+    }
+
+    private void MembersListView_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+    {
+      // checkbox has its own function
+      TextBox elem = e.EditingElement as TextBox;
+      if (elem != null)
+      {
+        string field = ((System.Windows.Data.Binding)((DataGridBoundColumn)e.Column).Binding).Path.Path;
+        string oldValue = e.Row.DataContext.GetType().GetProperty(field).GetValue(e.Row.DataContext, null).ToString();
+        string newValue = elem.Text;
+
+        if (!oldValue.Equals(newValue))
+        {
+          e.Row.DataContext.GetType().GetProperty(field).SetValue(e.Row.DataContext, newValue);
+          updateMember(e.Row.DataContext as Player);
+        }
+      }
+    }
+
+    private void updateMember(Player player)
+    {
+      string auditLine = DataManager.updateMember(player) == 0 ? "S" : "E";
+      auditLine += " | " + player.Name + " | " + player.ForumName + " | " + player.Class + " | " + player.Rank + " | " + player.Active;
+
+      if (memberAuditTextBox.Text.Contains("Audit Log"))
+      {
+        memberAuditTextBox.Clear();
+        memberAuditTextBox.AppendText(auditLine);
+      }
+      else
+      {
+        memberAuditTextBox.AppendText("\r" + auditLine);
+      }
+      memberAuditTextBox.ScrollToEnd();
+    }
+
+    private void CheckBoxActiveMembers_Checked(object sender, RoutedEventArgs e)
+    {
+      loadMembers();
     }
 
     private void LootDetailsListContextMenu_OnOpened(object sender, RoutedEventArgs e)

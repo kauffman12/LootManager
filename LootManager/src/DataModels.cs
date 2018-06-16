@@ -75,8 +75,10 @@ namespace LootManager
   public class Player
   {
     public string Name { get; set; }
+    public string ForumName { get; set; }
     public string Class { get; set; }
     public string Rank { get; set; }
+    public bool Active { get; set; }
   }
 
   public class Item
