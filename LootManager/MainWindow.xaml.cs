@@ -1042,7 +1042,7 @@ namespace LootManager
             if (player.Active != e.RoutedEvent.Name.Equals("Checked"))
             {
               player.Active = e.RoutedEvent.Name.Equals("Checked");
-              updateMember(player);
+              updateMember(player.Name, player);
             }
           }
         }
@@ -1061,15 +1061,18 @@ namespace LootManager
 
         if (!oldValue.Equals(newValue))
         {
+          Player player = e.Row.DataContext as Player;
+          string name = player.Name;
+
           e.Row.DataContext.GetType().GetProperty(field).SetValue(e.Row.DataContext, newValue);
-          updateMember(e.Row.DataContext as Player);
+          updateMember(name, player);
         }
       }
     }
 
-    private void updateMember(Player player)
+    private void updateMember(string name, Player player)
     {
-      string auditLine = DataManager.updateMember(player) == 0 ? "S" : "E";
+      string auditLine = DataManager.updateMember(name, player) == 0 ? "S" : "E";
       auditLine += " | " + player.Name + " | " + player.ForumName + " | " + player.Class + " | " + player.Rank + " | " + player.Active;
 
       if (memberAuditTextBox.Text.Contains("Audit Log"))

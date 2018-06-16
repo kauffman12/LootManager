@@ -322,9 +322,9 @@ namespace LootManager
       return audits;
     }
 
-    public static int updateMember(Player player)
+    public static int updateMember(string name, Player player)
     {
-      return updateRosterSpreadsheet(player);
+      return updateRosterSpreadsheet(name, player);
     }
 
     public static void cleanup()
@@ -642,7 +642,7 @@ namespace LootManager
       }
     }
 
-    private static int updateRosterSpreadsheet(Player player)
+    private static int updateRosterSpreadsheet(string name, Player player)
     {
       // default to error
       int ret = 1;
@@ -658,7 +658,7 @@ namespace LootManager
         }
       }
 
-      Dictionary<string, string> found = rosterList.FirstOrDefault(row => row.ContainsKey(NAME) && row[NAME].Equals(player.Name));
+      Dictionary<string, string> found = rosterList.FirstOrDefault(row => row.ContainsKey(NAME) && row[NAME].Equals(name));
       if (found != null)
       {
         int index = fullPlayerList.FindIndex(p => p.Name.Equals(player.Name));
@@ -688,7 +688,10 @@ namespace LootManager
             }).ToList();
 
             string range = "A" + found[SHEET_ROW] + ":" + rangeCountToLetter[updatedValues.Count] + found[SHEET_ROW];
+
+            DateTime newTime = DateTime.Now;
             updateSpreadsheet(ROSTER_ID, "Sheet1", range, updatedValues.Cast<object>().ToList());
+            fileModTimes[ROSTER_ID] = newTime;
             ret = 0;
           }
         }

@@ -7,7 +7,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" 
         x:Class="LootManager.MainWindow"
         mc:Ignorable="d"
-        Title="Loot Manager v1.0.0.9 (Not Connected)"
+        Title="Loot Manager v1.0.0.10 (Not Connected)"
         UseLayoutRounding="True"
         TextOptions.TextFormattingMode="Display"
         TextOptions.TextRenderingMode="ClearType"
@@ -317,7 +317,7 @@
               <Border x:Name="membersDataBorder" Background="Orange" Padding="0" BorderThickness="1" BorderBrush="#FF688CAF" Grid.Row="0" Margin="-3,-3,-3,0" />
               <Label x:Name="membersText" Content="No Members Data Available" Margin="10,-1,199,2" FontStyle="Italic" />
               <CheckBox x:Name="onlyActiveMembers" Content="Active Members Only" IsChecked="True" VerticalAlignment="Bottom" Height="16" HorizontalAlignment="Right" Width="154" Checked="CheckBoxActiveMembers_Checked" Unchecked="CheckBoxActiveMembers_Checked" ToolTip="Only Show Active Members" Margin="0,0,2,6"/>
-              <DataGrid x:Name="membersListView" AutoGenerateColumns="False" Margin="-3,24,-3,1" CanUserAddRows="False" ColumnWidth="SizeToHeader" HeadersVisibility="Column" GridLinesVisibility="None" CanUserReorderColumns="False" SelectionMode="Single" Background="#FFE8E8E8" CellEditEnding="MembersListView_CellEditEnding" RowHeight="18" CanUserResizeRows="False" ToolTip="Editing Current Limited: Can not Add/Delete Members or Edit Member Name" Grid.RowSpan="2">
+              <DataGrid x:Name="membersListView" AutoGenerateColumns="False" Margin="-3,24,-3,1" CanUserAddRows="False" ColumnWidth="SizeToHeader" HeadersVisibility="Column" GridLinesVisibility="None" CanUserReorderColumns="False" SelectionMode="Single" Background="#FFE8E8E8" CellEditEnding="MembersListView_CellEditEnding" RowHeight="18" CanUserResizeRows="False" Grid.RowSpan="2">
                 <DataGrid.Resources>
                   <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF569FD8"/>
                   <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF646464" />
@@ -329,7 +329,7 @@
                   </Style>
                 </DataGrid.ColumnHeaderStyle>
                 <DataGrid.Columns>
-                  <DataGridTextColumn Binding="{Binding Name}" ClipboardContentBinding="{x:Null}" Header="Player" IsReadOnly="True" CanUserReorder="False" Width="86*"/>
+                  <DataGridTextColumn Binding="{Binding Name}" ClipboardContentBinding="{x:Null}" Header="Player" IsReadOnly="False" CanUserReorder="False" Width="86*"/>
                   <DataGridTextColumn Binding="{Binding ForumName}" ClipboardContentBinding="{x:Null}" Header="Forum Name" IsReadOnly="False" CanUserReorder="False" Width="86*"/>
                   <DataGridTextColumn Binding="{Binding Class}" ClipboardContentBinding="{x:Null}" Header="Class" IsReadOnly="False" CanUserReorder="False" Width="94*"/>
                   <DataGridTextColumn Binding="{Binding Rank}" ClipboardContentBinding="{x:Null}" Header="Rank" IsReadOnly="False" CanUserReorder="False" Width="76*"/>
@@ -450,7 +450,7 @@
                     </Style>
                   </DataGridTextColumn.CellStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Binding="{Binding NonVisibles}" ClipboardContentBinding="{x:Null}" Header="Non-Visibles" IsReadOnly="True" MaxWidth="85" Width="85" CanUserReorder="False">
+                <DataGridTextColumn Binding="{Binding NonVisibles}" ClipboardContentBinding="{x:Null}" Header="Non-Vis" IsReadOnly="True" MaxWidth="62" Width="62" CanUserReorder="False">
                   <DataGridTextColumn.CellStyle>
                     <Style TargetType="{x:Type DataGridCell}">
                       <Setter Property="TextBlock.TextAlignment" Value="Center" />
@@ -492,7 +492,7 @@
                     </Style>
                   </DataGridTextColumn.CellStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Binding="{Binding LastAltDate}" SortMemberPath="LastAltDateValue" IsReadOnly="True" ClipboardContentBinding="{x:Null}" Header="Last Alt Date" CanUserReorder="False" MaxWidth="88" Width="88*">
+                <DataGridTextColumn Binding="{Binding LastAltDate}" SortMemberPath="LastAltDateValue" IsReadOnly="True" ClipboardContentBinding="{x:Null}" Header="Last Alt Date" CanUserReorder="False" MaxWidth="90" Width="90*">
                   <DataGridTextColumn.CellStyle>
                     <Style TargetType="{x:Type DataGridCell}">
                       <Setter Property="TextBlock.TextAlignment" Value="Center" />
