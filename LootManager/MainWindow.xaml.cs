@@ -8,6 +8,7 @@ using System.Linq;
 using System.IO;
 using System.Threading.Tasks;
 using log4net;
+using System;
 
 namespace LootManager
 {
@@ -234,13 +235,18 @@ namespace LootManager
       if (list != null)
       {
         List<string> players = list.Select(item => item.Player).ToList();
-        string result = string.Join(" ", players);
-        if (result != null && result.Length > 3)
-        {
-          lootHistoryTab.Focus();
-          lootDetailsFilterBox.FontStyle = FontStyles.Normal;
-          lootDetailsFilterBox.Text = result;
-        }
+        viewLoot(players);
+      }
+    }
+
+    private void viewLoot(List<string> players)
+    {
+      string result = string.Join(" ", players);
+      if (result != null && result.Length > 3)
+      {
+        lootHistoryTab.Focus();
+        lootDetailsFilterBox.FontStyle = FontStyles.Normal;
+        lootDetailsFilterBox.Text = result;
       }
     }
 
@@ -1016,7 +1022,7 @@ namespace LootManager
       // may not be ready during init
       if (membersListView != null)
       {
-        List<Player> list = onlyActiveMembers.IsChecked.Value ? DataManager.getActivePlayerList() : DataManager.getFullPlayerList();
+        ObservableCollection<Player> list = onlyActiveMembers.IsChecked.Value ? DataManager.getActivePlayerList() : DataManager.getFullPlayerList();
         membersListView.ItemsSource = list;
 
         if (membersText.FontStyle == FontStyles.Italic)
@@ -1063,10 +1069,44 @@ namespace LootManager
         {
           Player player = e.Row.DataContext as Player;
           string name = player.Name;
-
           e.Row.DataContext.GetType().GetProperty(field).SetValue(e.Row.DataContext, newValue);
-          updateMember(name, player);
+
+          if (!"Unknown".Equals(player.Name, StringComparison.OrdinalIgnoreCase) &&
+            !"Unknown".Equals(player.ForumName, StringComparison.OrdinalIgnoreCase) &&
+            !"Unknown".Equals(player.Class, StringComparison.OrdinalIgnoreCase))
+          {
+            updateMember(name, player);
+          }
         }
+      }
+    }
+
+    private void MembersListViewAdd_Click(object sender, RoutedEventArgs e)
+    {
+      ObservableCollection<Player> list = membersListView.ItemsSource as ObservableCollection<Player>;
+
+      if (list != null)
+      {
+        Player player = new Player { Name = "Unknown", ForumName = "Uknown", Class = "Unknown", Rank = "App", Active = true };
+        list.Add(player);
+
+        membersListView.SelectedItem = player;
+        membersListView.ScrollIntoView(player);
+      }
+    }
+
+    private void MembersViewListContextMenu_OnOpened(object sender, RoutedEventArgs e)
+    {
+      membersListViewAddMenuItem.IsEnabled = (membersListView.ItemsSource != null && membersListView.Items.Count > 0);
+      membersListViewLootMenuItem.IsEnabled = (membersListView.SelectedItems.Count > 0 && membersListView.SelectedItems.Count < 20);
+    }
+
+    private void MembersListViewLoot_Click(object sender, RoutedEventArgs e)
+    {
+      if (membersListView.SelectedItems != null)
+      {
+        List<string> players = membersListView.SelectedItems.Cast<Player>().Select(player => player.Name).ToList();
+        viewLoot(players);
       }
     }
 
@@ -1094,7 +1134,7 @@ namespace LootManager
 
     private void LootDetailsListContextMenu_OnOpened(object sender, RoutedEventArgs e)
     {
-      lootHistoryViewLogMenuItem.IsEnabled = (lootDetailsListView.SelectedItems.Count > -1 && lootDetailsListView.SelectedItems.Count < 10);
+      lootHistoryViewLogMenuItem.IsEnabled = (lootDetailsListView.SelectedItems.Count > 0 && lootDetailsListView.SelectedItems.Count < 20);
     }
 
     private void GuildChatExpander_Expanded(object sender, RoutedEventArgs e)

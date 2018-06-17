@@ -7,7 +7,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" 
         x:Class="LootManager.MainWindow"
         mc:Ignorable="d"
-        Title="Loot Manager v1.0.0.10 (Not Connected)"
+        Title="Loot Manager v1.0.1.0 (Not Connected)"
         UseLayoutRounding="True"
         TextOptions.TextFormattingMode="Display"
         TextOptions.TextRenderingMode="ClearType"
@@ -317,7 +317,7 @@
               <Border x:Name="membersDataBorder" Background="Orange" Padding="0" BorderThickness="1" BorderBrush="#FF688CAF" Grid.Row="0" Margin="-3,-3,-3,0" />
               <Label x:Name="membersText" Content="No Members Data Available" Margin="10,-1,199,2" FontStyle="Italic" />
               <CheckBox x:Name="onlyActiveMembers" Content="Active Members Only" IsChecked="True" VerticalAlignment="Bottom" Height="16" HorizontalAlignment="Right" Width="154" Checked="CheckBoxActiveMembers_Checked" Unchecked="CheckBoxActiveMembers_Checked" ToolTip="Only Show Active Members" Margin="0,0,2,6"/>
-              <DataGrid x:Name="membersListView" AutoGenerateColumns="False" Margin="-3,24,-3,1" CanUserAddRows="False" ColumnWidth="SizeToHeader" HeadersVisibility="Column" GridLinesVisibility="None" CanUserReorderColumns="False" SelectionMode="Single" Background="#FFE8E8E8" CellEditEnding="MembersListView_CellEditEnding" RowHeight="18" CanUserResizeRows="False" Grid.RowSpan="2">
+              <DataGrid x:Name="membersListView" ContextMenuOpening="MembersViewListContextMenu_OnOpened" CanUserAddRows="False" AutoGenerateColumns="False" Margin="-3,24,-3,1" ColumnWidth="SizeToHeader" HeadersVisibility="Column" GridLinesVisibility="None" CanUserReorderColumns="False" Background="#FFE8E8E8" CellEditEnding="MembersListView_CellEditEnding" RowHeight="18" CanUserResizeRows="False" Grid.RowSpan="2">
                 <DataGrid.Resources>
                   <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF569FD8"/>
                   <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF646464" />
@@ -328,6 +328,21 @@
                     <Setter Property="HorizontalContentAlignment" Value="Center"/>
                   </Style>
                 </DataGrid.ColumnHeaderStyle>
+                <DataGrid.ContextMenu>
+                  <ContextMenu Focusable="False">
+                    <MenuItem x:Name="membersListViewAddMenuItem" Header="Add New Member" IsEnabled="False" Click="MembersListViewAdd_Click" Focusable="False">
+                      <MenuItem.Icon>
+                        <Image Source="/LootManager;component/Icons/AddRow/AddRow_16x.png"/>
+                      </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator Height="0"/>
+                    <MenuItem x:Name="membersListViewLootMenuItem" Header="View Loot History" IsEnabled="False" Click="MembersListViewLoot_Click" Focusable="False">
+                      <MenuItem.Icon>
+                        <Image Source="/LootManager;component/Icons/DataTable/DataTable_16x.png"/>
+                      </MenuItem.Icon>
+                    </MenuItem>
+                  </ContextMenu>
+                </DataGrid.ContextMenu>                
                 <DataGrid.Columns>
                   <DataGridTextColumn Binding="{Binding Name}" ClipboardContentBinding="{x:Null}" Header="Player" IsReadOnly="False" CanUserReorder="False" Width="86*"/>
                   <DataGridTextColumn Binding="{Binding ForumName}" ClipboardContentBinding="{x:Null}" Header="Forum Name" IsReadOnly="False" CanUserReorder="False" Width="86*"/>

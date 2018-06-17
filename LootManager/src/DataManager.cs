@@ -6,6 +6,7 @@ using Google.Apis.Sheets.v4.Data;
 using System.Collections.Generic;
 using Google.Apis.Drive.v3;
 using Google.Apis.Drive.v3.Data;
+using System.Collections.ObjectModel;
 
 namespace LootManager
 {
@@ -214,14 +215,14 @@ namespace LootManager
       }
     }
 
-    public static List<Player> getFullPlayerList()
+    public static ObservableCollection<Player> getFullPlayerList()
     {
-      return fullPlayerList.ToList();
+      return new ObservableCollection<Player>(fullPlayerList);
     }
 
-    public static List<Player> getActivePlayerList()
+    public static ObservableCollection<Player> getActivePlayerList()
     {
-      return fullPlayerList.Where(player => player.Active).ToList();
+      return new ObservableCollection<Player>(fullPlayerList.Where(player => player.Active));
     }
 
     public static List<Item> getItemsList()
@@ -658,6 +659,7 @@ namespace LootManager
         }
       }
 
+      bool newEntry = false;
       Dictionary<string, string> found = rosterList.FirstOrDefault(row => row.ContainsKey(NAME) && row[NAME].Equals(name));
       if (found != null)
       {
@@ -665,36 +667,55 @@ namespace LootManager
         if (index >= 0)
         {
           fullPlayerList[index] = player;
-          bool active = found.ContainsKey(ACTIVE) && "yes".Equals(found[ACTIVE], StringComparison.OrdinalIgnoreCase);
-          updateValue(found, ACTIVE, player.Active ? "Yes" : "No");
-          updateValue(found, NAME, player.Name);
-          updateValue(found, CLASS, player.Class);
-          updateValue(found, RANK, player.Rank);
-          updateValue(found, FORUM_USERNAME, player.ForumName);
-
-          string headerKey = ROSTER_ID + "Sheet1";
-          if (headerMap.ContainsKey(headerKey) && found.ContainsKey(SHEET_ROW))
-          {
-            IList<string> updatedValues = headerMap[headerKey].Select(header =>
-            {
-              string value = "";
-              string key = header.ToString().ToLower();
-              if (found.ContainsKey(key))
-              {
-                value = found[key];
-              }
-
-              return value;
-            }).ToList();
-
-            string range = "A" + found[SHEET_ROW] + ":" + rangeCountToLetter[updatedValues.Count] + found[SHEET_ROW];
-
-            DateTime newTime = DateTime.Now;
-            updateSpreadsheet(ROSTER_ID, "Sheet1", range, updatedValues.Cast<object>().ToList());
-            fileModTimes[ROSTER_ID] = newTime;
-            ret = 0;
-          }
         }
+      }
+      else
+      {
+        found = new Dictionary<string, string>();
+        newEntry = true;
+      }
+
+      updateValue(found, ACTIVE, player.Active ? "Yes" : "No");
+      updateValue(found, NAME, player.Name);
+      updateValue(found, CLASS, player.Class);
+      updateValue(found, RANK, player.Rank);
+      updateValue(found, FORUM_USERNAME, player.ForumName);
+
+      string headerKey = ROSTER_ID + "Sheet1";
+      if (headerMap.ContainsKey(headerKey))
+      {
+        IList<string> updatedValues = headerMap[headerKey].Select(header =>
+        {
+          string value = "";
+          string key = header.ToString().ToLower();
+          if (found.ContainsKey(key))
+          {
+            value = found[key];
+          }
+
+          return value;
+        }).ToList();
+
+        DateTime newTime = DateTime.Now;
+        if (newEntry)
+        {
+          appendSpreadsheet(ROSTER_ID, "Sheet1", updatedValues.Cast<object>().ToList());
+
+          // assume roster list has been refresh
+          // account for header and starting row index of 1
+          found.Add(SHEET_ROW, (rosterList.Count + 2).ToString());
+          rosterList.Add(found);
+          fullPlayerList.Add(player);
+          fullPlayerList.Sort((x, y) => x.Name.CompareTo(y.Name));
+        }
+        else
+        {
+          string range = "A" + found[SHEET_ROW] + ":" + rangeCountToLetter[updatedValues.Count] + found[SHEET_ROW];
+          updateSpreadsheet(ROSTER_ID, "Sheet1", range, updatedValues.Cast<object>().ToList());
+        }
+
+        fileModTimes[ROSTER_ID] = newTime;
+        ret = 0;
       }
 
       return ret;
@@ -716,7 +737,7 @@ namespace LootManager
       request.Execute();
     }
 
-    private static void appendSpreadsheet(string docId, string sheetName, IList<object> values)
+    private static AppendValuesResponse appendSpreadsheet(string docId, string sheetName, IList<object> values)
     {
       ValueRange valueRange = new ValueRange();
       valueRange.MajorDimension = "ROWS";
@@ -728,7 +749,8 @@ namespace LootManager
 
       request.OauthToken = TokenManager.getAccessToken();
       request.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.USERENTERED;
-      request.Execute();
+      AppendValuesResponse response = request.Execute();
+      return response;
     }
 
     private static ValueRange readSpreadsheet(string docId, string sheetName)
@@ -756,6 +778,10 @@ namespace LootManager
       if (data.ContainsKey(key))
       {
         data[key] = value;
+      }
+      else
+      {
+        data.Add(key, value);
       }
     }
   }
