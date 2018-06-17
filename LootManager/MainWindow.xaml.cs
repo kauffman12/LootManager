@@ -818,6 +818,10 @@ namespace LootManager
       {
         newLootItem.Text = "No Matching Loot Found";
       }
+      else
+      {
+        newLootItem.Text = "Select Item";
+      }
     }
 
     private void NewLootAlt_Checked(object sender, RoutedEventArgs e)
