@@ -9,6 +9,7 @@ using System.IO;
 using System.Threading.Tasks;
 using log4net;
 using System;
+using System.Windows.Data;
 
 namespace LootManager
 {
@@ -190,6 +191,15 @@ namespace LootManager
       {
         requestListView.SelectedItems.Cast<RequestListItem>().ToList().Where(selected => requestListMap.ContainsKey(selected.Item)).ToList()
         .ForEach(selected => requestListMap[selected.Item].Remove(selected));
+      }
+      else if (sender == membersListViewClearMenuItem && membersListView.SelectedItem != null)
+      {
+        ObservableCollection<Player> list = membersListView.ItemsSource as ObservableCollection<Player>;
+        Player player = membersListView.SelectedItem as Player;
+        if (player != null && list != null)
+        {
+          list.Remove(player);
+        }
       }
     }
 
@@ -1058,24 +1068,39 @@ namespace LootManager
     private void MembersListView_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
     {
       // checkbox has its own function
-      TextBox elem = e.EditingElement as TextBox;
-      if (elem != null)
+      string newValue = null;
+      Binding binding = null;
+
+      if (e.EditAction.ToString().Equals("Commit"))
       {
-        string field = ((System.Windows.Data.Binding)((DataGridBoundColumn)e.Column).Binding).Path.Path;
-        string oldValue = e.Row.DataContext.GetType().GetProperty(field).GetValue(e.Row.DataContext, null).ToString();
-        string newValue = elem.Text;
-
-        if (!oldValue.Equals(newValue))
+        if (e.EditingElement as TextBox != null)
         {
-          Player player = e.Row.DataContext as Player;
-          string name = player.Name;
-          e.Row.DataContext.GetType().GetProperty(field).SetValue(e.Row.DataContext, newValue);
+          newValue = ((TextBox)e.EditingElement).Text;
+          binding = (Binding)((DataGridBoundColumn)e.Column).Binding;
+        }
+        else if (e.EditingElement as ComboBox != null)
+        {
+          newValue = ((ComboBox)e.EditingElement).SelectedValue.ToString();
+          binding = (Binding)((DataGridComboBoxColumn)e.Column).SelectedValueBinding;
+        }
 
-          if (!"Unknown".Equals(player.Name, StringComparison.OrdinalIgnoreCase) &&
-            !"Unknown".Equals(player.ForumName, StringComparison.OrdinalIgnoreCase) &&
-            !"Unknown".Equals(player.Class, StringComparison.OrdinalIgnoreCase))
+        if (newValue != null && binding != null)
+        {
+          string field = binding.Path.Path;
+          string oldValue = e.Row.DataContext.GetType().GetProperty(field).GetValue(e.Row.DataContext, null).ToString();
+
+          if (!oldValue.Equals(newValue))
           {
-            updateMember(name, player);
+            Player player = e.Row.DataContext as Player;
+            string name = player.Name;
+            e.Row.DataContext.GetType().GetProperty(field).SetValue(e.Row.DataContext, newValue);
+
+            if (!"Unknown".Equals(player.Name, StringComparison.OrdinalIgnoreCase) &&
+              !"Unknown".Equals(player.ForumName, StringComparison.OrdinalIgnoreCase) &&
+              !"Unknown".Equals(player.Class, StringComparison.OrdinalIgnoreCase))
+            {
+              updateMember(name, player);
+            }
           }
         }
       }
@@ -1099,6 +1124,16 @@ namespace LootManager
     {
       membersListViewAddMenuItem.IsEnabled = (membersListView.ItemsSource != null && membersListView.Items.Count > 0);
       membersListViewLootMenuItem.IsEnabled = (membersListView.SelectedItems.Count > 0 && membersListView.SelectedItems.Count < 20);
+
+      Player player = membersListView.SelectedItem as Player;
+      membersListViewClearMenuItem.IsEnabled = (player != null && membersListView.SelectedItems.Count == 1 && DataManager.getFullPlayerList().FirstOrDefault(p => p.Name.Equals(player.Name)) == null);
+    }
+
+
+    private void MembersListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+      Player player = membersListView.SelectedItem as Player;
+      membersListView.CanUserDeleteRows = (player != null && membersListView.SelectedItems.Count == 1 && DataManager.getFullPlayerList().FirstOrDefault(p => p.Name.Equals(player.Name)) == null);
     }
 
     private void MembersListViewLoot_Click(object sender, RoutedEventArgs e)

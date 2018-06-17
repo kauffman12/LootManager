@@ -98,7 +98,7 @@ namespace LootManager
     {
       { "Tanks", new List<string> { "Paladin", "Shadow Knight", "Warrior" } },
       { "Priests", new List<string> { "Cleric", "Druid", "Shaman" } },
-      { "Melee", new List<string> { "Monk", "Rogue", "Zerker" } },
+      { "Melee", new List<string> { "Monk", "Rogue", "Berserker" } },
       { "Hybrid", new List<string> { "Bard", "Beastlord", "Ranger" } },
       { "Casters", new List<string> { "Enchanter", "Magician", "Necromancer", "Wizard" } }
     };

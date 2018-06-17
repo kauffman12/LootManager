@@ -1,7 +1,42 @@
 ﻿
 
+using System.Collections.Generic;
+
 namespace LootManager
 {
+  public class ClassList : List<string>
+  {
+    public ClassList()
+    {
+      Add("Bard");
+      Add("Beastlord");
+      Add("Berserker");
+      Add("Cleric");
+      Add("Druid");
+      Add("Enchanter");
+      Add("Magician");
+      Add("Monk");
+      Add("Necromancer");
+      Add("Paladin");
+      Add("Ranger");
+      Add("Rogue");
+      Add("Shadow Knight");
+      Add("Shaman");
+      Add("Warrior");
+      Add("Wizard");
+    }
+  }
+
+  public class RankList : List<string>
+  {
+    public RankList()
+    {
+      Add("App");
+      Add("Member");
+      Add("Officer");
+    }
+  }
+
   public class LootedListItem
   {
     public string Item { get; set; }

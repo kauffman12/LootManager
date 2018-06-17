@@ -4,10 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:System="clr-namespace:System;assembly=mscorlib"
+        xmlns:local="clr-namespace:LootManager"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" 
         x:Class="LootManager.MainWindow"
         mc:Ignorable="d"
-        Title="Loot Manager v1.0.1.0 (Not Connected)"
+        Title="Loot Manager v1.0.1.1 (Not Connected)"
         UseLayoutRounding="True"
         TextOptions.TextFormattingMode="Display"
         TextOptions.TextRenderingMode="ClearType"
@@ -17,7 +18,11 @@
         Closing="Application_Closing" 
         Background="#FFF0F0F0" 
         Closed="Window_Closed">
-  <Grid Margin="0">
+  <Window.Resources>
+    <local:ClassList x:Key="ClassList" />
+    <local:RankList x:Key="RankList" />
+  </Window.Resources>
+      <Grid Margin="0">
     <Menu Margin="0,0,4,0" Height="20" VerticalAlignment="Top">
       <MenuItem Header="_File" Height="20" Width="40">
         <MenuItem x:Name="connectMenuItem" Header="_Connect" Height="20" Click="MenuItemConnect_Click">
@@ -208,7 +213,7 @@
                       </MenuItem.Icon>
                     </MenuItem>
                     <Separator Height="0"/>
-                    <MenuItem x:Name="requestListViewLootMenuItem" Header="View Loot History" Click="RequestListViewLoot_Click" Focusable="False" IsEnabled="False">
+                    <MenuItem x:Name="requestListViewLootMenuItem" Header="View Selected Loot History" Click="RequestListViewLoot_Click" Focusable="False" IsEnabled="False">
                       <MenuItem.Icon>
                         <Image Source="/LootManager;component/Icons/DataTable/DataTable_16x.png"/>
                       </MenuItem.Icon>
@@ -221,7 +226,7 @@
                   <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <TextBox x:Name="genChatBox" Margin="0,-1,109,-3" MinWidth="0" TextWrapping="Wrap" FontStyle="Italic" MinHeight="40" GotFocus="GenChatBox_GotFocus" LostFocus="GenChatBox_LostFocus" Text="Suggested Officer Chat for Selected Item" TabIndex="3" BorderBrush="#FF688CAF" BorderThickness="1,0" />
-                <CheckBox x:Name="lootAllTypes" Content="All Loot Types" Margin="0,0,10,-2" Height="15" VerticalAlignment="Bottom"  Checked="CheckBoxLootAllTypes_Checked" Unchecked="CheckBoxLootAllTypes_Checked" ToolTip="Always Include Alt and Rot Requests Even With Mains Asking" TabIndex="4" HorizontalAlignment="Right" Width="95" BorderBrush="#FF688CAF"/>
+                <CheckBox x:Name="lootAllTypes" Content="All Loot Types" Margin="0,0,10,-2" Height="15" VerticalAlignment="Bottom"  Checked="CheckBoxLootAllTypes_Checked" Unchecked="CheckBoxLootAllTypes_Checked" ToolTip="Always Include Alt and Rot Requests Een With Mains Asking" TabIndex="4" HorizontalAlignment="Right" Width="95" BorderBrush="#FF688CAF"/>
                 <Button Margin="0,0,109,-5" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="18" ToolTip="Copy To Clipbload" Click="GenChatButton_Click" BorderBrush="#FF688CAF" BorderThickness="1">
                   <StackPanel Orientation="Horizontal" Height="22" Margin="0" HorizontalAlignment="Center">
                     <Image Source="/LootManager;component/Icons/CopyToClipboard/CopyToClipboard_16x.png" Margin="0,0,0,2" Panel.ZIndex="1" Width="20" Height="20"/>
@@ -317,7 +322,7 @@
               <Border x:Name="membersDataBorder" Background="Orange" Padding="0" BorderThickness="1" BorderBrush="#FF688CAF" Grid.Row="0" Margin="-3,-3,-3,0" />
               <Label x:Name="membersText" Content="No Members Data Available" Margin="10,-1,199,2" FontStyle="Italic" />
               <CheckBox x:Name="onlyActiveMembers" Content="Active Members Only" IsChecked="True" VerticalAlignment="Bottom" Height="16" HorizontalAlignment="Right" Width="154" Checked="CheckBoxActiveMembers_Checked" Unchecked="CheckBoxActiveMembers_Checked" ToolTip="Only Show Active Members" Margin="0,0,2,6"/>
-              <DataGrid x:Name="membersListView" ContextMenuOpening="MembersViewListContextMenu_OnOpened" CanUserAddRows="False" AutoGenerateColumns="False" Margin="-3,24,-3,1" ColumnWidth="SizeToHeader" HeadersVisibility="Column" GridLinesVisibility="None" CanUserReorderColumns="False" Background="#FFE8E8E8" CellEditEnding="MembersListView_CellEditEnding" RowHeight="18" CanUserResizeRows="False" Grid.RowSpan="2">
+              <DataGrid x:Name="membersListView" ContextMenuOpening="MembersViewListContextMenu_OnOpened" CanUserAddRows="False" AutoGenerateColumns="False" Margin="-3,24,-3,1" ColumnWidth="SizeToHeader" HeadersVisibility="Column" GridLinesVisibility="None" CanUserReorderColumns="False" Background="#FFE8E8E8" CellEditEnding="MembersListView_CellEditEnding" CanUserResizeRows="False" Grid.RowSpan="2" CanUserDeleteRows="False" SelectionChanged="MembersListView_SelectionChanged">
                 <DataGrid.Resources>
                   <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF569FD8"/>
                   <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF646464" />
@@ -335,8 +340,13 @@
                         <Image Source="/LootManager;component/Icons/AddRow/AddRow_16x.png"/>
                       </MenuItem.Icon>
                     </MenuItem>
+                    <MenuItem x:Name="membersListViewClearMenuItem" IsEnabled="False" InputGestureText="Del" Header="Clear Selected" Click="ListClear_Click" Focusable="False">
+                      <MenuItem.Icon>
+                        <Image Source="/LootManager;component/Icons/Cancel/Cancel_16xMD.png"/>
+                      </MenuItem.Icon>
+                    </MenuItem>
                     <Separator Height="0"/>
-                    <MenuItem x:Name="membersListViewLootMenuItem" Header="View Loot History" IsEnabled="False" Click="MembersListViewLoot_Click" Focusable="False">
+                    <MenuItem x:Name="membersListViewLootMenuItem" Header="View Selected Loot History" IsEnabled="False" Click="MembersListViewLoot_Click" Focusable="False">
                       <MenuItem.Icon>
                         <Image Source="/LootManager;component/Icons/DataTable/DataTable_16x.png"/>
                       </MenuItem.Icon>
@@ -346,8 +356,8 @@
                 <DataGrid.Columns>
                   <DataGridTextColumn Binding="{Binding Name}" ClipboardContentBinding="{x:Null}" Header="Player" IsReadOnly="False" CanUserReorder="False" Width="86*"/>
                   <DataGridTextColumn Binding="{Binding ForumName}" ClipboardContentBinding="{x:Null}" Header="Forum Name" IsReadOnly="False" CanUserReorder="False" Width="86*"/>
-                  <DataGridTextColumn Binding="{Binding Class}" ClipboardContentBinding="{x:Null}" Header="Class" IsReadOnly="False" CanUserReorder="False" Width="94*"/>
-                  <DataGridTextColumn Binding="{Binding Rank}" ClipboardContentBinding="{x:Null}" Header="Rank" IsReadOnly="False" CanUserReorder="False" Width="76*"/>
+                  <DataGridComboBoxColumn ItemsSource="{StaticResource ClassList}"  SelectedValueBinding="{Binding Class}" ClipboardContentBinding="{x:Null}" Header="Class" IsReadOnly="False" CanUserReorder="False" Width="94*" />
+                  <DataGridComboBoxColumn ItemsSource="{StaticResource RankList}" SelectedValueBinding="{Binding Rank}" ClipboardContentBinding="{x:Null}" Header="Rank" IsReadOnly="False" CanUserReorder="False" Width="76*"/>
                   <DataGridCheckBoxColumn Binding="{Binding Active}" ClipboardContentBinding="{x:Null}" Header="Active" IsReadOnly="False" CanUserReorder="False" Width="52">
                     <DataGridCheckBoxColumn.CellStyle>
                       <Style>
@@ -524,7 +534,7 @@
               </DataGrid.Columns>
               <DataGrid.ContextMenu>
                 <ContextMenu Focusable="False">
-                  <MenuItem x:Name="lootHistoryViewLogMenuItem" Header="View Selected Audit Log(s)" Click="LootDetailsListViewLog_Click" Focusable="False" IsEnabled="False">
+                  <MenuItem x:Name="lootHistoryViewLogMenuItem" Header="View Selected Loot Log(s)" Click="LootDetailsListViewLog_Click" Focusable="False" IsEnabled="False">
                     <MenuItem.Icon>
                       <Image Source="/LootManager;component/Icons/DataTable/DataTable_16x.png"/>
                     </MenuItem.Icon>
