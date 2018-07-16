@@ -99,7 +99,7 @@ namespace LootManager
 
               // case of updating existing
               RequestListItem foundRequestListItem = list.FirstOrDefault(x => name.Equals(x.Player));
-              if (foundRequestListItem != null && (added - foundRequestListItem.Added).TotalSeconds > 600)
+              if (foundRequestListItem != null && (added - foundRequestListItem.Added).TotalSeconds < 600)
               {
                 list.Remove(foundRequestListItem);
               }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"><?define LootManager_TargetDir=$(var.LootManager.TargetDir)?>
-	<Product Id="*" Name="LootManager" Language="1033" Version="1.0.2.1" Manufacturer="ROI" UpgradeCode="083aae5b-8389-4a57-a696-18886c6d75db">
+	<Product Id="*" Name="LootManager" Language="1033" Version="1.0.2.2" Manufacturer="ROI" UpgradeCode="083aae5b-8389-4a57-a696-18886c6d75db">
     <Package Platform="x64" InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
 		<MajorUpgrade AllowSameVersionUpgrades="yes" DowngradeErrorMessage="A newer version of [ProductName] is already installed." />

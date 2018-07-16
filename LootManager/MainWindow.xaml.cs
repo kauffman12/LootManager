@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using log4net;
 using System;
 using System.Windows.Data;
+using System.Windows.Threading;
 
 namespace LootManager
 {
@@ -31,6 +32,7 @@ namespace LootManager
     private Task textUpdateTask = null;
     private LootAuditWindow lootAuditWindow = null;
     private bool ignoreOneEvent = false;
+    private Brush EXPIRED_ROW_COLOR = new SolidColorBrush(Colors.DarkRed);
 
     public MainWindow()
     {
@@ -81,6 +83,25 @@ namespace LootManager
 
       // read log file if one set
       setLogFile(RuntimeProperties.getProperty("log_file"), 0);
+
+      // tasks to run on an interval
+      DispatcherTimer timer = new DispatcherTimer();
+      timer.Tick += new EventHandler(Timer_Tick);
+      timer.Interval = new TimeSpan(0, 0, 60);
+      timer.Start();
+    }
+
+    private void Timer_Tick(object sender, EventArgs e)
+    {
+      lock (requestListView)
+      {
+        // check if items have expired
+        ObservableCollection<RequestListItem> list = requestListView.ItemsSource as ObservableCollection<RequestListItem>;
+        if (list != null)
+        {
+          list.ToList().ForEach(item => validateRequestItem(item));
+        }
+      }
     }
 
     //
@@ -208,6 +229,7 @@ namespace LootManager
           lootedListItems.Clear();
           watchListItems.Clear();
           requestListView.ItemsSource = null;
+          requestListMap.Clear();
         }
 
         setLogFile(dlg.FileName, mins);
@@ -262,6 +284,7 @@ namespace LootManager
       requestListClearMenuItem.IsEnabled = requestListView.SelectedIndex > -1;
       requestListClearAllMenuItem.IsEnabled = requestListView.Items.Count > 0;
       requestListViewLootMenuItem.IsEnabled = requestListView.Items.Count > 0;
+      requestListClearExpiredMenuItem.IsEnabled = requestListView.Items.Cast<RequestListItem>().Any(item => validateRequestItem(item));
     }
 
     private void RequestListReset_Click(object sender, RoutedEventArgs e)
@@ -283,6 +306,15 @@ namespace LootManager
       {
         List<string> players = list.Select(item => item.Player).ToList();
         viewLoot(players);
+      }
+    }
+
+    private void RequestListViewClearExpired_Click(object sender, RoutedEventArgs e)
+    {
+      lock (requestListView)
+      {
+        requestListView.Items.Cast<RequestListItem>().ToList().Where(selected => validateRequestItem(selected)).ToList()
+          .ForEach(selected => requestListMap[selected.Item].Remove(selected));
       }
     }
 
@@ -498,7 +530,7 @@ namespace LootManager
         bool hasMain = false;
         foreach (RequestListItem requestItem in requestList)
         {
-          if ((System.DateTime.Now - requestList[0].Added).TotalSeconds < 600)
+          if ((System.DateTime.Now - requestItem.Added).TotalSeconds < 600)
           {
             string displayName = requestItem.Player;
             if (!"Main".Equals(requestItem.Type))
@@ -511,14 +543,6 @@ namespace LootManager
             }
 
             process.Add(displayName);
-          }
-          else
-          {
-           // DataGridRow row = (DataGridRow) requestListView.ItemContainerGenerator.ContainerFromItem(requestItem);
-          //  if (row != null)
-           // {
-          //    row.Background = new SolidColorBrush(Colors.OrangeRed);
-          //  }
           }
         }
 
@@ -541,6 +565,32 @@ namespace LootManager
         genChatBox.FontStyle = FontStyles.Normal;
         genChatBox.Text = chat;
       }
+    }
+
+    private void RequestList_LoadingRow(object sender, DataGridRowEventArgs e)
+    {
+      validateRequestItem(e.Row.Item as RequestListItem);
+    }
+
+    private bool validateRequestItem(RequestListItem item)
+    {
+      bool expired = false;
+
+      if (item != null && (System.DateTime.Now - item.Added).TotalSeconds > 600)
+      {
+        DataGridRow row = (DataGridRow) requestListView.ItemContainerGenerator.ContainerFromItem(item);
+        if (row != null && row.Foreground != EXPIRED_ROW_COLOR)
+        {
+          row.Foreground = EXPIRED_ROW_COLOR;
+          row.FontStyle = FontStyles.Italic;
+          row.ToolTip = "Item Request is too old";
+          generateOfficerChatMessage();
+        }
+
+        expired = true;
+      }
+
+      return expired;
     }
 
     private void resetGenChatBox()
@@ -1263,5 +1313,6 @@ namespace LootManager
     {
       chatGrid.RowDefinitions[3].Height = AUTO_GRID;
     }
+
   }
 }

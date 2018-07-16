@@ -8,7 +8,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" 
         x:Class="LootManager.MainWindow"
         mc:Ignorable="d"
-        Title="Loot Manager v1.0.2.1 (Not Connected)"
+        Title="Loot Manager v1.0.2.2 (Not Connected)"
         UseLayoutRounding="True"
         TextOptions.TextFormattingMode="Display"
         TextOptions.TextRenderingMode="ClearType"
@@ -170,7 +170,7 @@
                   </ContextMenu>
                 </DataGrid.ContextMenu>
               </DataGrid>
-              <DataGrid x:Name="requestListView" ContextMenuOpening="RequestListContextMenu_OnOpened" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,199,0,1" ColumnWidth="SizeToHeader" CanUserReorderColumns="False" HeadersVisibility="Column" GridLinesVisibility="None" TabIndex="2" IsTabStop="True" Grid.RowSpan="2" BorderBrush="#FF688CAF" Background="#FFE8E8E8" CanUserResizeRows="False">
+              <DataGrid x:Name="requestListView" ContextMenuOpening="RequestListContextMenu_OnOpened" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,199,0,1" ColumnWidth="SizeToHeader" CanUserReorderColumns="False" HeadersVisibility="Column" GridLinesVisibility="None" TabIndex="2" IsTabStop="True" Grid.RowSpan="2" BorderBrush="#FF688CAF" Background="#FFE8E8E8" CanUserResizeRows="False" LoadingRow="RequestList_LoadingRow">
                 <DataGrid.Resources>
                   <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF569FD8"/>
                   <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF646464" />
@@ -233,6 +233,11 @@
                 </DataGrid.Columns>
                 <DataGrid.ContextMenu>
                   <ContextMenu Focusable="False">
+                    <MenuItem x:Name="requestListClearExpiredMenuItem" Header="Clear Expired" Click="RequestListViewClearExpired_Click" Focusable="False">
+                      <MenuItem.Icon>
+                        <Image Source="/LootManager;component/Icons/Cancel/Cancel_16xMD.png"/>
+                      </MenuItem.Icon>
+                    </MenuItem>                    
                     <MenuItem x:Name="requestListClearMenuItem" InputGestureText="Del" Header="Clear Selected" Click="ListClear_Click" Focusable="False">
                       <MenuItem.Icon>
                         <Image Source="/LootManager;component/Icons/Cancel/Cancel_16xMD.png"/>
