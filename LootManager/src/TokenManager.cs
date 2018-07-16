@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.IO;
 using Newtonsoft.Json;
 using System.Windows;
+using System.Threading;
 
 namespace LootManager
 {
@@ -67,18 +68,21 @@ namespace LootManager
       {
         if (System.DateTime.Now > expireTime)
         {
-          expireTime = System.DateTime.Now;
+          Thread myThread = new Thread(() =>
+          {
+            expireTime = System.DateTime.Now;
+            Dictionary<string, string> result = RefreshTokens().GetAwaiter().GetResult();
+            tokens["access_token"] = result["access_token"];
+            tokens["expires_in"] = result["expires_in"];
+            expireTime = expireTime.AddSeconds(System.Double.Parse(tokens["expires_in"]));
+          });
 
-          Dictionary<string, string> result = RefreshTokens().GetAwaiter().GetResult();
-          tokens["access_token"] = result["access_token"];
-          tokens["expires_in"] = result["expires_in"];
-
-          expireTime = expireTime.AddSeconds(System.Double.Parse(tokens["expires_in"]));
+          myThread.Start();
+          myThread.Join();
         }
-
-        token = tokens["access_token"];
       }
 
+      token = tokens["access_token"];
       return token;
     }
 

@@ -54,6 +54,8 @@ namespace LootManager
     public int Main { get; set; }
     public int Alt { get; set; }
     public int Days { get; set; }
+    public string Time { get; set; }
+    public System.DateTime Added { get; set; }
   }
 
   public class WatchListItem

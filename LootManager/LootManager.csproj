@@ -184,6 +184,7 @@
     <Resource Include="Icons\roi_icon2.ico" />
     <Resource Include="Icons\DataTable\DataTable_16x.png" />
     <Resource Include="Icons\AddRow\AddRow_16x.png" />
+    <Resource Include="Icons\History\History_16x.png" />
     <Content Include="lootmanager.log">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

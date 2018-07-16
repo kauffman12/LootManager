@@ -1,4 +1,6 @@
 ﻿using log4net;
+using System;
+using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -15,6 +17,7 @@ namespace LootManager
     public delegate void LogReaderEvent(object sender, LogEventArgs e);
     public event LogReaderEvent logEvent;
 
+    private int lastMins;
     private string logFilePath;
     private string logFileName;
     private Thread myThread;
@@ -22,6 +25,7 @@ namespace LootManager
     private Regex guildChat = new Regex(@"^\[.+\] \w+ (tells the guild|say to your guild)");
     private Regex officerChat = new Regex(@"^\[.+\] \w+ tell?(\w) (?i)officersofroi(?-i):");
     private Regex tells = new Regex(@"^\[.+\] \w+ tells you, '");
+    private Regex timeStamp = new Regex(@"^\[(.+)\].+");
     private Regex lootedItem = new Regex(@"^\[.+\] --(\w+) (has|have) looted a (.+)\.--");
     private Regex userFromFileName = new Regex(@"^eqlog_([a-zA-Z]+)_");
 
@@ -32,7 +36,7 @@ namespace LootManager
       return instance;
     }
 
-    public void setLogFile(string filename)
+    public void setLogFile(string filename, int mins)
     {
       LOG.Debug("Selecting EQ Log File: " + filename);
 
@@ -40,6 +44,7 @@ namespace LootManager
       {
         logFilePath = filename.Substring(0, filename.LastIndexOf("\\")) + "\\";
         logFileName = filename.Substring(filename.LastIndexOf("\\") + 1);
+        lastMins = mins;
 
         MatchCollection matches = userFromFileName.Matches(logFileName);
         if (matches.Count > 0)
@@ -101,8 +106,42 @@ namespace LootManager
         // events to notify for changes
         fsw.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.CreationTime;
 
-        // read to end and start listening for events
-        reader.ReadToEnd();
+        bool foundLatest = false;
+        DateTime now = DateTime.Now;
+        while (!reader.EndOfStream)
+        {
+          string line = reader.ReadLine();
+          if (foundLatest) // stop parsing dates once we reach a line in the right timeframe
+          {
+            parseLine(line);
+          }
+          else
+          {
+            MatchCollection matches = timeStamp.Matches(line);
+            if (matches.Count > 0 && matches[0].Groups.Count > 1)
+            {
+              try
+              {
+                DateTime dateTime = DateTime.ParseExact(matches[0].Groups[1].Value, "ddd MMM dd HH:mm:ss yyyy", CultureInfo.InvariantCulture);
+                if (dateTime != null)
+                {
+                  TimeSpan diff = now.Subtract(dateTime);
+                  if (diff.TotalMinutes < lastMins)
+                  {
+                    foundLatest = true;
+                    parseLine(line);
+                  }
+                }
+              }
+              catch (Exception e)
+              {
+                // continue
+                LOG.Error("Could not parse Date/Time from log.", e);
+              }
+            }
+          }          
+        }
+
         fsw.EnableRaisingEvents = true;
 
         while (myState.isRunning() && !exitOnError)
@@ -128,26 +167,7 @@ namespace LootManager
                 while (!reader.EndOfStream)
                 {
                   string line = reader.ReadLine();
-                  if (logEvent != null && line.Length > 0)
-                  {
-                    MatchCollection matches;
-                    if ((matches = officerChat.Matches(line)).Count > 0)
-                    {
-                      logEvent(this, new LogEventArgs(line, matches, LOG_TYPE.OFFICER_CHAT));
-                    }
-                    else if ((matches = guildChat.Matches(line)).Count > 0)
-                    {
-                      logEvent(this, new LogEventArgs(line, matches, LOG_TYPE.GUILD_CHAT));
-                    }
-                    else if ((matches = tells.Matches(line)).Count > 0)
-                    {
-                      logEvent(this, new LogEventArgs(line, matches, LOG_TYPE.TELLS));
-                    }
-                    else if ((matches = lootedItem.Matches(line)).Count > 0)
-                    {
-                      logEvent(this, new LogEventArgs(line, matches, LOG_TYPE.LOOT));
-                    }
-                  }
+                  parseLine(line);
                 }
               }
               break;
@@ -172,6 +192,30 @@ namespace LootManager
       });
 
       myThread.Start();
+    }
+
+    private void parseLine(string line)
+    {
+      if (logEvent != null && line.Length > 0)
+      {
+        MatchCollection matches;
+        if ((matches = officerChat.Matches(line)).Count > 0)
+        {
+          logEvent(this, new LogEventArgs(line, matches, LOG_TYPE.OFFICER_CHAT));
+        }
+        else if ((matches = guildChat.Matches(line)).Count > 0)
+        {
+          logEvent(this, new LogEventArgs(line, matches, LOG_TYPE.GUILD_CHAT));
+        }
+        else if ((matches = tells.Matches(line)).Count > 0)
+        {
+          logEvent(this, new LogEventArgs(line, matches, LOG_TYPE.TELLS));
+        }
+        else if ((matches = lootedItem.Matches(line)).Count > 0)
+        {
+          logEvent(this, new LogEventArgs(line, matches, LOG_TYPE.LOOT));
+        }
+      }
     }
   }
 

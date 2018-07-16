@@ -8,7 +8,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" 
         x:Class="LootManager.MainWindow"
         mc:Ignorable="d"
-        Title="Loot Manager v1.0.1.2 (Not Connected)"
+        Title="Loot Manager v1.0.2.1 (Not Connected)"
         UseLayoutRounding="True"
         TextOptions.TextFormattingMode="Display"
         TextOptions.TextRenderingMode="ClearType"
@@ -22,7 +22,7 @@
     <local:ClassList x:Key="ClassList" />
     <local:RankList x:Key="RankList" />
   </Window.Resources>
-      <Grid Margin="0">
+  <Grid Margin="0">
     <Menu Margin="0,0,4,0" Height="20" VerticalAlignment="Top">
       <MenuItem Header="_File" Height="20" Width="40">
         <MenuItem x:Name="connectMenuItem" Header="_Connect" Height="20" Click="MenuItemConnect_Click">
@@ -41,10 +41,35 @@
           </MenuItem.Icon>
         </MenuItem>
         <Separator Height="0"/>
-        <MenuItem Header="Select EQ _Log File" Height="20" Click="MenuItemSelectEQLogFile_Click">
+        <MenuItem Header="Select EQ _Log File" Height="20" >
           <MenuItem.Icon>
             <Image Source="/LootManager;component/Icons/OpenFile/OpenFile_16x.png"/>
           </MenuItem.Icon>
+          <MenuItem Header="Load starting now" Height="20" Click="MenuItemSelectEQLogFile_Click">
+            <MenuItem.Icon>
+              <Image Source="/LootManager;component/Icons/OpenFile/OpenFile_16x.png"/>
+            </MenuItem.Icon>
+          </MenuItem>
+          <MenuItem Header="Re-Load past 1 hour" Height="20" Click="MenuItemSelectEQLogFile1_Click">
+            <MenuItem.Icon>
+              <Image Source="/LootManager;component/Icons/History/History_16x.png"/>
+            </MenuItem.Icon>
+          </MenuItem>
+          <MenuItem Header="Re-Load past 2 hours" Height="20" Click="MenuItemSelectEQLogFile2_Click">
+            <MenuItem.Icon>
+              <Image Source="/LootManager;component/Icons/History/History_16x.png"/>
+            </MenuItem.Icon>
+          </MenuItem>
+          <MenuItem Header="Re-Load past 4 hours" Height="20" Click="MenuItemSelectEQLogFile4_Click">
+            <MenuItem.Icon>
+              <Image Source="/LootManager;component/Icons/History/History_16x.png"/>
+            </MenuItem.Icon>
+          </MenuItem>
+          <MenuItem Header="Re-Load past 6 hours" Height="20" Click="MenuItemSelectEQLogFile6_Click">
+            <MenuItem.Icon>
+              <Image Source="/LootManager;component/Icons/History/History_16x.png"/>
+            </MenuItem.Icon>
+          </MenuItem>
         </MenuItem>
         <Separator Height="0"/>
         <MenuItem Header="E_xit" Height="20" Click="MenuItemExit_Click" InputGestureText="Alt+F4">
@@ -89,9 +114,9 @@
             </Grid.RowDefinitions>
             <Grid Margin="-3,-3,-3,-1">
               <Grid.RowDefinitions>
-                <RowDefinition Height="200"/>
-                <RowDefinition Height="59*"/>
-                <RowDefinition Height="12*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="44*"/>
+                <RowDefinition Height="9*"/>
               </Grid.RowDefinitions>
               <DataGrid x:Name="watchListView" ContextMenuOpening="WatchListContextMenu_OnOpened" AutoGenerateColumns="False" CanUserAddRows="False" SelectionMode="Single" ColumnWidth="SizeToHeader" CanUserReorderColumns="False" HeadersVisibility="Column" Grid.Row="0" GridLinesVisibility="None" SelectionChanged="WatchList_SelectionChanged" TabIndex="1" IsTabStop="True" UnloadingRow="WatchList_UnloadingRow" BorderBrush="#FF688CAF" Background="#FFE8E8E8" CanUserResizeRows="False">
                 <DataGrid.Resources>
@@ -167,6 +192,13 @@
                     </DataGridTemplateColumn.CellTemplate>
                   </DataGridTemplateColumn>
                   <DataGridTextColumn Binding="{Binding Player}" ClipboardContentBinding="{x:Null}" Header="Tell From" CanUserReorder="False" MinWidth="90" Width="120*" />
+                  <DataGridTextColumn Binding="{Binding Time}" ClipboardContentBinding="{x:Null}" Header="Time" CanUserReorder="False" MinWidth="45" Width="45">
+                    <DataGridTextColumn.CellStyle>
+                      <Style TargetType="{x:Type DataGridCell}">
+                        <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                      </Style>
+                    </DataGridTextColumn.CellStyle>
+                  </DataGridTextColumn>
                   <DataGridTextColumn Binding="{Binding Type}" ClipboardContentBinding="{x:Null}" Header="Type" IsReadOnly="True" CanUserReorder="False" MinWidth="55" Width="55">
                     <DataGridTextColumn.CellStyle>
                       <Style TargetType="{x:Type DataGridCell}">
@@ -301,10 +333,9 @@
                       </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                   </DataGridTemplateColumn>
-                  <DataGridTextColumn Binding="{Binding Player}" ClipboardContentBinding="{x:Null}" Header="Player" IsReadOnly="True" CanUserReorder="False" Width="120*"/>
-                  <DataGridTextColumn Binding="{Binding Item}" ClipboardContentBinding="{x:Null}" Header="Item Looted" IsReadOnly="True" CanUserReorder="False" Width="165*"/>
-                  <DataGridTextColumn Binding="{Binding Slot}" ClipboardContentBinding="{x:Null}" Header="Slot" IsReadOnly="True" CanUserReorder="False" Width="60"/>
-                  <DataGridTextColumn Binding="{Binding Found}" ClipboardContentBinding="{x:Null}" Header="Found In DB" IsReadOnly="True" CanUserReorder="False" Width="135*"/>
+                  <DataGridTextColumn Binding="{Binding Player}" ClipboardContentBinding="{x:Null}" Header="Player" IsReadOnly="True" CanUserReorder="False"  MinWidth="90" Width="120*" />
+                  <DataGridTextColumn Binding="{Binding Item}" ClipboardContentBinding="{x:Null}" Header="Item Looted" IsReadOnly="True" CanUserReorder="False" Width="175*"/>
+                  <DataGridTextColumn Binding="{Binding Found}" ClipboardContentBinding="{x:Null}" Header="Found In DB" IsReadOnly="True" CanUserReorder="False" Width="80*"/>
                 </DataGrid.Columns>
               </DataGrid>
               <TextBox x:Name="newLootAuditTextBox" Margin="-3,1,-3,-3" Grid.Row="2" Text="Audit Log" IsReadOnly="True" TextWrapping="Wrap" FontFamily="Consolas" FontSize="10" BorderBrush="#FF688EAF" BorderThickness="1,0,1,1" VerticalScrollBarVisibility="Auto"/>
@@ -352,7 +383,7 @@
                       </MenuItem.Icon>
                     </MenuItem>
                   </ContextMenu>
-                </DataGrid.ContextMenu>                
+                </DataGrid.ContextMenu>
                 <DataGrid.Columns>
                   <DataGridTextColumn Binding="{Binding Name}" ClipboardContentBinding="{x:Null}" Header="Player" IsReadOnly="False" CanUserReorder="False" Width="86*"/>
                   <DataGridTextColumn Binding="{Binding ForumName}" ClipboardContentBinding="{x:Null}" Header="Forum Name" IsReadOnly="False" CanUserReorder="False" Width="86*"/>

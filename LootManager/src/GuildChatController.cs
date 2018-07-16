@@ -25,6 +25,13 @@ namespace LootManager
       guildChatBuffer.Blocks.Add(new Paragraph());
     }
 
+    public new void Clear()
+    {
+      base.Clear();
+      guildChatBuffer.Blocks.Clear();
+      guildChatBuffer.Blocks.Add(new Paragraph());
+    }
+
     public new void handleEvent(LogEventArgs e)
     {
       string line = parseLine(e.line);

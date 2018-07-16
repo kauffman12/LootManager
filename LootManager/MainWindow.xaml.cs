@@ -30,6 +30,7 @@ namespace LootManager
     private TellsChatController tellsChatController;
     private Task textUpdateTask = null;
     private LootAuditWindow lootAuditWindow = null;
+    private bool ignoreOneEvent = false;
 
     public MainWindow()
     {
@@ -79,7 +80,7 @@ namespace LootManager
       LogReader.getInstance().logEvent += new LogReader.LogReaderEvent(logReaderEventHandler);
 
       // read log file if one set
-      setLogFile(RuntimeProperties.getProperty("log_file"));
+      setLogFile(RuntimeProperties.getProperty("log_file"), 0);
     }
 
     //
@@ -161,6 +162,31 @@ namespace LootManager
 
     private void MenuItemSelectEQLogFile_Click(object sender, RoutedEventArgs e)
     {
+      loadEQLogFile(0);
+    }
+
+    private void MenuItemSelectEQLogFile1_Click(object sender, RoutedEventArgs e)
+    {
+      loadEQLogFile(60);
+    }
+
+    private void MenuItemSelectEQLogFile2_Click(object sender, RoutedEventArgs e)
+    {
+      loadEQLogFile(120);
+    }
+
+    private void MenuItemSelectEQLogFile4_Click(object sender, RoutedEventArgs e)
+    {
+      loadEQLogFile(240);
+    }
+
+    private void MenuItemSelectEQLogFile6_Click(object sender, RoutedEventArgs e)
+    {
+      loadEQLogFile(360);
+    }
+
+    private void loadEQLogFile(int mins)
+    {
       // WPF doesn't have its own file chooser so use Win32 version
       Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
 
@@ -173,7 +199,18 @@ namespace LootManager
       System.Nullable<bool> result = dlg.ShowDialog();
       if (result == true)
       {
-        setLogFile(dlg.FileName);
+        if (mins > 0)
+        {
+          resetNewLoot(true, true);
+          tellsChatController.Clear();
+          guildChatController.Clear();
+          officerChatController.Clear();
+          lootedListItems.Clear();
+          watchListItems.Clear();
+          requestListView.ItemsSource = null;
+        }
+
+        setLogFile(dlg.FileName, mins);
       }
     }
 
@@ -378,11 +415,11 @@ namespace LootManager
     // 
     // Helper methods
     //
-    private void setLogFile(string path)
+    private void setLogFile(string path, int seconds)
     {
       if (path != null)
       {
-        LogReader.getInstance().setLogFile(path);
+        LogReader.getInstance().setLogFile(path, seconds);
         chatBorder.Background = new SolidColorBrush(Color.FromRgb(179, 220, 217));
 
         logStatusText.FontStyle = FontStyles.Normal;
@@ -461,17 +498,28 @@ namespace LootManager
         bool hasMain = false;
         foreach (RequestListItem requestItem in requestList)
         {
-          string displayName = requestItem.Player;
-          if (!"Main".Equals(requestItem.Type))
+          if ((System.DateTime.Now - requestList[0].Added).TotalSeconds < 600)
           {
-            displayName += "(" + requestItem.Type + ")";
+            string displayName = requestItem.Player;
+            if (!"Main".Equals(requestItem.Type))
+            {
+              displayName += "(" + requestItem.Type + ")";
+            }
+            else
+            {
+              hasMain = true;
+            }
+
+            process.Add(displayName);
           }
           else
           {
-            hasMain = true;
+           // DataGridRow row = (DataGridRow) requestListView.ItemContainerGenerator.ContainerFromItem(requestItem);
+          //  if (row != null)
+           // {
+          //    row.Background = new SolidColorBrush(Colors.OrangeRed);
+          //  }
           }
-
-          process.Add(displayName);
         }
 
         foreach (string displayName in process)
@@ -506,10 +554,10 @@ namespace LootManager
       if (lootedListView.SelectedIndex >= 0)
       {
         LootedListItem listItem = lootedListView.SelectedItem as LootedListItem;
-        List<Player> players = newLootPlayer.ItemsSource as List<Player>;
+        ObservableCollection<Player> players = newLootPlayer.ItemsSource as ObservableCollection<Player>;
         if (players != null)
         {
-          newLootPlayer.SelectedIndex = players.FindIndex(player => player.Name.Equals(listItem.Player));
+          newLootPlayer.SelectedIndex = players.ToList().FindIndex(player => player.Name.Equals(listItem.Player));
         }
 
         if (newLootPlayer.SelectedIndex == -1)
@@ -521,7 +569,10 @@ namespace LootManager
         if (found.Count > 0)
         {
           newLootItem.ItemsSource = found;
-          newLootItem.SelectedIndex = 0;
+          if (newLootItem.SelectedIndex != 0)
+          {
+            newLootItem.SelectedIndex = 0;
+          }
         }
         else
         {
@@ -590,8 +641,9 @@ namespace LootManager
         if (slots != null)
         {
           int index = slots.IndexOf(item.Slot);
-          if (index >= 0)
+          if (index >= 0 && newLootSlot.SelectedIndex != index)
           {
+            ignoreOneEvent = true;
             newLootSlot.SelectedIndex = index;
           }
         }
@@ -599,7 +651,11 @@ namespace LootManager
         List<RaidEvent> events = newLootEvent.ItemsSource as List<RaidEvent>;
         if (!"Any".Equals(item.EventName))
         {
-          newLootEvent.SelectedIndex = events.FindIndex(evt => evt.ShortName.Equals(item.EventName));
+          int eventIndex = events.FindIndex(evt => evt.ShortName.Equals(item.EventName));
+          if (newLootEvent.SelectedIndex != eventIndex)
+          {
+            newLootEvent.SelectedIndex = eventIndex;
+          }
         }
       }
       else
@@ -612,8 +668,9 @@ namespace LootManager
 
     private void NewLootSlot_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-      if (newLootEvent == null)
+      if (newLootEvent == null || ignoreOneEvent)
       {
+        ignoreOneEvent = false;
         return; // UI not ready?
       }
 
@@ -789,7 +846,8 @@ namespace LootManager
         newLootItem.Text = "Select Item";
       }
 
-      if (force || (newLootEvent.SelectedIndex == -1 && newLootEvent.Text.Trim().Length == 0))
+      // uh hack to not change event on save (or unload row i guess)
+      if ((force && dateToo) || (newLootEvent.SelectedIndex == -1 && newLootEvent.Text.Trim().Length == 0))
       {
         newLootEvent.SelectedIndex = -1;
         newLootEvent.Text = "Select Event";

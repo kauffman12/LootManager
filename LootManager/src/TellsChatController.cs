@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Collections;
 using System.Windows.Documents;
+using System.Globalization;
 
 namespace LootManager
 {
@@ -12,6 +13,7 @@ namespace LootManager
   {
     private Regex aNumber = new Regex(@"\d");
     private Regex lootTell = new Regex(@"^(\D+) tells you, '(.+)'");
+    private Regex timeStamp = new Regex(@"^\[(\w{3} \w{3} \d+) (\d{2}:\d{2}).*\].+");
     private DataGrid watchListView;
     private IDictionary<string, ObservableCollection<RequestListItem>> requestListMap;
     private CheckBox lootChatOnly;
@@ -26,6 +28,13 @@ namespace LootManager
 
       tellsChatBuffer = new FlowDocument();
       tellsChatBuffer.Blocks.Add(new Paragraph());
+      tellsChatBuffer.Blocks.Add(new Paragraph());
+    }
+
+    public new void Clear()
+    {
+      base.Clear();
+      tellsChatBuffer.Blocks.Clear();
     }
 
     public new void handleEvent(LogEventArgs e)
@@ -39,6 +48,16 @@ namespace LootManager
       {
         string name = matches[0].Groups[1].Value;
         string text = matches[0].Groups[2].Value;
+
+        // read time
+        string time = "";
+        System.DateTime added = System.DateTime.Now;
+        MatchCollection timeMatch = timeStamp.Matches(e.line);
+        if (timeMatch.Count == 1 && timeMatch[0].Groups.Count > 2)
+        {
+          time = timeMatch[0].Groups[2].Value;
+          added = System.DateTime.ParseExact(timeMatch[0].Groups[1].Value + " " + time, "ddd MMM dd HH:mm", CultureInfo.InvariantCulture);
+        }
 
         ObservableCollection<WatchListItem> watchList = watchListView.ItemsSource as ObservableCollection<WatchListItem>;
         if (watchList != null)
@@ -80,7 +99,7 @@ namespace LootManager
 
               // case of updating existing
               RequestListItem foundRequestListItem = list.FirstOrDefault(x => name.Equals(x.Player));
-              if (foundRequestListItem != null)
+              if (foundRequestListItem != null && (added - foundRequestListItem.Added).TotalSeconds > 600)
               {
                 list.Remove(foundRequestListItem);
               }
@@ -93,7 +112,17 @@ namespace LootManager
               }
 
               // Add player
-              RequestListItem requestListItem = new RequestListItem { Item = found.Item, Player = name, Type = type, Main = 0, Alt = 0, Days = -1 };
+              RequestListItem requestListItem = new RequestListItem {
+                Item = found.Item,
+                Player = name,
+                Type = type,
+                Main = 0,
+                Alt = 0,
+                Days = -1,
+                Time = time,
+                Added = added
+              };
+
               // Update with loot counts
               DataManager.updateLootCounts(requestListItem);
               list.Add(requestListItem);
