@@ -46,6 +46,8 @@ namespace LootManager
         logFileName = filename.Substring(filename.LastIndexOf("\\") + 1);
         lastMins = mins;
 
+        LOG.Warn("Looking for entries newer than " + lastMins + " minutes.");
+
         MatchCollection matches = userFromFileName.Matches(logFileName);
         if (matches.Count > 0)
         {
@@ -77,6 +79,36 @@ namespace LootManager
       }
     }
 
+    private bool hasTimeInRange(System.DateTime now, string line)
+    {
+      bool found = false;
+      MatchCollection matches = timeStamp.Matches(line);
+
+      if (matches.Count > 0 && matches[0].Groups.Count > 1)
+      {
+        try
+        {
+          DateTime dateTime = DateTime.ParseExact(matches[0].Groups[1].Value, "ddd MMM dd HH:mm:ss yyyy", CultureInfo.InvariantCulture);
+          if (dateTime != null)
+          {
+            TimeSpan diff = now.Subtract(dateTime);
+            LOG.Warn("Time Difference: " + diff.TotalMinutes);
+            if (diff.TotalMinutes < lastMins)
+            {
+              found = true;
+            }
+          }
+        }
+        catch (Exception e)
+        {
+          // continue
+          LOG.Error("Could not parse Date/Time from log: " + matches[0].Groups[1].Value, e);
+        }
+      }
+
+      return found;
+    }
+
     private void start()
     {
       if (threadState != null)
@@ -91,6 +123,7 @@ namespace LootManager
       myThread = new Thread(() =>
       {
         bool exitOnError = false;
+        DateTime now = DateTime.Now;
 
         // get file stream
         FileStream fs = new FileStream(logFilePath + logFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -106,40 +139,42 @@ namespace LootManager
         // events to notify for changes
         fsw.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.CreationTime;
 
-        bool foundLatest = false;
-        DateTime now = DateTime.Now;
-        while (!reader.EndOfStream)
+        if (fs.Length > 0)
         {
-          string line = reader.ReadLine();
-          if (foundLatest) // stop parsing dates once we reach a line in the right timeframe
+          long position = fs.Length / 2;
+          long lastPos = 0;
+          long value = -1;
+
+          fs.Seek(position, System.IO.SeekOrigin.Begin);
+          reader.ReadLine();
+
+          while (!reader.EndOfStream && value != 0)
           {
-            parseLine(line);
-          }
-          else
-          {
-            MatchCollection matches = timeStamp.Matches(line);
-            if (matches.Count > 0 && matches[0].Groups.Count > 1)
+            string line = reader.ReadLine();
+            bool inRange = hasTimeInRange(now, line);
+            value = Math.Abs(lastPos - position) / 2;
+
+            lastPos = position;
+
+            if (!inRange)
             {
-              try
-              {
-                DateTime dateTime = DateTime.ParseExact(matches[0].Groups[1].Value, "ddd MMM dd HH:mm:ss yyyy", CultureInfo.InvariantCulture);
-                if (dateTime != null)
-                {
-                  TimeSpan diff = now.Subtract(dateTime);
-                  if (diff.TotalMinutes < lastMins)
-                  {
-                    foundLatest = true;
-                    parseLine(line);
-                  }
-                }
-              }
-              catch (Exception e)
-              {
-                // continue
-                LOG.Error("Could not parse Date/Time from log.", e);
-              }
+              position += value;
             }
-          }          
+            else
+            {
+              position -= value;
+            }
+
+            fs.Seek(position, System.IO.SeekOrigin.Begin);
+            reader.DiscardBufferedData();
+            reader.ReadLine(); // seek will lead to partial line
+          }
+
+          fs.Seek(lastPos, System.IO.SeekOrigin.Begin);
+          while (!reader.EndOfStream)
+          {
+            parseLine(reader.ReadLine());
+          }
         }
 
         fsw.EnableRaisingEvents = true;
