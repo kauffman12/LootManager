@@ -526,33 +526,62 @@ namespace LootManager
         string item = requestList[0].Item;
         chat = item;
 
-        List<string> process = new List<string>();
-        bool hasMain = false;
+        List<string> mainMembersProcess = new List<string>();
+        List<string> altMembersProcess = new List<string>();
+        List<string> rotMembersProcess = new List<string>();
+        List<string> appsProcess = new List<string>();
         foreach (RequestListItem requestItem in requestList)
         {
+          bool alt = false;
+          bool rot = false;
           if ((System.DateTime.Now - requestItem.Added).TotalSeconds < 600)
           {
             string displayName = requestItem.Player;
-            if (!"Main".Equals(requestItem.Type))
+            if (!"Main".Equals(requestItem.Type, StringComparison.OrdinalIgnoreCase))
             {
+              alt = "Alt".Equals(requestItem.Type, StringComparison.OrdinalIgnoreCase);
+              rot = "Rot".Equals(requestItem.Type, StringComparison.OrdinalIgnoreCase);
               displayName += "(" + requestItem.Type + ")";
+            }
+
+            if (DataManager.isMember(requestItem.Player))
+            {
+              if (!alt && !rot)
+              {
+                mainMembersProcess.Add(displayName);
+              }
+              else if (alt)
+              {
+                altMembersProcess.Add(displayName);
+              }
+              else if (rot)
+              {
+                rotMembersProcess.Add(displayName);
+              }
             }
             else
             {
-              hasMain = true;
+              appsProcess.Add(displayName);
             }
-
-            process.Add(displayName);
           }
         }
 
+        List<string> process;
+        if (lootAllTypes.IsChecked.Value)
+        {
+          process = mainMembersProcess;
+          process.AddRange(rotMembersProcess);
+          process.AddRange(appsProcess);
+          process.AddRange(altMembersProcess);
+        }
+        else
+        {
+          process = mainMembersProcess.Count > 0 ? mainMembersProcess : rotMembersProcess.Count > 0 ? rotMembersProcess : appsProcess.Count > 0 ? appsProcess : altMembersProcess;
+        }
+        
         foreach (string displayName in process)
         {
-          // if show all is not checked then only display alts and rot if no mains are available
-          if (lootAllTypes.IsChecked.Value || !hasMain || !displayName.Contains("("))
-          {
-            chat += " - " + displayName;
-          }
+          chat += " - " + displayName;
         }
       }
 

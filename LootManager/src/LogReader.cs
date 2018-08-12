@@ -171,7 +171,9 @@ namespace LootManager
           }
 
           fs.Seek(lastPos, System.IO.SeekOrigin.Begin);
-          while (!reader.EndOfStream)
+          reader.DiscardBufferedData();
+
+          while (myState.isRunning() && !exitOnError && !reader.EndOfStream)
           {
             parseLine(reader.ReadLine());
           }

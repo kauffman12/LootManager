@@ -323,6 +323,17 @@ namespace LootManager
       return audits;
     }
 
+    public static bool isMember(string name)
+    {
+      bool pass = false;
+      if (activePlayerByName.ContainsKey(name))
+      {
+        Player player = activePlayerByName[name];
+        pass = (player != null && !"App".Equals(player.Rank, StringComparison.OrdinalIgnoreCase));
+      }
+      return pass;
+    }
+
     public static int updateMember(string name, Player player)
     {
       return updateRosterSpreadsheet(name, player);
