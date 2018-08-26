@@ -585,7 +585,7 @@ namespace LootManager
         }
       }
 
-      if ("".Equals(chat) && genChatBox.FontStyle != FontStyles.Italic)
+      if ("".Equals(chat))
       {
         resetGenChatBox();
       }
@@ -624,8 +624,17 @@ namespace LootManager
 
     private void resetGenChatBox()
     {
-      genChatBox.FontStyle = FontStyles.Italic;
-      genChatBox.Text = "Suggested Officer Chat for Selected Item";
+      WatchListItem item = watchListView.SelectedItem as WatchListItem;
+      if (item != null)
+      {
+        genChatBox.FontStyle = FontStyles.Normal;
+        genChatBox.Text = item.Item + " - ROT";
+      }
+      else if (genChatBox.FontStyle != FontStyles.Italic)
+      {
+        genChatBox.FontStyle = FontStyles.Italic;
+        genChatBox.Text = "Suggested Officer Chat for Selected Item";
+      }
     }
 
     private void LootedList_SelectionChanged(object sender, SelectionChangedEventArgs e)
