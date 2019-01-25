@@ -73,7 +73,6 @@ namespace LootManager
     public int Visibles { get; set; }
     public int NonVisibles { get; set; }
     public int Weapons { get; set; }
-    public int Other { get; set; }
     public int Special { get; set; }
     public int Main { get; set; }
     public int Alt { get; set; }

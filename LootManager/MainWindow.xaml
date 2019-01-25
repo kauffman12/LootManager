@@ -8,7 +8,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" 
         x:Class="LootManager.MainWindow"
         mc:Ignorable="d"
-        Title="Loot Manager v1.0.2.5 (Not Connected)"
+        Title="Loot Manager v1.0.2.6 (Not Connected)"
         UseLayoutRounding="True"
         TextOptions.TextFormattingMode="Display"
         TextOptions.TextRenderingMode="ClearType"
@@ -525,7 +525,7 @@
                     </Style>
                   </DataGridTextColumn.CellStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Binding="{Binding Other}" ClipboardContentBinding="{x:Null}" Header="Other" IsReadOnly="True" MaxWidth="45" Width="45" CanUserReorder="False">
+                <DataGridTextColumn Binding="{Binding Special}" ClipboardContentBinding="{x:Null}" Header="Special" IsReadOnly="True" MaxWidth="50" Width="50" CanUserReorder="False">
                   <DataGridTextColumn.CellStyle>
                     <Style TargetType="{x:Type DataGridCell}">
                       <Setter Property="TextBlock.TextAlignment" Value="Center" />

@@ -568,7 +568,8 @@ namespace LootManager
             }
             else
             {
-              lootDetails.Other++;
+              lootDetails.Special++;
+              added = true;
             }
 
             if (added)
