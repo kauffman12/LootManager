@@ -7,6 +7,9 @@ using System.Collections.Generic;
 using Google.Apis.Drive.v3;
 using Google.Apis.Drive.v3.Data;
 using System.Collections.ObjectModel;
+using System.Net;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace LootManager
 {
@@ -18,6 +21,10 @@ namespace LootManager
     private static string ROSTER_ID = "1J3Io-COBeCaAQ_jTiJS9kmdP8gqpFNr2_5-gfY_c5cg";
     private static string LOOT_ID = "1fGMG78HVN8iLO43zoi8Ermt_nhfkqBHcQkdQLQ7BqnI";
     private static string ITEMS_ID = "13_qG0syQGgK7-yT06r5MJ3HNrWmVh0872ou-FhXjjDM";
+
+    private static Regex FIND_USER_ID = new Regex(@"^.*compare_ids.*value=""(\d+)"".*$", RegexOptions.Compiled);
+    private static Regex FIND_MEMBER = new Regex(@"^.*viewmember.*name=(\w+).*$", RegexOptions.Compiled);
+    private static Regex FIND_PERCENT = new Regex(@"^.*>(\d+)% of raids.*$", RegexOptions.Compiled);
 
     // ROI Loot.xlsx
     // -- RainOfFearLoot      Date, Name, Event, Item, Slot, Rot, Alt Loot
@@ -56,6 +63,7 @@ namespace LootManager
 
     private static Dictionary<string, DateTime?> fileModTimes = new Dictionary<string, DateTime?>();
     private static Dictionary<string, IList<object>> headerMap = new Dictionary<string, IList<object>>();
+    private static Dictionary<string, string> attendance30Day = new Dictionary<string, string>();
 
     // player loot counts
     private static Dictionary<string, LootCounts> lootCountsByName = new Dictionary<string, LootCounts>();
@@ -91,7 +99,7 @@ namespace LootManager
     private static readonly Dictionary<string, bool> weaponTypes = new Dictionary<string, bool>
     {
       { "1HB", true }, { "1HP", true }, { "1HS", true }, { "2HB", true }, { "2HP", true },
-      { "2HS", true }, { "H2H", true }, { "Bow", true }
+      { "2HS", true }, { "H2H", true }, { "HTH", true }, { "Bow", true }
     };
     // class type map
     private static readonly Dictionary<string, List<string>> classTypeMap = new Dictionary<string, List<string>>
@@ -179,6 +187,74 @@ namespace LootManager
       temp.Where(d => d.ContainsKey(ARMOR_TYPES)).ToList().ForEach(d => armorTypesList.Add(d[ARMOR_TYPES]));
       armorTypesList.Sort();
       armorTypesList.Insert(0, "Any Slot");
+
+      // try to query attendance
+      try
+      {
+        HttpWebRequest webRequest = WebRequest.Create("https://forum.roiguild.org/dkp/listmembers.php") as HttpWebRequest;
+        webRequest.Method = "GET";
+
+        List<string> playerIds = new List<string>();
+        var response = webRequest.GetResponse();
+        using (var reader = new System.IO.StreamReader(response.GetResponseStream(), Encoding.ASCII))
+        {
+          while (!reader.EndOfStream)
+          {
+            string line = reader.ReadLine();
+            var matches = FIND_USER_ID.Matches(line);
+            if (matches.Count > 0)
+            {
+              playerIds.Add(matches[0].Groups[1].Value);
+            }
+          }
+        }
+
+        if (playerIds.Count > 0)
+        {
+          string attendanceQuery = "https://forum.roiguild.org/dkp/listmembers.php?compare=" + string.Join(",", playerIds.ToArray());
+          webRequest = WebRequest.Create(attendanceQuery) as HttpWebRequest;
+          var attendanceResponse = webRequest.GetResponse();
+
+          using (var reader = new System.IO.StreamReader(attendanceResponse.GetResponseStream(), Encoding.ASCII))
+          {
+            string name = null;
+            string value;
+            while (!reader.EndOfStream)
+            {
+              string line = reader.ReadLine();
+
+              if (name == null)
+              {
+                var matches = FIND_MEMBER.Matches(line);
+                if (matches.Count > 0)
+                {
+                  name = matches[0].Groups[1].Value;
+                }
+              }
+              else
+              {
+                var matches = FIND_PERCENT.Matches(line);
+                if (matches.Count > 0)
+                {
+                  value = matches[0].Groups[1].Value;
+
+                  if (!attendance30Day.ContainsKey(name))
+                  {
+                    attendance30Day[name] = value;
+                  }
+
+                  name = null;
+                  value = null;
+                }
+              }
+            }
+          }
+        }
+      }
+      catch (Exception ex)
+      {
+        LOG.Error(ex);
+      }
 
       LOG.Debug("Finished Loading Data in " + (System.DateTime.Now - start).TotalSeconds + " seconds");
     }
@@ -347,6 +423,8 @@ namespace LootManager
       eventsList.Clear();
       rosterList.Clear();
       itemsList.Clear();
+      lootedList.Clear();
+      attendance30Day.Clear();
     }
 
     private static void populatePlayerList()
@@ -528,6 +606,8 @@ namespace LootManager
             cache.Add(name, lootDetails);
           }
 
+          lootDetails.Total++;
+
           bool isAlt = false;
           if (row.ContainsKey(ALT_LOOT) && "Yes".Equals(row[ALT_LOOT], StringComparison.OrdinalIgnoreCase))
           {
@@ -536,7 +616,7 @@ namespace LootManager
           }
 
           bool isRot = false;
-          if (row.ContainsKey(ROT) && "Yes".Equals(row[ROT], StringComparison.OrdinalIgnoreCase))
+          if (!isAlt && row.ContainsKey(ROT) && "Yes".Equals(row[ROT], StringComparison.OrdinalIgnoreCase))
           {
             isRot = true;
             lootDetails.Rot++;
@@ -550,31 +630,21 @@ namespace LootManager
           string slot;
           if (row.ContainsKey(SLOT) && ((slot = row[SLOT]) != null))
           {
-            bool added = false;
             if (visibleArmorTypes.ContainsKey(slot))
             {
               lootDetails.Visibles++;
-              added = true;
             }
             else if (nonVisibleArmorTypes.ContainsKey(slot))
             {
               lootDetails.NonVisibles++;
-              added = true;
             }
             else if (weaponTypes.ContainsKey(slot))
             {
               lootDetails.Weapons++;
-              added = true;
             }
             else
             {
               lootDetails.Special++;
-              added = true;
-            }
-
-            if (added)
-            {
-              lootDetails.Total++;
             }
           }
 
@@ -597,7 +667,18 @@ namespace LootManager
         }
       }
 
-      cache.Values.Cast<LootDetailsListItem>().ToList().ForEach(item => lootDetailsList.Add(item));
+      cache.Values.Cast<LootDetailsListItem>().ToList().ForEach(item =>
+      {
+        if (attendance30Day.ContainsKey(item.Player))
+        {
+          int test = 0;
+          int.TryParse(attendance30Day[item.Player], out test);
+          item.Attendance = test;
+        }
+
+        lootDetailsList.Add(item);
+      });
+
       lootDetailsList.Sort((x, y) => x.Player.CompareTo(y.Player));
 
       historyStatus = "Found " + count + " Entries Matching Filters, First Entry Recorded On " + oldestDate;

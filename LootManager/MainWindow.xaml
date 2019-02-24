@@ -8,12 +8,12 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" 
         x:Class="LootManager.MainWindow"
         mc:Ignorable="d"
-        Title="Loot Manager v1.0.2.6 (Not Connected)"
+        Title="Loot Manager v1.0.2.8 (Not Connected)"
         UseLayoutRounding="True"
         TextOptions.TextFormattingMode="Display"
         TextOptions.TextRenderingMode="ClearType"
         Height="700" 
-        Width="1150" MinHeight="600" MinWidth="800"
+        Width="1250" MinHeight="600" MinWidth="800"
         Icon="/LootManager;component/Icons/roi_icon2.ico" 
         Closing="Application_Closing" 
         Background="#FFF0F0F0" 
@@ -470,6 +470,10 @@
         </TabItem>
         <TabItem x:Name="lootHistoryTab" Header="Loot History">
           <Grid Background="#FFFAFAFA">
+            <Grid.Resources>
+              <local:PercentConverter x:Key="PercentConverter" />
+              <local:PercentStyleConverter x:Key="PercentStyleConverter" />
+            </Grid.Resources>
             <Border x:Name="historyBorder" Background="Orange" Margin="-3,-3,-3,0" Padding="0" BorderThickness="1" BorderBrush="#FF688CAF" Height="28" VerticalAlignment="Top"/>
             <Label x:Name="historyStatusText" Margin="10,-1,234,0" FontStyle="Italic" Height="26" VerticalAlignment="Top" Content="No Loot Data Available"/>
             <TextBox x:Name="lootDetailsFilterBox" Height="22" Margin="73,65,43,0" TextWrapping="Wrap" Text="Enter Player Names To Limit Results" VerticalAlignment="Top" VerticalContentAlignment="Center" FontStyle="Italic" TextChanged="LootDetailsFilterTextBox_TextChanged" GotFocus="LootDetailsFilterTextBox_GotFocus" LostFocus="LootDetailsFilterTextBox_LostFocus" KeyUp="LootDetailsFilterTextBox_KeyUp" BorderBrush="#FF688CAF"/>
@@ -480,7 +484,7 @@
             <xctk:LongUpDown x:Name="timeSpinner" Width="74" AllowTextInput="False" ValueChanged="TimeSpinner_ValueChanged" Increment="30" FormatString="0 Days" Value="90" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Height="22" Margin="73,35,0,0" VerticalAlignment="Top" Minimum="30" Maximum="9999" AutoMoveFocus="False" BorderBrush="#FF688CAF"/>
             <xctk:CheckComboBox x:Name="classComboBox" HorizontalAlignment="Left" VerticalContentAlignment="Center" VerticalAlignment="Top" IsEditable="true" Width="205" Height="22" Margin="407,34,0,0" BorderThickness="1" ClipToBounds="True" BorderBrush="#FF688CAF" Panel.ZIndex="1" ItemSelectionChanged="ClassComboBox_ItemSelectionChanged"/>
             <Label Content="Role:" HorizontalAlignment="Left" Margin="365,32,0,0" VerticalAlignment="Top" Width="43"/>
-            <DataGrid x:Name="lootDetailsListView" ContextMenuOpening="LootDetailsListContextMenu_OnOpened" AutoGenerateColumns="False" CanUserAddRows="False" IsTabStop="True" ColumnWidth="SizeToHeader" HeadersVisibility="Column" CanUserReorderColumns="False" Margin="-3,94,-3,-3" HorizontalGridLinesBrush="#FF688CAF" VerticalGridLinesBrush="#FF688CAF" Background="#FFE8E8E8" CanUserResizeRows="False">
+            <DataGrid x:Name="lootDetailsListView" ContextMenuOpening="LootDetailsListContextMenu_OnOpened" AutoGenerateColumns="False" CanUserAddRows="False" IsTabStop="True" ColumnWidth="SizeToHeader" HeadersVisibility="Column" CanUserReorderColumns="False" Margin="-3,94,-3,-3" HorizontalGridLinesBrush="#FF688CAF" VerticalGridLinesBrush="#FF688CAF" Background="#FFE8E8E8" CanUserResizeRows="False" EnableRowVirtualization="False">
               <DataGrid.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF569FD8"/>
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#FF569FD8" />
@@ -497,70 +501,79 @@
               <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Player}" ClipboardContentBinding="{x:Null}" Header="Name" IsReadOnly="True" CanUserReorder="False" MinWidth="85" Width="88*" />
                 <DataGridTextColumn Binding="{Binding Class}" ClipboardContentBinding="{x:Null}" Header="Class" IsReadOnly="True" CanUserReorder="False" MinWidth="88" Width="88*" />
-                <DataGridTextColumn Binding="{Binding Total}" ClipboardContentBinding="{x:Null}" Header="Total" IsReadOnly="True" MaxWidth="40" Width="40" CanUserReorder="False">
+                <DataGridTextColumn Binding="{Binding Total}" ClipboardContentBinding="{x:Null}" Header="Total" IsReadOnly="True" MinWidth="40" Width="40" CanUserReorder="False">
                   <DataGridTextColumn.CellStyle>
                     <Style TargetType="{x:Type DataGridCell}">
                       <Setter Property="TextBlock.TextAlignment" Value="Center" />
                     </Style>
                   </DataGridTextColumn.CellStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Binding="{Binding Visibles}" ClipboardContentBinding="{x:Null}" Header="Visibles" IsReadOnly="True" MaxWidth="55" Width="55" CanUserReorder="False">
+                <DataGridTextColumn Binding="{Binding Main}" ClipboardContentBinding="{x:Null}" Header="Main" IsReadOnly="True" MinWidth="40" Width="40" CanUserReorder="False">
                   <DataGridTextColumn.CellStyle>
                     <Style TargetType="{x:Type DataGridCell}">
                       <Setter Property="TextBlock.TextAlignment" Value="Center" />
                     </Style>
                   </DataGridTextColumn.CellStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Binding="{Binding NonVisibles}" ClipboardContentBinding="{x:Null}" Header="Non-Vis" IsReadOnly="True" MaxWidth="62" Width="62" CanUserReorder="False">
+                <DataGridTextColumn Binding="{Binding Rot}" ClipboardContentBinding="{x:Null}" Header="Rot" IsReadOnly="True" MinWidth="32" Width="32" CanUserReorder="False">
                   <DataGridTextColumn.CellStyle>
                     <Style TargetType="{x:Type DataGridCell}">
                       <Setter Property="TextBlock.TextAlignment" Value="Center" />
                     </Style>
                   </DataGridTextColumn.CellStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Binding="{Binding Weapons}" ClipboardContentBinding="{x:Null}" Header="Weapons" IsReadOnly="True" MaxWidth="65" Width="65" CanUserReorder="False">
+                <DataGridTextColumn Binding="{Binding Alt}" ClipboardContentBinding="{x:Null}" Header="Alt" IsReadOnly="True"  MinWidth="32" Width="32" CanUserReorder="False">
                   <DataGridTextColumn.CellStyle>
                     <Style TargetType="{x:Type DataGridCell}">
                       <Setter Property="TextBlock.TextAlignment" Value="Center" />
                     </Style>
                   </DataGridTextColumn.CellStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Binding="{Binding Special}" ClipboardContentBinding="{x:Null}" Header="Special" IsReadOnly="True" MaxWidth="50" Width="50" CanUserReorder="False">
+                <DataGridTextColumn Binding="{Binding Special}" ClipboardContentBinding="{x:Null}" Header="Special" IsReadOnly="True" MinWidth="50" Width="50" CanUserReorder="False">
                   <DataGridTextColumn.CellStyle>
                     <Style TargetType="{x:Type DataGridCell}">
                       <Setter Property="TextBlock.TextAlignment" Value="Center" />
                     </Style>
                   </DataGridTextColumn.CellStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Binding="{Binding Main}" ClipboardContentBinding="{x:Null}" Header="Main" IsReadOnly="True" MaxWidth="40" Width="40" CanUserReorder="False">
+                <DataGridTextColumn Binding="{Binding Attendance, Converter={StaticResource PercentConverter}}" ClipboardContentBinding="{x:Null}" Header="Attendance" IsReadOnly="True" MinWidth="75" Width="75" CanUserReorder="False">
                   <DataGridTextColumn.CellStyle>
                     <Style TargetType="{x:Type DataGridCell}">
+                      <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource Self}, Path=Content.Text, Converter={StaticResource PercentStyleConverter}}" />
                       <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                      <Setter Property="FontWeight" Value="Bold"/>
                     </Style>
                   </DataGridTextColumn.CellStyle>
-                </DataGridTextColumn>
-                <DataGridTextColumn Binding="{Binding Alt}" ClipboardContentBinding="{x:Null}" Header="Alt" IsReadOnly="True"  MaxWidth="32" Width="32" CanUserReorder="False">
-                  <DataGridTextColumn.CellStyle>
-                    <Style TargetType="{x:Type DataGridCell}">
-                      <Setter Property="TextBlock.TextAlignment" Value="Center" />
-                    </Style>
-                  </DataGridTextColumn.CellStyle>
-                </DataGridTextColumn>
-                <DataGridTextColumn Binding="{Binding Rot}" ClipboardContentBinding="{x:Null}" Header="Rot" IsReadOnly="True" MaxWidth="32" Width="32" CanUserReorder="False">
-                  <DataGridTextColumn.CellStyle>
-                    <Style TargetType="{x:Type DataGridCell}">
-                      <Setter Property="TextBlock.TextAlignment" Value="Center" />
-                    </Style>
-                  </DataGridTextColumn.CellStyle>
-                </DataGridTextColumn>
-                <DataGridTextColumn Binding="{Binding LastAltDate}" SortMemberPath="LastAltDateValue" IsReadOnly="True" ClipboardContentBinding="{x:Null}" Header="Last Alt Date" CanUserReorder="False" MaxWidth="90" Width="90*">
-                  <DataGridTextColumn.CellStyle>
-                    <Style TargetType="{x:Type DataGridCell}">
-                      <Setter Property="TextBlock.TextAlignment" Value="Center" />
-                    </Style>
-                  </DataGridTextColumn.CellStyle>
-                </DataGridTextColumn>
+                </DataGridTextColumn>                
                 <DataGridTextColumn Binding="{Binding LastMainDate}" SortMemberPath="LastMainDateValue" IsReadOnly="True" ClipboardContentBinding="{x:Null}" Header="Last Main Date" CanUserReorder="False" MinWidth="90" Width="90*" >
+                  <DataGridTextColumn.CellStyle>
+                    <Style TargetType="{x:Type DataGridCell}">
+                      <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                    </Style>
+                  </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding LastAltDate}" SortMemberPath="LastAltDateValue" IsReadOnly="True" ClipboardContentBinding="{x:Null}" Header="Last Alt Date" CanUserReorder="False" MinWidth="85" Width="85*">
+                  <DataGridTextColumn.CellStyle>
+                    <Style TargetType="{x:Type DataGridCell}">
+                      <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                    </Style>
+                  </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding Visibles}" ClipboardContentBinding="{x:Null}" Header="Visibles" IsReadOnly="True" MinWidth="55" Width="55" CanUserReorder="False">
+                  <DataGridTextColumn.CellStyle>
+                    <Style TargetType="{x:Type DataGridCell}">
+                      <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                    </Style>
+                  </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding NonVisibles}" ClipboardContentBinding="{x:Null}" Header="Non-Vis" IsReadOnly="True" MinWidth="62" Width="62" CanUserReorder="False">
+                  <DataGridTextColumn.CellStyle>
+                    <Style TargetType="{x:Type DataGridCell}">
+                      <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                    </Style>
+                  </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding Weapons}" ClipboardContentBinding="{x:Null}" Header="Weapons" IsReadOnly="True" MinWidth="65" Width="65" CanUserReorder="False">
                   <DataGridTextColumn.CellStyle>
                     <Style TargetType="{x:Type DataGridCell}">
                       <Setter Property="TextBlock.TextAlignment" Value="Center" />

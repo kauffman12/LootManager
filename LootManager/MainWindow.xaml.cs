@@ -11,6 +11,7 @@ using log4net;
 using System;
 using System.Windows.Data;
 using System.Windows.Threading;
+using System.Globalization;
 
 namespace LootManager
 {
@@ -1351,6 +1352,71 @@ namespace LootManager
     {
       chatGrid.RowDefinitions[3].Height = AUTO_GRID;
     }
+  }
 
+  public class PercentConverter : IValueConverter
+  {
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+      if (value.GetType() == typeof(int))
+      {
+        return value.ToString() + "%";
+      }
+      return string.Empty;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+      if (value is string)
+      {
+        int intValue;
+        if (!int.TryParse((string) value, out intValue))
+        {
+          intValue = 0;
+        }
+        return intValue;
+      }
+      return 0;
+    }
+  }
+
+  public class PercentStyleConverter : IValueConverter
+  {
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+      string color = Colors.Black.ToString();
+
+      if (value != null)
+      {
+        string attendance = value as string;
+        if (attendance != null && attendance.Length > 1)
+        {
+          int intValue = -1;
+          int.TryParse(attendance.Substring(0, attendance.Length - 1), out intValue);
+          if (intValue > -1)
+          {
+            if (intValue <= 69)
+            {
+              color = Colors.DarkRed.ToString();
+            }
+            else if (intValue <= 79)
+            {
+              color = "#e46b00";
+            }
+            else
+            {
+              color = Colors.DarkGreen.ToString();
+            }
+          }
+        }
+      }
+
+      return color.ToString();
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+      throw new NotImplementedException();
+    }
   }
 }

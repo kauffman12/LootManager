@@ -77,6 +77,7 @@ namespace LootManager
     public int Main { get; set; }
     public int Alt { get; set; }
     public int Rot { get; set; }
+    public int Attendance { get; set; }
     public string LastAltDate { get; set; }
     public string LastMainDate { get; set; }
     public System.DateTime LastAltDateValue { get; set; }
