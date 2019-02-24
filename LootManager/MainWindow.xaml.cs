@@ -983,7 +983,7 @@ namespace LootManager
     {
       if (genChatBox.FontStyle != FontStyles.Italic)
       {
-        Clipboard.SetText(genChatBox.Text);
+        Clipboard.SetDataObject(genChatBox.Text);
         copyNotice.Opacity = 1.0;
         copyNotice.Visibility = Visibility.Visible;
         Task.Delay(System.TimeSpan.FromMilliseconds(150)).ContinueWith(task => hideCopyNotice());
