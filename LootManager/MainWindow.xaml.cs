@@ -478,10 +478,10 @@ namespace LootManager
             break;
           case LogReader.LOG_TYPE.LOOT:
             // Group 0 is everything       Group 1     Group 2     Group 3
-            //[Sun May 13 20:20:29 2018] --(You) have (looted) a (Enchanted Runestone).--
-            if (e.matches[0].Groups.Count == 4)
+            //[Sun May 13 20:20:29 2018] --(You) have (looted) (a|an) (Enchanted Runestone).--
+            if (e.matches[0].Groups.Count == 5)
             {
-              string item = e.matches[0].Groups[3].Value;
+              string item = e.matches[0].Groups[4].Value;
               string player = e.matches[0].Groups[1].Value;
               if ("You".Equals(player))
               {
