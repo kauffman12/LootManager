@@ -1114,7 +1114,7 @@ namespace LootManager
           historyStatusText.FontStyle = FontStyles.Normal;
           historyBorder.Background = new SolidColorBrush(Color.FromRgb(179, 220, 217));
           tierComboBox.ItemsSource = DataManager.getTiers();
-          tierComboBox.SelectedItemsOverride = DataManager.getTiers();
+          tierComboBox.SelectedItemsOverride = DataManager.getCurrentTiers();
           classComboBox.ItemsSource = DataManager.getClassTypes();
           classComboBox.SelectedItemsOverride = DataManager.getClassTypes();
         }

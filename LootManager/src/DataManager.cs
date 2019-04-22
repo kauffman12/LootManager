@@ -18,13 +18,13 @@ namespace LootManager
     private static readonly ILog LOG = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
     // document IDs
-    private static string ROSTER_ID = "1J3Io-COBeCaAQ_jTiJS9kmdP8gqpFNr2_5-gfY_c5cg";
-    private static string LOOT_ID = "1fGMG78HVN8iLO43zoi8Ermt_nhfkqBHcQkdQLQ7BqnI";
-    private static string ITEMS_ID = "13_qG0syQGgK7-yT06r5MJ3HNrWmVh0872ou-FhXjjDM";
+    private static readonly string ROSTER_ID = "1J3Io-COBeCaAQ_jTiJS9kmdP8gqpFNr2_5-gfY_c5cg";
+    private static readonly string LOOT_ID = "1fGMG78HVN8iLO43zoi8Ermt_nhfkqBHcQkdQLQ7BqnI";
+    private static readonly string ITEMS_ID = "13_qG0syQGgK7-yT06r5MJ3HNrWmVh0872ou-FhXjjDM";
 
-    private static Regex FIND_USER_ID = new Regex(@"^.*compare_ids.*value=""(\d+)"".*$", RegexOptions.Compiled);
-    private static Regex FIND_MEMBER = new Regex(@"^.*viewmember.*name=(\w+).*$", RegexOptions.Compiled);
-    private static Regex FIND_PERCENT = new Regex(@"^.*>(\d+)% of raids.*$", RegexOptions.Compiled);
+    private static readonly Regex FIND_USER_ID = new Regex(@"^.*compare_ids.*value=""(\d+)"".*$", RegexOptions.Compiled);
+    private static readonly Regex FIND_MEMBER = new Regex(@"^.*viewmember.*name=(\w+).*$", RegexOptions.Compiled);
+    private static readonly Regex FIND_PERCENT = new Regex(@"^.*>(\d+)% of raids.*$", RegexOptions.Compiled);
 
     // ROI Loot.xlsx
     // -- RainOfFearLoot      Date, Name, Event, Item, Slot, Rot, Alt Loot
@@ -35,31 +35,30 @@ namespace LootManager
     // -- ROF Global Drops    Slot, Item Name, Tier, Special
     // Roster.xlsx
     // -- Sheet1              Name, Class, Rank, Active, Forum Username, Global Loot Viewer
-    private static string ACTIVE = "Active".ToLower();
-    private static string ALT_LOOT = "Alt Loot".ToLower();
-    private static string ARMOR_TYPES = "Armor Types".ToLower();
-    private static string CLASS = "Class".ToLower();
-    private static string DATE = "Date".ToLower();
-    private static string DISPLAY_IN_LIST = "Display In List".ToLower();
-    private static string EVENT = "Event".ToLower();
-    private static string FORUM_USERNAME = "Forum Username".ToLower();
-    private static string GLOBAL_LOOT_VIEWER = "Global Loot Viewer".ToLower();
-    private static string ITEM = "Item".ToLower();
-    private static string ITEM_NAME = "Item Name".ToLower();
-    private static string RANK = "Rank".ToLower();
-    private static string ROT = "Rot".ToLower();
-    private static string NAME = "Name".ToLower();
-    private static string SHORT_NAME = "Short Name".ToLower();
-    private static string SLOT = "Slot".ToLower();
-    private static string SPECIAL = "Special".ToLower();
-    private static string TIER = "Tier".ToLower();
+    private static readonly string ACTIVE = "Active".ToLower();
+    private static readonly string ALT_LOOT = "Alt Loot".ToLower();
+    private static readonly string ARMOR_TYPES = "Armor Types".ToLower();
+    private static readonly string CLASS = "Class".ToLower();
+    private static readonly string CURRENT_TIERS = "Current Tiers".ToLower();
+    private static readonly string DATE = "Date".ToLower();
+    private static readonly string DISPLAY_IN_LIST = "Display In List".ToLower();
+    private static readonly string EVENT = "Event".ToLower();
+    private static readonly string FORUM_USERNAME = "Forum Username".ToLower();
+    private static readonly string ITEM = "Item".ToLower();
+    private static readonly string ITEM_NAME = "Item Name".ToLower();
+    private static readonly string RANK = "Rank".ToLower();
+    private static readonly string ROT = "Rot".ToLower();
+    private static readonly string NAME = "Name".ToLower();
+    private static readonly string SHORT_NAME = "Short Name".ToLower();
+    private static readonly string SLOT = "Slot".ToLower();
+    private static readonly string TIER = "Tier".ToLower();
 
     // keep track of original row in spreadsheet
-    private static string SHEET_ROW = "SheetRow";
+    private static readonly string SHEET_ROW = "SheetRow";
 
     // full datasets
-    private static List<Dictionary<string, string>> rosterList = new List<Dictionary<string, string>>();
-    private static List<Dictionary<string, string>> lootedList = new List<Dictionary<string, string>>();
+    private static readonly List<Dictionary<string, string>> rosterList = new List<Dictionary<string, string>>();
+    private static readonly List<Dictionary<string, string>> lootedList = new List<Dictionary<string, string>>();
 
     private static Dictionary<string, DateTime?> fileModTimes = new Dictionary<string, DateTime?>();
     private static Dictionary<string, IList<object>> headerMap = new Dictionary<string, IList<object>>();
@@ -77,6 +76,8 @@ namespace LootManager
     private static List<Item> itemsList = new List<Item>();
     // sorted armor types list
     private static List<string> armorTypesList = new List<string>();
+    // current tiers list
+    private static List<string> currentTiersList = new List<string>();
     // sorted list of loot details
     private static List<LootDetailsListItem> lootDetailsList = new List<LootDetailsListItem>();
 
@@ -187,6 +188,12 @@ namespace LootManager
       temp.Where(d => d.ContainsKey(ARMOR_TYPES)).ToList().ForEach(d => armorTypesList.Add(d[ARMOR_TYPES]));
       armorTypesList.Sort();
       armorTypesList.Insert(0, "Any Slot");
+
+      // current tiers
+      temp.Clear();
+      readData(temp, LOOT_ID, "Constants");
+      temp.Where(d => d.ContainsKey(CURRENT_TIERS)).ToList().ForEach(d => currentTiersList.Add(d[CURRENT_TIERS]));
+      currentTiersList.Sort();
 
       // try to query attendance
       try
@@ -336,6 +343,11 @@ namespace LootManager
     public static List<string> getTiers()
     {
       return eventToTier.Values.Distinct().ToList();
+    }
+
+    public static List<string> getCurrentTiers()
+    {
+      return currentTiersList;
     }
 
     public static void saveLoot(string date, string player, string eventName, string item, string slot, string rot, string alt)
@@ -527,8 +539,8 @@ namespace LootManager
     {
       int count = 0;
       string oldestDate = null;
-      System.DateTime oldestDateValue = System.DateTime.Now;
-      System.DateTime start = System.DateTime.Now;
+      DateTime oldestDateValue = DateTime.Now;
+      DateTime start = DateTime.Now;
 
       Dictionary<string, bool> classMap = new Dictionary<string, bool>();
       if (classTypes != null)
@@ -541,10 +553,10 @@ namespace LootManager
       foreach (Dictionary<string, string> row in lootedList)
       {
         LootDetailsListItem lootDetails;
-        System.DateTime theDate;
+        DateTime theDate;
         string name;
 
-        if (row.ContainsKey(NAME) && ((name = row[NAME]) != null) && row.ContainsKey(DATE) && (theDate = System.DateTime.Parse(row[DATE])) != null)
+        if (row.ContainsKey(NAME) && ((name = row[NAME]) != null) && row.ContainsKey(DATE) && (theDate = DateTime.Parse(row[DATE])) != null)
         {
           // check active player map in addition to name filter
           if (!activePlayerByName.ContainsKey(name) || (names != null && !names.Any(n => n.Equals(name, StringComparison.OrdinalIgnoreCase))))
@@ -664,6 +676,30 @@ namespace LootManager
               lootDetails.LastMainDateValue = theDate;
             }
           }
+        }
+      }
+
+      // they want to see all players listed even if they have no loot
+      foreach (string player in activePlayerByName.Keys)
+      {
+        if (!cache.ContainsKey(player) && (names == null || names.Any(n => n.Equals(player, StringComparison.OrdinalIgnoreCase))))
+        {
+          var empty = new LootDetailsListItem
+          {
+            Player = player,
+            Class = activePlayerByName[player].Class,
+            Total = 0,
+            Visibles = 0,
+            NonVisibles = 0,
+            Weapons = 0,
+            Special = 0,
+            Main = 0,
+            Alt = 0,
+            Rot = 0,
+            LastAltDate = "",
+            LastMainDate = ""
+          };
+          cache.Add(player, empty);
         }
       }
 

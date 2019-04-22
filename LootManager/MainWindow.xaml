@@ -8,7 +8,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" 
         x:Class="LootManager.MainWindow"
         mc:Ignorable="d"
-        Title="Loot Manager v1.0.2.9 (Not Connected)"
+        Title="Loot Manager v1.0.2.10 (Not Connected)"
         UseLayoutRounding="True"
         TextOptions.TextFormattingMode="Display"
         TextOptions.TextRenderingMode="ClearType"
@@ -481,7 +481,7 @@
             <xctk:CheckComboBox x:Name="tierComboBox" HorizontalAlignment="Left" VerticalContentAlignment="Center" VerticalAlignment="Top" IsEditable="true" Width="150" Height="22" Margin="199,34,0,0" BorderThickness="1" ClipToBounds="True" BorderBrush="#FF688CAF" Panel.ZIndex="1" ItemSelectionChanged="TierComboBox_ItemSelectionChanged"/>
             <Label Content="Tier:" HorizontalAlignment="Left" Margin="163,32,0,0" VerticalAlignment="Top" Width="43"/>
             <Label Content="Days Back:" HorizontalAlignment="Left" Margin="2,32,0,0" VerticalAlignment="Top" Width="70"/>
-            <xctk:LongUpDown x:Name="timeSpinner" Width="74" AllowTextInput="False" ValueChanged="TimeSpinner_ValueChanged" Increment="30" FormatString="0 Days" Value="90" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Height="22" Margin="73,35,0,0" VerticalAlignment="Top" Minimum="30" Maximum="9999" AutoMoveFocus="False" BorderBrush="#FF688CAF"/>
+            <xctk:LongUpDown x:Name="timeSpinner" Width="74" AllowTextInput="False" ValueChanged="TimeSpinner_ValueChanged" Increment="30" FormatString="0 Days" Value="360" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Height="22" Margin="73,35,0,0" VerticalAlignment="Top" Minimum="30" Maximum="9999" AutoMoveFocus="False" BorderBrush="#FF688CAF"/>
             <xctk:CheckComboBox x:Name="classComboBox" HorizontalAlignment="Left" VerticalContentAlignment="Center" VerticalAlignment="Top" IsEditable="true" Width="205" Height="22" Margin="407,34,0,0" BorderThickness="1" ClipToBounds="True" BorderBrush="#FF688CAF" Panel.ZIndex="1" ItemSelectionChanged="ClassComboBox_ItemSelectionChanged"/>
             <Label Content="Role:" HorizontalAlignment="Left" Margin="365,32,0,0" VerticalAlignment="Top" Width="43"/>
             <DataGrid x:Name="lootDetailsListView" ContextMenuOpening="LootDetailsListContextMenu_OnOpened" AutoGenerateColumns="False" CanUserAddRows="False" IsTabStop="True" ColumnWidth="SizeToHeader" HeadersVisibility="Column" CanUserReorderColumns="False" Margin="-3,94,-3,-3" HorizontalGridLinesBrush="#FF688CAF" VerticalGridLinesBrush="#FF688CAF" Background="#FFE8E8E8" CanUserResizeRows="False" EnableRowVirtualization="False">
