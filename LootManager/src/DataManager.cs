@@ -80,6 +80,8 @@ namespace LootManager
     private static List<string> currentTiersList = new List<string>();
     // sorted list of loot details
     private static List<LootDetailsListItem> lootDetailsList = new List<LootDetailsListItem>();
+    // recent loot cache
+    private static Dictionary<string, bool> recentLootCache = new Dictionary<string, bool>();
 
     // map of Events to Tiers
     private static Dictionary<string, string> eventToTier = new Dictionary<string, string>();
@@ -151,6 +153,7 @@ namespace LootManager
 
       // read all loot data and remove everything older than 90 days
       temp.Clear();
+      lootedList.Clear();
       readData(lootedList, LOOT_ID, "RainOfFearLoot");
       temp = lootedList.Where(evt =>
       {
@@ -363,6 +366,18 @@ namespace LootManager
 
       // resort
       itemsList.Sort((x, y) => x.Name.CompareTo(y.Name));
+    }
+
+    public static bool hasLootedRecently(string player)
+    {
+      bool recent = false;
+
+      if (recentLootCache.ContainsKey(player))
+      {
+        recent = recentLootCache[player];
+      }
+
+      return recent;
     }
 
     public static List<LootAuditRecord> getLootAudit(string player, List<string> tiers, long? days)
@@ -674,6 +689,7 @@ namespace LootManager
             {
               lootDetails.LastMainDate = row[DATE];
               lootDetails.LastMainDateValue = theDate;
+              recentLootCache[lootDetails.Player] = (start - theDate).TotalHours <= 36;
             }
           }
         }

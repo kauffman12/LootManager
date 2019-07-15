@@ -111,6 +111,11 @@ namespace LootManager
                 watchListView.SelectedItem = found;
               }
 
+              if (cleaned.Contains("luck"))
+              {
+                type = type + "*";
+              }
+
               // Add player
               RequestListItem requestListItem = new RequestListItem {
                 Item = found.Item,

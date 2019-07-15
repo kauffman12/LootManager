@@ -1,0 +1,2 @@
+C:\Users\john\code\github\LootManager\LootManagerInstall\bin\Release\LootManagerInstall.msi
+C:\Users\john\code\github\LootManager\LootManagerInstall\bin\Release\LootManagerInstall.wixpdb

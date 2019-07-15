@@ -1,0 +1,14 @@
+C:\Users\john\code\github\LootManager\LootManager\bin\x64\Release\Google.Apis.Auth.dll
+C:\Users\john\code\github\LootManager\LootManager\bin\x64\Release\Google.Apis.Auth.PlatformServices.dll
+C:\Users\john\code\github\LootManager\LootManager\bin\x64\Release\Google.Apis.Core.dll
+C:\Users\john\code\github\LootManager\LootManager\bin\x64\Release\Google.Apis.dll
+C:\Users\john\code\github\LootManager\LootManager\bin\x64\Release\Google.Apis.Drive.v3.dll
+C:\Users\john\code\github\LootManager\LootManager\bin\x64\Release\Google.Apis.PlatformServices.dll
+C:\Users\john\code\github\LootManager\LootManager\bin\x64\Release\Google.Apis.Sheets.v4.dll
+C:\Users\john\code\github\LootManager\LootManager\bin\x64\Release\log4net.dll
+C:\Users\john\code\github\LootManager\LootManager\bin\x64\Release\LootManager.exe
+C:\Users\john\code\github\LootManager\LootManager\bin\x64\Release\LootManager.exe.config
+C:\Users\john\code\github\LootManager\LootManager\bin\x64\Release\lootmanager.log
+C:\Users\john\code\github\LootManager\LootManager\bin\x64\Release\Newtonsoft.Json.dll
+C:\Users\john\code\github\LootManager\LootManager\bin\x64\Release\properties.json
+C:\Users\john\code\github\LootManager\LootManager\bin\x64\Release\Xceed.Wpf.Toolkit.dll

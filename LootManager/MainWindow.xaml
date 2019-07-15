@@ -8,7 +8,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" 
         x:Class="LootManager.MainWindow"
         mc:Ignorable="d"
-        Title="Loot Manager v1.0.2.10 (Not Connected)"
+        Title="Loot Manager v1.0.2.12 (Not Connected)"
         UseLayoutRounding="True"
         TextOptions.TextFormattingMode="Display"
         TextOptions.TextRenderingMode="ClearType"
@@ -473,6 +473,7 @@
             <Grid.Resources>
               <local:PercentConverter x:Key="PercentConverter" />
               <local:PercentStyleConverter x:Key="PercentStyleConverter" />
+              <local:RecentLootFontConverter x:Key="RecentLootFontConverter" />
             </Grid.Resources>
             <Border x:Name="historyBorder" Background="Orange" Margin="-3,-3,-3,0" Padding="0" BorderThickness="1" BorderBrush="#FF688CAF" Height="28" VerticalAlignment="Top"/>
             <Label x:Name="historyStatusText" Margin="10,-1,234,0" FontStyle="Italic" Height="26" VerticalAlignment="Top" Content="No Loot Data Available"/>
@@ -499,7 +500,13 @@
                 </Style>
               </DataGrid.ColumnHeaderStyle>
               <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding Player}" ClipboardContentBinding="{x:Null}" Header="Name" IsReadOnly="True" CanUserReorder="False" MinWidth="85" Width="88*" />
+                <DataGridTextColumn Binding="{Binding Player}" ClipboardContentBinding="{x:Null}" Header="Name" IsReadOnly="True" CanUserReorder="False" MinWidth="85" Width="88*">
+                  <DataGridTextColumn.CellStyle>
+                    <Style TargetType="{x:Type DataGridCell}">
+                      <Setter Property="FontWeight" Value="{Binding RelativeSource={RelativeSource Self}, Path=Content.Text, Converter={StaticResource RecentLootFontConverter}}"/>
+                    </Style>
+                  </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
                 <DataGridTextColumn Binding="{Binding Class}" ClipboardContentBinding="{x:Null}" Header="Class" IsReadOnly="True" CanUserReorder="False" MinWidth="88" Width="88*" />
                 <DataGridTextColumn Binding="{Binding Total}" ClipboardContentBinding="{x:Null}" Header="Total" IsReadOnly="True" MinWidth="40" Width="40" CanUserReorder="False">
                   <DataGridTextColumn.CellStyle>

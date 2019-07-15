@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace LootManager
 {
@@ -21,10 +24,9 @@ namespace LootManager
     public void load(string player)
     {
       // get tiers filter
-      List<string> tiers = auditTierComboBox.SelectedItemsOverride as List<string>;
 
       // if data loaded
-      if (player != null && tabControl != null && tiers != null && Resources.Contains("AuditRecordsTemplate"))
+      if (player != null && tabControl != null && auditTierComboBox.SelectedItemsOverride is List<string> tiers && Resources.Contains("AuditRecordsTemplate"))
       {
         DataGrid dataGrid = null;
         TabItem tabItem = tabControl.Items.Cast<TabItem>().FirstOrDefault(item => player.Equals(item.Header));
@@ -63,8 +65,7 @@ namespace LootManager
     private void TierComboBox_ItemSelectionChanged(object sender, Xceed.Wpf.Toolkit.Primitives.ItemSelectionChangedEventArgs e)
     {
       // silly workaround
-      List<string> selected = auditTierComboBox.SelectedItemsOverride as List<string>;
-      if (selected != null)
+      if (auditTierComboBox.SelectedItemsOverride is List<string> selected)
       {
         auditTierComboBox.SelectedValue = string.Join(",", selected);
       }
@@ -79,8 +80,7 @@ namespace LootManager
 
     private void TabItem_CloseClick(object sender, RoutedEventArgs e)
     {
-      Image image = sender as Image;
-      if (image != null && tabControl.SelectedItem != null)
+      if (sender is Image && tabControl.SelectedItem != null)
       {
         tabControl.Items.Remove(tabControl.SelectedItem);
       }
@@ -91,8 +91,7 @@ namespace LootManager
       string name = null;
       if (tabControl != null)
       {
-        TabItem tabItem = tabControl.SelectedItem as TabItem;
-        if (tabItem != null)
+        if (tabControl.SelectedItem is TabItem tabItem)
         {
           name = tabItem.Header as string;
         }

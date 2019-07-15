@@ -12,6 +12,7 @@ using System;
 using System.Windows.Data;
 using System.Windows.Threading;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace LootManager
 {
@@ -22,18 +23,18 @@ namespace LootManager
   {
     private static readonly ILog LOG = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-    private ObservableCollection<LootedListItem> lootedListItems = new ObservableCollection<LootedListItem>();
-    private ObservableCollection<WatchListItem> watchListItems = new ObservableCollection<WatchListItem>();
-    private IDictionary<string, ObservableCollection<RequestListItem>> requestListMap = new Dictionary<string, ObservableCollection<RequestListItem>>();
+    private readonly ObservableCollection<LootedListItem> lootedListItems = new ObservableCollection<LootedListItem>();
+    private readonly ObservableCollection<WatchListItem> watchListItems = new ObservableCollection<WatchListItem>();
+    private readonly IDictionary<string, ObservableCollection<RequestListItem>> requestListMap = new Dictionary<string, ObservableCollection<RequestListItem>>();
     private GridLength AUTO_GRID = (GridLength) new GridLengthConverter().ConvertFromString("Auto");
     private GridLength STAR_GRID = (GridLength)new GridLengthConverter().ConvertFromString("*");
-    private SimpleChatController officerChatController;
-    private GuildChatController guildChatController;
-    private TellsChatController tellsChatController;
+    private readonly SimpleChatController officerChatController;
+    private readonly GuildChatController guildChatController;
+    private readonly TellsChatController tellsChatController;
     private Task textUpdateTask = null;
     private LootAuditWindow lootAuditWindow = null;
     private bool ignoreOneEvent = false;
-    private Brush EXPIRED_ROW_COLOR = new SolidColorBrush(Colors.DarkRed);
+    private readonly Brush EXPIRED_ROW_COLOR = new SolidColorBrush(Colors.DarkRed);
 
     public MainWindow()
     {
@@ -44,8 +45,8 @@ namespace LootManager
 
       try
       {
-        double height = System.Double.Parse(RuntimeProperties.getProperty("height"));
-        double width = System.Double.Parse(RuntimeProperties.getProperty("width"));
+        double height = double.Parse(RuntimeProperties.getProperty("height"));
+        double width = double.Parse(RuntimeProperties.getProperty("width"));
         if (height > 200 && width > 200)
         {
           Height = height;
@@ -60,7 +61,7 @@ namespace LootManager
         }       
       }
 #pragma warning disable CS0168 // Variable is declared but never used
-      catch (System.Exception e)
+      catch (Exception e)
 #pragma warning restore CS0168 // Variable is declared but never used
       {
         // do nothing
@@ -97,8 +98,7 @@ namespace LootManager
       lock (requestListView)
       {
         // check if items have expired
-        ObservableCollection<RequestListItem> list = requestListView.ItemsSource as ObservableCollection<RequestListItem>;
-        if (list != null)
+        if (requestListView.ItemsSource is ObservableCollection<RequestListItem> list)
         {
           list.ToList().ForEach(item => validateRequestItem(item));
         }
@@ -154,7 +154,7 @@ namespace LootManager
           disconnectMenuItem.IsEnabled = refreshMenuItem.IsEnabled = true;
           Title = Title.Replace("Loading Database...", "Connected");
           resetNewLoot(true, true);
-          checkLoadLootHistory();
+          loadHistoryData();
           loadMembers();
         }));
       }).Start();
@@ -177,7 +177,7 @@ namespace LootManager
       DataManager.cleanup();
       DataManager.load();
       resetNewLoot(true, true);
-      checkLoadLootHistory();
+      loadHistoryData();
       loadMembers();
       Title = Title.Replace("Reloading Database...", "Connected");
     }
@@ -210,11 +210,12 @@ namespace LootManager
     private void loadEQLogFile(int mins)
     {
       // WPF doesn't have its own file chooser so use Win32 version
-      Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-
-      // filter to txt files
-      dlg.DefaultExt = ".txt";
-      dlg.Filter = "eqlog_player_server (.txt)|*.txt";
+      Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
+      {
+        // filter to txt files
+        DefaultExt = ".txt",
+        Filter = "eqlog_player_server (.txt)|*.txt"
+      };
 
       // show dialog and read result
       // if null result then dialog was probably canceled
@@ -254,9 +255,7 @@ namespace LootManager
       }
       else if (sender == membersListViewClearMenuItem && membersListView.SelectedItem != null)
       {
-        ObservableCollection<Player> list = membersListView.ItemsSource as ObservableCollection<Player>;
-        Player player = membersListView.SelectedItem as Player;
-        if (player != null && list != null)
+        if (membersListView.SelectedItem is Player player && membersListView.ItemsSource is ObservableCollection<Player> list)
         {
           list.Remove(player);
         }
@@ -292,8 +291,7 @@ namespace LootManager
     {
       if (watchListView.SelectedIndex >= 0)
       {
-        WatchListItem selected = watchListView.SelectedItem as WatchListItem;
-        if (selected != null && requestListMap.ContainsKey(selected.Item))
+        if (watchListView.SelectedItem is WatchListItem selected && requestListMap.ContainsKey(selected.Item))
         {
           requestListMap[selected.Item].Clear();
         }
@@ -302,8 +300,7 @@ namespace LootManager
 
     private void RequestListViewLoot_Click(object sender, RoutedEventArgs e)
     {
-      ObservableCollection<RequestListItem> list = requestListView.ItemsSource as ObservableCollection<RequestListItem>;
-      if (list != null)
+      if (requestListView.ItemsSource is ObservableCollection<RequestListItem> list)
       {
         List<string> players = list.Select(item => item.Player).ToList();
         viewLoot(players);
@@ -344,8 +341,7 @@ namespace LootManager
       {
         foreach (object item in e.NewItems)
         {
-          WatchListItem watchListItem = item as WatchListItem;
-          if (watchListItem != null && !requestListMap.ContainsKey(watchListItem.Item))
+          if (item is WatchListItem watchListItem && !requestListMap.ContainsKey(watchListItem.Item))
           {
             ObservableCollection<RequestListItem> requestList = new ObservableCollection<RequestListItem>();
             requestListMap.Add(watchListItem.Item, requestList);
@@ -535,14 +531,28 @@ namespace LootManager
         {
           bool alt = false;
           bool rot = false;
-          if ((System.DateTime.Now - requestItem.Added).TotalSeconds < 600)
+          if ((DateTime.Now - requestItem.Added).TotalSeconds < 600)
           {
             string displayName = requestItem.Player;
-            if (!"Main".Equals(requestItem.Type, StringComparison.OrdinalIgnoreCase))
+            bool luck = requestItem.Type.EndsWith("*");
+
+            string test = requestItem.Type;
+            if (luck)
             {
-              alt = "Alt".Equals(requestItem.Type, StringComparison.OrdinalIgnoreCase);
-              rot = "Rot".Equals(requestItem.Type, StringComparison.OrdinalIgnoreCase);
-              displayName += "(" + requestItem.Type + ")";
+              // eh its easier
+              test = requestItem.Type.Substring(0, requestItem.Type.Length - 1);
+            }
+
+            alt = "Alt".Equals(test, StringComparison.OrdinalIgnoreCase);
+            rot = "Rot".Equals(test, StringComparison.OrdinalIgnoreCase);
+
+            if (alt || rot)
+            {
+              displayName += " (" + test + (luck ? " luck" : "") + ")";
+            }
+            else if (luck)
+            {
+              displayName += " (luck)";
             }
 
             if (DataManager.isMember(requestItem.Player))
@@ -986,7 +996,7 @@ namespace LootManager
         Clipboard.SetDataObject(genChatBox.Text);
         copyNotice.Opacity = 1.0;
         copyNotice.Visibility = Visibility.Visible;
-        Task.Delay(System.TimeSpan.FromMilliseconds(150)).ContinueWith(task => hideCopyNotice());
+        Task.Delay(TimeSpan.FromMilliseconds(150)).ContinueWith(task => hideCopyNotice());
       }
     }
 
@@ -997,7 +1007,7 @@ namespace LootManager
         copyNotice.Opacity = copyNotice.Opacity - 0.10;
         if (copyNotice.Opacity > 0)
         {
-          Task.Delay(System.TimeSpan.FromMilliseconds(50)).ContinueWith(task => hideCopyNotice());
+          Task.Delay(TimeSpan.FromMilliseconds(50)).ContinueWith(task => hideCopyNotice());
         }
         else
         {
@@ -1019,12 +1029,6 @@ namespace LootManager
         secondTabControl.Focus();
       }
 
-      checkLoadLootHistory();
-    }
-
-    private void checkLoadLootHistory()
-    {
-      // load data firs time tab is used
       if (secondTabControl.SelectedItem == lootHistoryTab && lootDetailsListView.ItemsSource == null)
       {
         loadHistoryData();
@@ -1049,7 +1053,7 @@ namespace LootManager
 
         Dispatcher.BeginInvoke((System.Action)(() =>
         {
-            loadHistoryData();
+          loadHistoryData();
         }
         ));
       }
@@ -1130,6 +1134,11 @@ namespace LootManager
           else
           {
             names = lootDetailsFilterBox.Text.Split(null).ToList();
+          }
+
+          for (int i=0; i<names.Count; i++)
+          {
+            names[i] = Regex.Replace(names[i], @"\W+", "");
           }
         }
 
@@ -1415,6 +1424,19 @@ namespace LootManager
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+      throw new NotImplementedException();
+    }
+  }
+
+  class RecentLootFontConverter : IValueConverter
+  {
+    object IValueConverter.Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+      return DataManager.hasLootedRecently(value as string) ? FontWeights.Bold : FontWeights.Normal;
+    }
+
+    object IValueConverter.ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
       throw new NotImplementedException();
     }
