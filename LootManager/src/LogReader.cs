@@ -26,7 +26,7 @@ namespace LootManager
     private Regex officerChat = new Regex(@"^\[.+\] \w+ tell?(\w) (?i)officersofroi(?-i):");
     private Regex tells = new Regex(@"^\[.+\] \w+ tells you, '");
     private Regex timeStamp = new Regex(@"^\[(.+)\].+");
-    private Regex lootedItem = new Regex(@"^\[.+\] --(\w+) (has|have) looted (a|an) (.+)\.--");
+    private Regex lootedItem = new Regex(@"^\[.+\] --(\w+) (has|have) looted (a|an) (.+) from .+\.--");
     private Regex userFromFileName = new Regex(@"^eqlog_([a-zA-Z]+)_");
 
     private LogReader() { }
