@@ -42,6 +42,7 @@ namespace LootManager
     private static readonly string CURRENT_TIERS = "Current Tiers".ToLower();
     private static readonly string DATE = "Date".ToLower();
     private static readonly string DISPLAY_IN_LIST = "Display In List".ToLower();
+    private static readonly string DKP_LIST_MEMBERS = "DKP List Members URL".ToLower();
     private static readonly string EVENT = "Event".ToLower();
     private static readonly string FORUM_USERNAME = "Forum Username".ToLower();
     private static readonly string ITEM = "Item".ToLower();
@@ -193,15 +194,21 @@ namespace LootManager
       armorTypesList.Insert(0, "Any Slot");
 
       // current tiers
-      temp.Clear();
-      readData(temp, LOOT_ID, "Constants");
       temp.Where(d => d.ContainsKey(CURRENT_TIERS)).ToList().ForEach(d => currentTiersList.Add(d[CURRENT_TIERS]));
       currentTiersList.Sort();
+
+      // hostname for DKP server
+      string hostName = "";
+      if (temp.Where(d => d.ContainsKey(DKP_LIST_MEMBERS)).ToList().FirstOrDefault()?.TryGetValue(DKP_LIST_MEMBERS, out hostName) == false)
+      {
+        hostName = "dkp.roiguild.org/listmembers.php"; // default if it's not found
+      }
 
       // try to query attendance
       try
       {
-        HttpWebRequest webRequest = WebRequest.Create("https://forum.roiguild.org/dkp/listmembers.php") as HttpWebRequest;
+        string dkpUrl = "https://" + hostName;
+        HttpWebRequest webRequest = WebRequest.Create(dkpUrl) as HttpWebRequest;
         webRequest.Method = "GET";
 
         List<string> playerIds = new List<string>();
@@ -221,7 +228,7 @@ namespace LootManager
 
         if (playerIds.Count > 0)
         {
-          string attendanceQuery = "https://forum.roiguild.org/dkp/listmembers.php?compare=" + string.Join(",", playerIds.ToArray());
+          string attendanceQuery = dkpUrl + "?compare=" + string.Join(",", playerIds.ToArray());
           webRequest = WebRequest.Create(attendanceQuery) as HttpWebRequest;
           var attendanceResponse = webRequest.GetResponse();
 
@@ -266,7 +273,7 @@ namespace LootManager
         LOG.Error(ex);
       }
 
-      LOG.Debug("Finished Loading Data in " + (System.DateTime.Now - start).TotalSeconds + " seconds");
+      LOG.Debug("Finished Loading Data in " + (DateTime.Now - start).TotalSeconds + " seconds");
     }
 
     // -1 means no matches found at all
@@ -333,25 +340,13 @@ namespace LootManager
       return lootDetailsList.ToList();  // avoids some odd refresh problems
     }
 
-    public static string getHistoryStatus()
-    {
-      return historyStatus;
-    }
+    public static string getHistoryStatus() => historyStatus;
 
-    public static List<string> getClassTypes()
-    {
-      return classTypes.ToList();
-    }
+    public static List<string> getClassTypes() => classTypes.ToList();
 
-    public static List<string> getTiers()
-    {
-      return eventToTier.Values.Distinct().ToList();
-    }
+    public static List<string> getTiers() => eventToTier.Values.Distinct().ToList();
 
-    public static List<string> getCurrentTiers()
-    {
-      return currentTiersList;
-    }
+    public static List<string> getCurrentTiers() => currentTiersList;
 
     public static void saveLoot(string date, string player, string eventName, string item, string slot, string rot, string alt)
     {
@@ -384,7 +379,7 @@ namespace LootManager
     {
       long time = D1 * (days == null ? 90 : Convert.ToInt64(days));
       List<LootAuditRecord> audits = new List<LootAuditRecord>();
-      System.DateTime start = System.DateTime.Now;
+      DateTime start = DateTime.Now;
 
       foreach (Dictionary<string, string> row in lootedList)
       {
@@ -397,7 +392,7 @@ namespace LootManager
             string slot = row[SLOT];
             string eventName = row[EVENT];
             string date = row[DATE];
-            System.DateTime dateValue = System.DateTime.Parse(row[DATE]);
+            DateTime dateValue = DateTime.Parse(row[DATE]);
             bool alt = row.ContainsKey(ALT_LOOT) && "Yes".Equals(row[ALT_LOOT], StringComparison.OrdinalIgnoreCase);
             bool rot = row.ContainsKey(ROT) && "Yes".Equals(row[ROT], StringComparison.OrdinalIgnoreCase);
 
@@ -437,10 +432,7 @@ namespace LootManager
       return pass;
     }
 
-    public static int updateMember(string name, Player player)
-    {
-      return updateRosterSpreadsheet(name, player);
-    }
+    public static int updateMember(string name, Player player) => updateRosterSpreadsheet(name, player);
 
     public static void cleanup()
     {
