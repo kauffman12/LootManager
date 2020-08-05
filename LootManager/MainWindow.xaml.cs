@@ -141,14 +141,14 @@ namespace LootManager
         // Authenticate to Google Drive
         TokenManager.authenticate();
 
-        Dispatcher.BeginInvoke((System.Action)(() =>
+        Dispatcher.BeginInvoke((Action)(() =>
         {
           Title = Title.Replace("Connecting...", "Loading Database...");
         }));
 
         DataManager.load();
 
-        Dispatcher.BeginInvoke((System.Action)(() =>
+        Dispatcher.BeginInvoke((Action)(() =>
         {
           connectMenuItem.IsEnabled = false;
           disconnectMenuItem.IsEnabled = refreshMenuItem.IsEnabled = true;
@@ -459,7 +459,7 @@ namespace LootManager
 
     private void logReaderEventHandler(object sender, LogEventArgs e)
     {
-      Dispatcher.BeginInvoke((System.Action)(() =>
+      Dispatcher.BeginInvoke((Action)(() =>
       {
         switch (e.type)
         {
@@ -654,14 +654,28 @@ namespace LootManager
       {
         LootedListItem listItem = lootedListView.SelectedItem as LootedListItem;
         ObservableCollection<Player> players = newLootPlayer.ItemsSource as ObservableCollection<Player>;
+
+        // if it's an Alt then return the main player name
+        var selectedPlayer = DataManager.resolvePlayerName(listItem.Player);
+
+        if (selectedPlayer != listItem.Player)
+        {
+          newLootAlt.IsChecked = true;
+        }
+        else
+        {
+          newLootAlt.IsChecked = false;
+          newLootRot.IsChecked = false;
+        }
+
         if (players != null)
         {
-          newLootPlayer.SelectedIndex = players.ToList().FindIndex(player => player.Name.Equals(listItem.Player));
+          newLootPlayer.SelectedIndex = players.ToList().FindIndex(player => player.Name.Equals(selectedPlayer));
         }
 
         if (newLootPlayer.SelectedIndex == -1)
         {
-          newLootPlayer.Text = listItem.Player;
+          newLootPlayer.Text = selectedPlayer;
         }
 
         List<Item> found = DataManager.getItemsList().Where(item => item.Name.Equals(listItem.Item)).ToList();
@@ -716,9 +730,9 @@ namespace LootManager
     {
       if (textUpdateTask == null || textUpdateTask.IsCompleted)
       {
-        textUpdateTask = Task.Delay(System.TimeSpan.FromMilliseconds(100)).ContinueWith(task =>
+        textUpdateTask = Task.Delay(TimeSpan.FromMilliseconds(100)).ContinueWith(task =>
         {
-          Dispatcher.BeginInvoke((System.Action)(() =>
+          Dispatcher.BeginInvoke((Action)(() =>
           {
             newLootSaveButton.IsEnabled = (newLootSlot.SelectedIndex > 0 && newLootEvent.Text.Length > 0 && !newLootEvent.Text.Equals("Select Event") &&
             newLootItem.Text.Length > 0 && !newLootItem.Text.Equals("Select Item") && !newLootItem.Text.Equals("No Matching Loot Found") && newLootPlayer.Text.Length > 0 && !newLootPlayer.Text.Equals("Select Player"));
@@ -975,7 +989,7 @@ namespace LootManager
       {
         newLootItem.Text = "No Matching Loot Found";
       }
-      else
+      else if (newLootItem.SelectedIndex < 0)
       {
         newLootItem.Text = "Select Item";
       }
@@ -1002,7 +1016,7 @@ namespace LootManager
 
     private void hideCopyNotice()
     {
-      Dispatcher.BeginInvoke((System.Action)(() =>
+      Dispatcher.BeginInvoke((Action)(() =>
       {
         copyNotice.Opacity = copyNotice.Opacity - 0.10;
         if (copyNotice.Opacity > 0)
@@ -1051,7 +1065,7 @@ namespace LootManager
         lootDetailsFilterBox.FontStyle = FontStyles.Italic;
         lootDetailsFilterBox.Text = "Enter Player Names To Limit Results";
 
-        Dispatcher.BeginInvoke((System.Action)(() =>
+        Dispatcher.BeginInvoke((Action)(() =>
         {
           loadHistoryData();
         }
@@ -1063,9 +1077,9 @@ namespace LootManager
     {
       if (textUpdateTask == null || textUpdateTask.IsCompleted)
       {
-        textUpdateTask = Task.Delay(System.TimeSpan.FromMilliseconds(200)).ContinueWith(task =>
+        textUpdateTask = Task.Delay(TimeSpan.FromMilliseconds(200)).ContinueWith(task =>
         {
-          Dispatcher.BeginInvoke((System.Action)(() => loadHistoryData() ));
+          Dispatcher.BeginInvoke((Action)(() => loadHistoryData() ));
         });
       }
     }

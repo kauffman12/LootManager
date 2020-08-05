@@ -15,12 +15,13 @@ namespace LootManager
 {
   static class DataManager
   {
-    private static readonly ILog LOG = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+    private static readonly ILog LOG = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
     // document IDs
     private static readonly string ROSTER_ID = "1J3Io-COBeCaAQ_jTiJS9kmdP8gqpFNr2_5-gfY_c5cg";
     private static readonly string LOOT_ID = "1fGMG78HVN8iLO43zoi8Ermt_nhfkqBHcQkdQLQ7BqnI";
     private static readonly string ITEMS_ID = "13_qG0syQGgK7-yT06r5MJ3HNrWmVh0872ou-FhXjjDM";
+    private static readonly string ALT_LIST_ID = "10FYISV7NKOoPMEAN3PsVifNTlbHWv8ZeiQY5buI93SA";
 
     private static readonly Regex FIND_USER_ID = new Regex(@"^.*compare_ids.*value=""(\d+)"".*$", RegexOptions.Compiled);
     private static readonly Regex FIND_MEMBER = new Regex(@"^.*viewmember.*name=(\w+).*$", RegexOptions.Compiled);
@@ -35,7 +36,11 @@ namespace LootManager
     // -- ROF Global Drops    Slot, Item Name, Tier, Special
     // Roster.xlsx
     // -- Sheet1              Name, Class, Rank, Active, Forum Username, Global Loot Viewer
+    // ROI Alts List
+    // -- Sheet1             Name, Alts
+
     private static readonly string ACTIVE = "Active".ToLower();
+    private static readonly string ALTS = "Alts".ToLower();
     private static readonly string ALT_LOOT = "Alt Loot".ToLower();
     private static readonly string ARMOR_TYPES = "Armor Types".ToLower();
     private static readonly string CLASS = "Class".ToLower();
@@ -71,6 +76,8 @@ namespace LootManager
     private static List<Player> fullPlayerList = new List<Player>();
     // active player Map
     private static Dictionary<string, Player> activePlayerByName = new Dictionary<string, Player>();
+    // alt to active player Map
+    private static Dictionary<string, Player> activePlayerByAlt = new Dictionary<string, Player>();
     // sorted events list
     private static List<RaidEvent> eventsList = new List<RaidEvent>();
     // sorted item list
@@ -127,13 +134,13 @@ namespace LootManager
 
     public static void load()
     {
-      System.DateTime start = System.DateTime.Now;
+      DateTime start = DateTime.Now;
 
       // sort class types
       classTypes.Sort();
 
       // temp list
-      List<Dictionary<string, string>> temp = new List<Dictionary<string, string>>();
+      var temp = new List<Dictionary<string, string>>();
 
       // read raid events and filter out ones that arent active
       readData(temp, LOOT_ID, "RainOfFearRaids");
@@ -292,6 +299,21 @@ namespace LootManager
       else
       {
         result = found.Count == 0 ? -1 : 1;
+      }
+
+      return result;
+    }
+
+    public static string resolvePlayerName(string name)
+    {
+      string result;
+      if (activePlayerByAlt.TryGetValue(name, out Player value))
+      {
+        result = value.Name;
+      }
+      else
+      {
+        result = name;
       }
 
       return result;
@@ -456,7 +478,7 @@ namespace LootManager
       // full roster data and sorted players
       readData(rosterList, ROSTER_ID, "Sheet1");
 
-      foreach (Dictionary<string, string> row in rosterList)
+      foreach (var row in rosterList)
       {
         bool active = row.ContainsKey(ACTIVE) && "Yes".Equals(row[ACTIVE], StringComparison.OrdinalIgnoreCase);
         string forumName = row.ContainsKey(FORUM_USERNAME) ? row[FORUM_USERNAME] : "";
@@ -471,6 +493,26 @@ namespace LootManager
       }
 
       fullPlayerList.Sort((x, y) => x.Name.CompareTo(y.Name));
+
+      // get alts
+      activePlayerByAlt.Clear();
+      var temp = new List<Dictionary<string, string>>();
+      readData(temp, ALT_LIST_ID, "Sheet1");
+
+      foreach (var row in temp)
+      {
+        if (row.ContainsKey(NAME) && row.ContainsKey(ALTS))
+        {
+          if (activePlayerByName.ContainsKey(row[NAME]) && !string.IsNullOrEmpty(row[ALTS]))
+          {
+            foreach (var altName in row[ALTS].Split(','))
+            {
+              var trimmed = altName.Trim();
+              activePlayerByAlt[trimmed] = activePlayerByName[row[NAME]];
+            }
+          }
+        }
+      }
     }
 
     private static void populateItemsList(List<Dictionary<string, string>> list)
