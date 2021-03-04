@@ -74,7 +74,7 @@ namespace LootManager
             Dictionary<string, string> result = RefreshTokens().GetAwaiter().GetResult();
             tokens["access_token"] = result["access_token"];
             tokens["expires_in"] = result["expires_in"];
-            expireTime = expireTime.AddSeconds(System.Double.Parse(tokens["expires_in"]));
+            expireTime = expireTime.AddSeconds(double.Parse(tokens["expires_in"]));
           });
 
           myThread.Start();

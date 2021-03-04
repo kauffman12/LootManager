@@ -21,7 +21,7 @@ namespace LootManager
     private static readonly string ROSTER_ID = "1J3Io-COBeCaAQ_jTiJS9kmdP8gqpFNr2_5-gfY_c5cg";
     private static readonly string LOOT_ID = "1fGMG78HVN8iLO43zoi8Ermt_nhfkqBHcQkdQLQ7BqnI";
     private static readonly string ITEMS_ID = "13_qG0syQGgK7-yT06r5MJ3HNrWmVh0872ou-FhXjjDM";
-    private static readonly string ALT_LIST_ID = "10FYISV7NKOoPMEAN3PsVifNTlbHWv8ZeiQY5buI93SA";
+    private static readonly string ALT_LIST_ID = "1RXARpJNSpQvxMXCacHPcKh_fFDR0sWSHMvoZM2f2PgA";
 
     private static readonly Regex FIND_USER_ID = new Regex(@"^.*compare_ids.*value=""(\d+)"".*$", RegexOptions.Compiled);
     private static readonly Regex FIND_MEMBER = new Regex(@"^.*viewmember.*name=(\w+).*$", RegexOptions.Compiled);

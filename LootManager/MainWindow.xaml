@@ -8,7 +8,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" 
         x:Class="LootManager.MainWindow"
         mc:Ignorable="d"
-        Title="Loot Manager v1.0.2.15 (Not Connected)"
+        Title="Loot Manager v1.0.2.16 (Not Connected)"
         UseLayoutRounding="True"
         TextOptions.TextFormattingMode="Display"
         TextOptions.TextRenderingMode="ClearType"
